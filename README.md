@@ -1,2 +1,2 @@
 # AI
-Graduate Artificial Intelligence - Fall 2021
+Graduate Artificial Intelligence - Dartmouth Fall 2021
