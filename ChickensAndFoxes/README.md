@@ -30,4 +30,8 @@ is: {(3,3), (2, 3), (3, 2), (2, 2), (2, 1), (1, 2), (1, 1), (1, 0), (0, 1), (0, 
 From this we can conclude that adding a binary variable to the state definition (boat or not boat) would double the number of possible states.
 See the below figure for a look at each of the 20 unique states.
 
-![image](/docs/all_vertices.pdf)
+![all_vertices](/Users/spencerbertsch/Desktop/dev/CS/AI/ChickensAndFoxes/docs/all_vertices.png)
+
+* **Note:** I also have PDF copies of all figures under the `docs` directory in the ChickenAndFoxes assignment. I couldn't figure out 
+how to embed local PDF files into markdown docs, but if the TAs have some example code for that I will surely use that method
+in the future. For now please refer to the PNG files in the markdown and the PDF copies with the same names in the `docs` directory if more clarity is needed. 
