@@ -32,8 +32,14 @@ class FoxProblem:
             if right_chickens > 0:
                 successors.append((state[0]+1, state[1], state[2]+1))
 
+            if right_chickens > 1:
+                successors.append((state[0]+2, state[1], state[2]+1))
+
             if right_foxes > 0:
                 successors.append((state[0], state[1]+1, state[2]+1))
+
+            if right_foxes > 1:
+                successors.append((state[0], state[1]+2, state[2]+1))
 
         elif state[2] == 1:
             print(f"Boat is on left bank - collecting the possible next states for {state}.")
@@ -43,8 +49,14 @@ class FoxProblem:
             if left_chickens > 0:
                 successors.append((state[0]-1, state[1], state[2]-1))
 
+            if left_chickens > 1:
+                successors.append((state[0]-2, state[1], state[2]-1))
+
             if left_foxes > 0:
                 successors.append((state[0], state[1]-1, state[2]-1))
+
+            if left_foxes > 0:
+                successors.append((state[0], state[1]-2, state[2]-1))
 
         else:
             raise Exception(f"Something has gone wrong... check state: {state}.")
@@ -103,5 +115,5 @@ class FoxProblem:
 # __main__ here just for testing - can be safely ignored or removed.
 if __name__ == "__main__":
     test_cp = FoxProblem(start_state=(3, 3, 1))
-    print(test_cp.get_successors(state=(2, 2, 0)))
+    print(test_cp.get_successors(state=(3, 3, 1)))
     print(test_cp)
