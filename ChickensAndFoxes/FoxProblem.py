@@ -1,3 +1,8 @@
+# Spencer Bertsch
+# September 2021
+# Code adapted from Assignment 1
+# CS 276 @ Dartmouth College
+
 class FoxProblem:
     def __init__(self, start_state=(3, 3, 1)):
         self.start_state = start_state

@@ -1,3 +1,8 @@
+# Spencer Bertsch
+# September 2021
+# Code adapted from Assignment 1
+# CS 276 @ Dartmouth College
+
 class SearchSolution:
     def __init__(self, problem, search_method):
         self.problem_name = str(problem)

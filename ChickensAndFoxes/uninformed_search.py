@@ -1,3 +1,7 @@
+# Spencer Bertsch
+# September 2021
+# Code adapted from Assignment 1
+# CS 276 @ Dartmouth College
 
 from collections import deque
 from SearchSolution import SearchSolution
@@ -45,22 +49,20 @@ class SearchNode:
 def bfs_search(search_problem) -> bool:
 
     print(f'BFS Search Initiated! Starting State: {search_problem.start_state}')
-    # define the frontier as an empty queue
+    # define the frontier as an empty FIFO queue
     frontier: deque = deque()
     # define the start node based on the starting state
     start_node = SearchNode(state=search_problem.start_state, starting_state=search_problem.start_state)
     # append the starting node to the frontier
     frontier.appendleft(start_node)
 
-    # define the explored set
+    # define the explored set and add the starting state to the new set
     explored: set = set()
-    # add the starting state to the 'explored' set
     explored.add(search_problem.start_state)
 
     while len(frontier) != 0:
-        # get the current node from the frontier
+        # get the current node from the frontier and the current state from that node
         current_node = frontier.pop()
-        # get the current state from the current node
         current_state = current_node.state
 
         # test to see if we have found the solution
@@ -84,6 +86,7 @@ def bfs_search(search_problem) -> bool:
                 # we now add the node to the frontier so it will get popped and used for continued searching
                 frontier.appendleft(new_node)
 
+    print(f'No solution found.')
     return False
 
 
@@ -97,11 +100,21 @@ def dfs_search(search_problem, depth_limit=100, node=None, solution=None):
     #  so that statistics like number of nodes visited or recursion depth
     #  might be recorded
 
-    if node == None:
-        node = SearchNode(search_problem.start_state)
-        solution = SearchSolution(search_problem, "DFS")
+    if node is None:
+        node = SearchNode(state=search_problem.start_state, starting_state=search_problem.start_state)
+        solution = SearchSolution(problem=search_problem, search_method="DFS")
 
-    # you write this part
+    # if we are at the solution:
+    if node.state == search_problem.goal_state:
+        solution_path: list = back_chaining(SearchNode=node)
+        solution_path.reverse()
+        print(f'Solution found! Path to solution: {solution_path}')
+        return True
+    else:
+
+
+
+        dfs_search(search_problem=search_problem, depth_limit=100, node=node, solution=solution)
 
 
 
