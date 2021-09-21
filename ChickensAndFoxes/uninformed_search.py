@@ -37,16 +37,52 @@ class SearchNode:
         self.state = state
         self.starting_state = starting_state
         self.parent = parent
-        # you write this part
 
     # you might write other helper functions, too. For example,
     #  I like to separate out backchaining, and the dfs path checking functions
 
 
-def bfs_search(search_problem):
-    print(f'BFS Search Initiated. Starting State: {search_problem.start_state}')
-    # TODO
+def bfs_search(search_problem) -> bool:
 
+    print(f'BFS Search Initiated! Starting State: {search_problem.start_state}')
+    # define the frontier as an empty queue
+    frontier: deque = deque()
+    # define the start node based on the starting state
+    start_node = SearchNode(state=search_problem.start_state, starting_state=search_problem.start_state)
+    # append the starting node to the frontier
+    frontier.appendleft(start_node)
+
+    # define the explored set
+    explored: set = set()
+    # add the starting state to the 'explored' set
+    explored.add(search_problem.start_state)
+
+    while len(frontier) != 0:
+        # get the current node from the frontier
+        current_node = frontier.pop()
+        # get the current state from the current node
+        current_state = current_node.state
+
+        # test to see if we have found the solution
+        if current_state == search_problem.goal_state:
+            print(f'Solution found! Path to solution: {back_chaining(SearchNode=current_node)}')
+            return True
+
+        # goal not found, so we need to search the children of the current node.
+        for child_node in search_problem.get_successors(state=current_state):
+            # if the child_node is new and unexplored
+            if child_node not in explored:
+                # add this state to the set of explored states
+                explored.add(child_node)
+                # we now need to create a new node! We pack the current_state into the node and point to the
+                # current_node as the parent for the new node
+                new_node = SearchNode(state=current_state,
+                                      starting_state=search_problem.start_state,
+                                      parent=current_node)
+                # we now add the node to the frontier so it will get popped and used for continued searching
+                frontier.appendleft(new_node)
+
+    return False
 
 
 def dfs_search(search_problem, depth_limit=100, node=None, solution=None):
