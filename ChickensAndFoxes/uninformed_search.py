@@ -90,7 +90,7 @@ def bfs_search(search_problem) -> bool:
     return False
 
 
-def dfs_search(search_problem, depth_limit=100, node=None, solution=None):
+def dfs_search(search_problem, depth_limit=20, node=None, solution=None):
     # if no node object given, create a new search from starting state
 
     # Don't forget that your dfs function should be recursive and do path checking,
@@ -104,12 +104,12 @@ def dfs_search(search_problem, depth_limit=100, node=None, solution=None):
         node = SearchNode(state=search_problem.start_state, starting_state=search_problem.start_state)
         solution = SearchSolution(problem=search_problem, search_method="DFS")
 
-    # add the case where we exceed the depth_limit
-    if solution.nodes_visited > depth_limit:
+    # base case for when we exceed the depth_limit
+    if len(solution.path) > depth_limit:
         print(f'Depth limit has been reached.')
-
-    # if we are at the solution:
-    if node.state == search_problem.goal_state:
+        return True
+    # base case for when we are at the solution:
+    elif node.state == search_problem.goal_state:
         solution_path: list = solution.path
         # solution_path.reverse()
         print(f'Solution found! Path to solution: {solution_path}')
@@ -124,11 +124,11 @@ def dfs_search(search_problem, depth_limit=100, node=None, solution=None):
                 new_node = SearchNode(state=child_state,
                                       starting_state=search_problem.start_state,
                                       parent=node)
-                # incrememnt the solution nodes_visited
+                # increment the solution nodes_visited
                 solution.nodes_visited = solution.nodes_visited + 1
                 # add the node to the solution path
                 solution.path.append(node.state)
-                dfs_search(search_problem=search_problem, depth_limit=100, node=new_node, solution=solution)
+                dfs_search(search_problem=search_problem, depth_limit=20, node=new_node, solution=solution)
 
 
 def ids_search(search_problem, depth_limit=100):
