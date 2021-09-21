@@ -65,18 +65,20 @@ def bfs_search(search_problem) -> bool:
 
         # test to see if we have found the solution
         if current_state == search_problem.goal_state:
-            print(f'Solution found! Path to solution: {back_chaining(SearchNode=current_node)}')
+            solution_path: list = back_chaining(SearchNode=current_node)
+            solution_path.reverse()
+            print(f'Solution found! Path to solution: {solution_path}')
             return True
 
         # goal not found, so we need to search the children of the current node.
-        for child_node in search_problem.get_successors(state=current_state):
+        for child_state in search_problem.get_successors(state=current_state):
             # if the child_node is new and unexplored
-            if child_node not in explored:
+            if child_state not in explored:
                 # add this state to the set of explored states
-                explored.add(child_node)
+                explored.add(child_state)
                 # we now need to create a new node! We pack the current_state into the node and point to the
                 # current_node as the parent for the new node
-                new_node = SearchNode(state=current_state,
+                new_node = SearchNode(state=child_state,
                                       starting_state=search_problem.start_state,
                                       parent=current_node)
                 # we now add the node to the frontier so it will get popped and used for continued searching
