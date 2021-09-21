@@ -90,7 +90,7 @@ def bfs_search(search_problem) -> bool:
     return False
 
 
-def dfs_search(search_problem, depth_limit: int = 100, node=None, solution=None):
+def dfs_search(search_problem, depth_limit: int = 100, node=None, solution=None) -> bool:
     # if no node object given, create a new search from starting state
 
     # Don't forget that your dfs function should be recursive and do path checking,
@@ -108,17 +108,16 @@ def dfs_search(search_problem, depth_limit: int = 100, node=None, solution=None)
 
     # base case for when we exceed the depth_limit
     if len(solution.path) >= depth_limit:
-        print(f'node state: {node.state}')
-        print(f'length of solution path: {len(solution.path)}, solution path: {solution.path}')
-        print(f'Depth limit has been reached! depth_limit={depth_limit}. \n')
+        print(f'Depth Limit Reached! Max Depth: {depth_limit}, Current Path: {solution.path}')
         return False
+
     # base case for when we are at the solution:
     elif node.state == search_problem.goal_state:
         solution_path: list = solution.path
-        # solution_path.reverse()
         print(f'Solution found! Path to solution: {solution_path}')
         print(f'{solution}')
         return True
+
     else:
         # look at the next state:
         for child_state in search_problem.get_successors(state=node.state):
@@ -138,12 +137,18 @@ def dfs_search(search_problem, depth_limit: int = 100, node=None, solution=None)
 
 def ids_search(search_problem, depth_limit=100):
 
-    for depth in range(depth_limit):
-        s = dfs_search(search_problem=search_problem, depth_limit=depth)
-        if s:
+    # Loop through each depth and run limited DFS for that depth, breaking if DFS returns True OR if depth > max_limit
+    i = 0
+    while True:
+        i = i+1
+        # This currently works, except it loops too many times. dfs_search returns None, not a bool!
+        if dfs_search(search_problem=search_problem, depth_limit=i):
             break
 
-    print('ids_search complete.')
+        if i > depth_limit:
+            break
+
+    print('ids_search complete!')
 
 
 # __main__ is just here for testing - it can be safely ignored or removed
