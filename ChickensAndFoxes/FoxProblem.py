@@ -8,7 +8,7 @@ class FoxProblem:
         #  based on start_state
 
     # get successor states for the given state
-    def get_successors(self, state: tuple) -> list:
+    def get_successors(self, state: tuple, verbose: bool = False) -> list:
         """
         Method to get the legal next states given a state. The boat can either be on the left or right bank and
         can either ferry both a chicken and fox, or just a chicken, or just a fox to the other side of the river.
@@ -25,7 +25,8 @@ class FoxProblem:
         right_foxes: int = self.start_state[1] - state[1]
 
         if state[2] == 0:
-            print(f"Boat is on right bank - collecting the possible next states for {state}.")
+            if verbose:
+                print(f"Boat is on right bank - collecting the possible next states for {state}.")
             if (right_chickens > 0) & (right_foxes > 0):
                 successors.append((state[0]+1, state[1]+1, state[2]+1))
 
@@ -42,7 +43,9 @@ class FoxProblem:
                 successors.append((state[0], state[1]+2, state[2]+1))
 
         elif state[2] == 1:
-            print(f"Boat is on left bank - collecting the possible next states for {state}.")
+            if verbose:
+                print(f"Boat is on left bank - collecting the possible next states for {state}.")
+
             if(left_chickens > 0) & (left_foxes > 0):
                 successors.append((state[0]-1, state[1]-1, state[2]-1))
 
@@ -55,7 +58,7 @@ class FoxProblem:
             if left_foxes > 0:
                 successors.append((state[0], state[1]-1, state[2]-1))
 
-            if left_foxes > 0:
+            if left_foxes > 1:
                 successors.append((state[0], state[1]-2, state[2]-1))
 
         else:
@@ -65,10 +68,12 @@ class FoxProblem:
         for current_state in successors.copy():
             is_legal = self.is_legal(state=current_state)
             if not is_legal:
-                print(f"Illegal state found... Removing: {current_state}.")
+                if verbose:
+                    print(f"Illegal state found... Removing: {current_state}.")
                 successors.remove(current_state)
 
-        print(f'SUCCESSORS TO {state}: {successors}')
+        if verbose:
+            print(f'SUCCESSORS TO {state}: {successors}')
         return successors
 
     def is_legal(self, state: tuple) -> bool:
