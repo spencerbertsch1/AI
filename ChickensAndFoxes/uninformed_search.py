@@ -113,6 +113,7 @@ def dfs_search(search_problem, depth_limit=20, node=None, solution=None):
         solution_path: list = solution.path
         # solution_path.reverse()
         print(f'Solution found! Path to solution: {solution_path}')
+        print(f'{solution}')
         return True
     else:
         # look at the next state:

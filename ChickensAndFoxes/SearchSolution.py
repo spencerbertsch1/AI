@@ -7,10 +7,10 @@ class SearchSolution:
     def __init__(self, problem, search_method):
         self.problem_name = str(problem)
         self.search_method = search_method
-        self.path = []
+        self.path = []  # <-- This is the FIFO queue that will get updates as we search
         self.nodes_visited = 0
 
-    def __str__(self):
+    def __repr__(self):
         string = "----\n"
         string += "{:s}\n"
         string += "attempted with search method {:s}\n"
