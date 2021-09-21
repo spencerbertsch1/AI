@@ -90,7 +90,7 @@ def bfs_search(search_problem) -> bool:
     return False
 
 
-def dfs_search(search_problem, depth_limit=20, node=None, solution=None):
+def dfs_search(search_problem, depth_limit: int = 100, node=None, solution=None):
     # if no node object given, create a new search from starting state
 
     # Don't forget that your dfs function should be recursive and do path checking,
@@ -103,11 +103,15 @@ def dfs_search(search_problem, depth_limit=20, node=None, solution=None):
     if node is None:
         node = SearchNode(state=search_problem.start_state, starting_state=search_problem.start_state)
         solution = SearchSolution(problem=search_problem, search_method="DFS")
+        # the next line isn't strictly necessary, but it makes the output more readable in my opinion.
+        solution.path.append(node.state)
 
     # base case for when we exceed the depth_limit
-    if len(solution.path) > depth_limit:
-        print(f'Depth limit has been reached.')
-        return True
+    if len(solution.path) >= depth_limit:
+        print(f'node state: {node.state}')
+        print(f'length of solution path: {len(solution.path)}, solution path: {solution.path}')
+        print(f'Depth limit has been reached! depth_limit={depth_limit}. \n')
+        return False
     # base case for when we are at the solution:
     elif node.state == search_problem.goal_state:
         solution_path: list = solution.path
@@ -128,13 +132,18 @@ def dfs_search(search_problem, depth_limit=20, node=None, solution=None):
                 # increment the solution nodes_visited
                 solution.nodes_visited = solution.nodes_visited + 1
                 # add the node to the solution path
-                solution.path.append(node.state)
-                dfs_search(search_problem=search_problem, depth_limit=20, node=new_node, solution=solution)
+                solution.path.append(new_node.state)  # <-- node or new node?
+                dfs_search(search_problem=search_problem, depth_limit=depth_limit, node=new_node, solution=solution)
 
 
 def ids_search(search_problem, depth_limit=100):
-    pass
-    # you write this part
+
+    for depth in range(depth_limit):
+        s = dfs_search(search_problem=search_problem, depth_limit=depth)
+        if s:
+            break
+
+    print('ids_search complete.')
 
 
 # __main__ is just here for testing - it can be safely ignored or removed
