@@ -122,7 +122,7 @@ def dfs_search(search_problem, depth_limit: int = 100, node=None, solution=None)
     # look at the next state:
     for child_state in search_problem.get_successors(state=node.state):
         # if the child_node is new and unexplored
-        if child_state not in solution.path:
+        if (child_state not in solution.path) & (solution.solved is False):
             # we now need to create a new node! We pack the current_state into the node and point to the
             # current_node as the parent for the new node
             new_node = SearchNode(state=child_state,
