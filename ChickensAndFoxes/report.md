@@ -31,7 +31,23 @@ TODO
 
 ### What design decisions were made?
 
-TODO 
+The design decisions that I made were relatively limited in this assignment because of the extensive skeleton code that was provided, 
+but I will say that I added a few things in order to get the system to work. One thing I added was a new instance variable called 'solved' to the 
+SearchSolution class so that I could always run a test on the returned solution outside the DFS and inside the ids_search function. It took 
+me a while to think of a way to relay information back from the recursive DFS function to an outside function that was making iterative 
+DFS function calls, but by returning an instance of a solution object that had been solved already, I could simply add a boolean instance 
+variable that would tell ids_search if DFS had found the solution or not. 
+
+Another design decision that I made that went against one of the guidelines I saw in the comments was to not use an explicit goal_test method in the
+FoxProblem object. I initially created a method to test whether the current state is the goal state, but the goal test logic can be fit 
+into a single equality test on one line, so I found myself ignoring the goal_test method and eventually deleted it to clean up the code. 
+
+Another design decision that I made was to include a print statement in ids_search whenever the depth limit was reached
+printing the path that was used to reach that depth. Including print statements in loops or recursive functions is generally frowned upon
+and if I did this at my old job I'm sure some coworkers would wonder why, but I think it's fun to see the exploration of 
+ids_search as it uses DFS to try to find the goal node while being iteratively restricted to larger and larger depths. If anyone 
+grading this assignment can't stand all those prints in the output when you test the ids_search, feel free to comment line 
+line 111 of uninformed search and run again. 
 
 ### How were the problems laid out? 
 

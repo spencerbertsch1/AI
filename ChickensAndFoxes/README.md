@@ -7,9 +7,10 @@ Spencer Bertsch
 
 ## To run the code: 
 
-1. Clone [this github repository](https://github.com/spencerbertsch1/AI.git) locally and make sure you have python 3 installed. 
+1. Clone [this github repository](https://github.com/spencerbertsch1/AI.git) locally and `cd` into the `AI` directory. 
 Alternatively, if you acquired this code from a zip file, simply unzip the file locally, `cd` into the `AI` directory, and continue to Step 2. 
-   1. If you don't have python3 installed, you can install Anaconda and create a new Conda environment using the following command:
+In order to run any of the test scripts in this repository, you will need python 3. 
+   1. If you don't have python 3 installed, you can install Anaconda and create a new Conda environment using the following command:
       1. `$ conda create -n CS-276 python=3.8`
    2. Then activate the new environment by running the following command:
        1. `$ conda activate CS-276`
