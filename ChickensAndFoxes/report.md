@@ -193,19 +193,25 @@ and the ids_search needs to iterate a large number of times to get to the soluti
 
 ### Lossy chickens and foxes
 
-This is an interesting change to the problem definition! Intuitively I think we can arrive at the solution more quickly for solvable start states
-such as (3,3,1) or (5,4,1) if E (number of dispensable chickens) was greater than 0. 
+This is an interesting change to the problem definition! Intuitively we can re-define the starting state from (3,3,1) to (3,3,1,0) where the last number represents
+the number of chickens that have been eaten. A number E would act as a maximum such that the fourth int in the tuple representing each state could not exceed the 
+maximum (E) number of chickens that can be consumed. 
+
+Note: If I were actually programming this, I would probably create actions that could be taken that represented eating the 
+chickens. (See the graph below). This would mean that the graph would start with the maximum number of chickens being consumed 
+right away, then the traditional search would start from there. I'm sure there are many ways to implement this problem, but if I were
+actually implementing the solution this is how I would do it. 
 
 Let's look at a graph representing the first few layers of the Chicken & Fox problem in which E = 1: 
 
-TODO 
+![Chicken&Fox Graph](https://github.com/spencerbertsch1/AI/blob/main/ChickensAndFoxes/docs/Lossy_chickens_and_foxes.png?raw=true)
+
 
 In order to update our code to allow this, we would change the way that the state itself is represented by the tuple. Instead of a tuple of length 3, 
-we can use a tuple of length 4. 
+we can use a tuple of length 4 (chickens, foxes, boat, chickens_consumed). If E=1, then the last number can be either 0 or 1, representing the number of 
+chickens that have been eaten. The code changes would need to reflect the new state, so the SearchSolution class would have to change, the 
+method that determines potential new states would have to change, and all checks to see if we are at a goal state would have to change. I believe the 
+actual search algorithms themselves will still work the same way on the new graphs created by adding the extra (chickens_consumed) to the problem. 
 
-we would only need to make a change to the is_legal method of the FoxProblem class. 
-The logic that is used to determine the legal nodes would change in order to take E into account so that 1, 2, 3, etc. chickens could be sacrificed. 
-An upper bound on the number of states given that E = 1 would be: 
 
-TODO 
 

@@ -16,14 +16,17 @@ problem551 = FoxProblem((5, 5, 1))
 #  even if the goal was not found. If goal not found, len() of the path
 #  in the solution object should be 0.
 
-# print(bfs_search(problem331))
-# print(dfs_search(problem331))
-# print(ids_search(problem331))
+n = '\n'*3
+print(bfs_search(problem331))
+print(dfs_search(problem331))
+print(ids_search(problem331))
+print(n)
 
-# print(bfs_search(problem551))
-# print(dfs_search(problem551))
-# print(ids_search(problem551))
+print(bfs_search(problem551))
+print(dfs_search(problem551))
+print(ids_search(problem551))
+print(n)
 
-# print(bfs_search(problem541))
-# print(dfs_search(problem541))
-# print(ids_search(problem541))
+print(bfs_search(problem541))
+print(dfs_search(problem541))
+print(ids_search(problem541))
