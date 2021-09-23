@@ -106,46 +106,46 @@ def dfs_search(search_problem, depth_limit: int = 100, node=None, solution=None)
         # the next line isn't strictly necessary, but it makes the output more readable in my opinion.
         solution.path.append(node.state)
 
-    # base case for when we exceed the depth_limit
+    # BASE CASE 1 where we exceed the depth_limit:
     if len(solution.path) >= depth_limit:
         print(f'Depth Limit Reached! Max Depth: {depth_limit}, Current Path: {solution.path}')
         return False
 
-    # base case for when we are at the solution:
-    elif node.state == search_problem.goal_state:
+    # BASE CASE 2 where we are at the solution:
+    if node.state == search_problem.goal_state:
         solution_path: list = solution.path
-        print(f'Solution found! Path to solution: {solution_path}')
-        print(f'{solution}')
-        return True
+        print(solution_path)
+        return solution
 
-    else:
-        # look at the next state:
-        for child_state in search_problem.get_successors(state=node.state):
-            # if the child_node is new and unexplored
-            if child_state not in solution.path:
-                # we now need to create a new node! We pack the current_state into the node and point to the
-                # current_node as the parent for the new node
-                new_node = SearchNode(state=child_state,
-                                      starting_state=search_problem.start_state,
-                                      parent=node)
-                # increment the solution nodes_visited
-                solution.nodes_visited = solution.nodes_visited + 1
-                # add the node to the solution path
-                solution.path.append(new_node.state)  # <-- node or new node?
-                dfs_search(search_problem=search_problem, depth_limit=depth_limit, node=new_node, solution=solution)
+    # RECURSIVE CASE where we need to explore
+    # look at the next state:
+    for child_state in search_problem.get_successors(state=node.state):
+        # if the child_node is new and unexplored
+        if child_state not in solution.path:
+            # we now need to create a new node! We pack the current_state into the node and point to the
+            # current_node as the parent for the new node
+            new_node = SearchNode(state=child_state,
+                                  starting_state=search_problem.start_state,
+                                  parent=node)
+            # increment the solution nodes_visited
+            solution.nodes_visited = solution.nodes_visited + 1
+            # add the node to the solution path
+            solution.path.append(new_node.state)
+            dfs_search(search_problem=search_problem, depth_limit=depth_limit, node=new_node, solution=solution)
+            # if new_node.state == search_problem.goal_state:
+            #     return True
+
+    # return solution  # <-- uncomment for dfs
 
 
 def ids_search(search_problem, depth_limit=100):
 
     # Loop through each depth and run limited DFS for that depth, breaking if DFS returns True OR if depth > max_limit
     i = 0
-    while True:
+    while i < depth_limit:
         i = i+1
         # This currently works, except it loops too many times. dfs_search returns None, not a bool!
         if dfs_search(search_problem=search_problem, depth_limit=i):
-            break
-
-        if i > depth_limit:
             break
 
     print('ids_search complete!')
