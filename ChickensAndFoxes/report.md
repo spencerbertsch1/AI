@@ -37,6 +37,8 @@ TODO
 
 TODO 
 
+Talk about how we laid out the code in different files. 
+
 
 # Evaluation
 
@@ -95,4 +97,51 @@ path's states in the solution's path instance variable. This saves even more mem
 with all the nodes that we have seen before. I'm curious if there is an expression that describes the memory saved when using 
 path-checking DFS over vanilla DFS - I will check with the TAs. 
 
+* Q2: Draw an example of a graph where path-checking DFS takes much more run-time than breadth-first search.
+
+This is an interesting example. The textbook describes this situation quite well; if there are multiple goals and one goal exists several layers
+down starting from a left branch of the root node, then DFS will search through many nodes to find a very non-optimal solution. (See below graphic)
+
+![Chicken&Fox Graph](https://github.com/spencerbertsch1/AI/blob/main/ChickensAndFoxes/docs/DFS_vs_BFS.png?raw=true)
+
+This is where Iterative Deepening Depth First Search comes into action! Because vanilla DFS won't find the optimal solution and will 
+often be worse than BFS in terms of time complexity, Iterative Deepening DFS was created to give us the best of both worlds. Using ID-DFS
+we can begin with a Depth Limited Search with l=0 (pretty boring case), then we can move onto a Depth Limited Search where l=1, and so on. 
+That way we are achieving the space complexity of DFS while also roughly achieving the completeness and optimality of BFS. 
+
+* Q3: Does memoizing DFS save significant memory with respect to breadth-first search?  Why or why not?
+
+Good question - as discussed above, memoizing DFS still saves memory over BFS. The space required by BFS is O(b^d) where the 
+space required for DFS is O(b*m). 
+
+### Iterative Deepening Search Discussion
+
+Iterative deepening search was easy enough to implement, but I was initially unsure about how to break out of the loop when a solution
+was found. 
+
+* Q1: On a graph, would it make sense to use path-checking DFS, or would you prefer memoizing DFS in your iterative deepening search?  Consider both time and memory aspects.
+
+If the solution is shallow: 
+Use memoizing DFS for iteritive deepening
+
+If the solution is deep:
+Use path-checkinig DFS
+
+### Lossy chickens and foxes
+
+This is an interesting change to the problem definition! Intuitively I think we can arrive at the solution more quickly for solvable start states
+such as (3,3,1) or (5,4,1) if E (number of dispensable chickens) was greater than 0. 
+
+Let's look at a graph representing the first few layers of the Chicken & Fox problem in which E = 1: 
+
+TODO 
+
+In order to update our code to allow this, we would change the way that the state itself is represented by the tuple. Instead of a tuple of length 3, 
+we can use a tuple of length 4. 
+
+we would only need to make a change to the is_legal method of the FoxProblem class. 
+The logic that is used to determine the legal nodes would change in order to take E into account so that 1, 2, 3, etc. chickens could be sacrificed. 
+An upper bound on the number of states given that E = 1 would be: 
+
+TODO 
 

@@ -9,6 +9,7 @@ class SearchSolution:
         self.search_method = search_method
         self.path = []  # <-- This is the FIFO queue that will get updates as we search
         self.nodes_visited = 0
+        self.solved = False
 
     def __repr__(self):
         string = "----\n"

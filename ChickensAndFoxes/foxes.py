@@ -17,7 +17,7 @@ problem551 = FoxProblem((5, 5, 1))
 #  in the solution object should be 0.
 
 # print(bfs_search(problem331))
-print(dfs_search(problem331))
+# print(dfs_search(problem331))
 # print(ids_search(problem331))
 
 # print(bfs_search(problem551))
@@ -26,4 +26,4 @@ print(dfs_search(problem331))
 
 # print(bfs_search(problem541))
 # print(dfs_search(problem541))
-# print(ids_search(problem541))
+print(ids_search(problem541))

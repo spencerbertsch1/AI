@@ -90,7 +90,7 @@ def bfs_search(search_problem) -> bool:
     return False
 
 
-def dfs_search(search_problem, depth_limit: int = 100, node=None, solution=None) -> bool:
+def dfs_search(search_problem, depth_limit: int = 100, node=None, solution=None):
     # if no node object given, create a new search from starting state
 
     # Don't forget that your dfs function should be recursive and do path checking,
@@ -109,10 +109,11 @@ def dfs_search(search_problem, depth_limit: int = 100, node=None, solution=None)
     # BASE CASE 1 where we exceed the depth_limit:
     if len(solution.path) >= depth_limit:
         print(f'Depth Limit Reached! Max Depth: {depth_limit}, Current Path: {solution.path}')
-        return False
+        return solution
 
     # BASE CASE 2 where we are at the solution:
     if node.state == search_problem.goal_state:
+        solution.solved = True
         solution_path: list = solution.path
         print(solution_path)
         return solution
@@ -135,7 +136,7 @@ def dfs_search(search_problem, depth_limit: int = 100, node=None, solution=None)
             # if new_node.state == search_problem.goal_state:
             #     return True
 
-    # return solution  # <-- uncomment for dfs
+    return solution  # <-- uncomment for dfs
 
 
 def ids_search(search_problem, depth_limit=100):
@@ -145,8 +146,9 @@ def ids_search(search_problem, depth_limit=100):
     while i < depth_limit:
         i = i+1
         # This currently works, except it loops too many times. dfs_search returns None, not a bool!
-        if dfs_search(search_problem=search_problem, depth_limit=i):
-            break
+        s = dfs_search(search_problem=search_problem, depth_limit=i)
+        if s.solved:
+            return s
 
     print('ids_search complete!')
 
