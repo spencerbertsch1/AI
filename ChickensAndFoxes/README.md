@@ -22,7 +22,7 @@ In order to run any of the test scripts in this repository, you will need python
 
 
 3. Run the following command to run the foxes.py file. 
-   1. `$ python foxes.py`
+   1. `$ python3 foxes.py`
 
 
 4. You will see the output of each search algorithm applied to each of the test cases provided in the assignment. If you want to see the output for
