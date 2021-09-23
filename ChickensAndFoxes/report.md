@@ -27,7 +27,30 @@ Constraints:
 
 ### How do the implemented algorithms work? 
 
-TODO 
+The general ideas for the descriptions of these algorithms come from our textbook: [Artificial Intelligence, a Modern Approach](http://aima.cs.berkeley.edu/), and from the lecture notes. 
+
+#### Breadth-First Search
+
+Our implementation of the breadth-first search algorithm begins by checking if the starting node is the goal node. It then examines the top "layer" of 
+the graph or tree, testing each child of the source node to determine if it is the goal node. It then repeats this pattern for the next layer, and so on. 
+This top-down approach is great for finding the optimal solution as long as 
+the path cost doesn't increase as the depth increases. We learned in class that the memory required from vanilla BFS is very large; 
+with a space complexity of O(b^d), the memory explodes for large b or large d. 
+
+#### Depth-First Search
+
+Depth first search starts the same way as breadth first search, checking if the start node is the goal node. It then checks if the 
+first child of the start node is the goal node, but unlike BFS it then continues to check the first children of all current nodes until 
+it either reaches the goal node, or it reaches a terminal or leaf node. Our implementation of DFS uses backtracking in order to save memory, 
+so at this point the DFS algorithm will travel back up the chain, checking each node along the way if it has any unexplored (nodes not currently 
+on the path from start to current state) children. The memory used by DFS is generally much smaller than BFS, but there is a chance that the
+algorithm will find a non-optimal solution. 
+
+#### Iterative Deepening Search 
+
+Iterative deepening search combines a memory usage similar to DFS O(b*d) with the completeness of BFS as long as the number of branches
+coming from each node (b) is finite. The implementation of this algorithm was pretty straightforward - we just make a function call to DFS and 
+put the call in a loop until we find a solution, then break and return the solution containing the best path.
 
 ### What design decisions were made?
 
@@ -49,18 +72,40 @@ ids_search as it uses DFS to try to find the goal node while being iteratively r
 grading this assignment can't stand all those prints in the output when you test the ids_search, feel free to comment line 
 line 111 of uninformed search and run again. 
 
-### How were the problems laid out? 
+### How were the problems laid out?
 
-TODO 
+The assignment was presented to use with a strong framework of skeleton code that we were instructed to fill in. I used the file structure
+that existed in the assignment, and although I made some additions and substitutions for class methods, functions, variables, etc., I still used
+the same overall structure in the assignment framework. The problem is defined in a FoxProblem class in the FoxProblem.py file. This class is used 
+to dynamically generate the graph which is explored throughout the search. 
 
-Talk about how we laid out the code in different files. 
+The actual search algorithms themselves are defined in the 
+uninformed_search.py file. A class representing a SearchSolution object can be found in the SearchSolution.py file; this object
+is designed to hold the current state, previous state, and other metadata regarding the state of the search. There is driver code in the file foxes.py
+in which the different search algorithms are called on different FoxProblem objects. In order to see more or less printed output to the console, 
+just comment or uncomment the print statements in foxes.py. I have also created a README
+which provides instructions on how to pull down this project code locally, install python if users don't already have it, and run
+the driver code in foxes.py. 
 
 
 # Evaluation
 
 ### Did the implemented algorithms work? How well did they work? 
 
-TODO 
+Yes, the implemented algorithms all work as expected.  
+All algorithms show that there is a solution the problems with starting states of (3,3,1) and (5,4,1), but not to the problem with 
+a starting state of (5,5,1). 
+
+As discussed above, I took a few liberties with the print statement in the ids_search, but if you comment all print statements in 
+foxes.py except for a single print, you can see that the outputs of each algorithm are correct. Now onto how well each algorithm performed! 
+
+For the problem with a starting state of (5,4,1), the BFS returned a solution with a path length of 16, while the DFS and isd_search returned 
+a solution with a path length of 21. Similarly, for the problem with a start state of (3,3,1), DFS search returned a solution with a path length of 12,
+while DFS and ids_search returned a solution with a path length of 13. Ignoring time and space complexity and only considering optimality, 
+I would say in this case BFS is more optimal. 
+
+Discussions on the time and space complexity of these algorithms and their different flavors (memoizing vs. path checking, etc.) can be found in above and below discussions. 
+
 
 # Responses to Discussion Questions
 
@@ -127,21 +172,24 @@ That way we are achieving the space complexity of DFS while also roughly achievi
 
 * Q3: Does memoizing DFS save significant memory with respect to breadth-first search?  Why or why not?
 
-Good question - as discussed above, memoizing DFS still saves memory over BFS. The space required by BFS is O(b^d) where the 
-space required for DFS is O(b*m). 
+Memoizing DFS will not save significant memory with respect to DFS. From the lecture notes we can see that the space complexity of DFS is O(min(n, b^m)) 
+and the space complexity of graph BFS is O(min(n, b^d)). In this case the max depth of the state space (m) and the depth of the shallowest solution (d) are very similar, 
+so the space complexity of memoizing DFS and graph BFS will be similar. 
+
 
 ### Iterative Deepening Search Discussion
 
-Iterative deepening search was easy enough to implement, but I was initially unsure about how to break out of the loop when a solution
-was found. 
-
 * Q1: On a graph, would it make sense to use path-checking DFS, or would you prefer memoizing DFS in your iterative deepening search?  Consider both time and memory aspects.
 
-If the solution is shallow: 
-Use memoizing DFS for iteritive deepening
+The answer to this question depends on what we want to optimize. 
 
-If the solution is deep:
-Use path-checkinig DFS
+If the solution is shallow, and we want to find the solution quickly: 
+Use memoizing DFS for ids_search here because the overall speed will be faster if we store all visited nodes in memory, not just
+the nodes on the current path. 
+
+If the solution is deep and you want to save memory:
+Use path-checkinig DFS for the ids_search because path-checking DFS will save the most memory, especially if the solution is very deep 
+and the ids_search needs to iterate a large number of times to get to the solution. 
 
 ### Lossy chickens and foxes
 
