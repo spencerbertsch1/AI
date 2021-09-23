@@ -26,4 +26,4 @@ problem551 = FoxProblem((5, 5, 1))
 
 # print(bfs_search(problem541))
 # print(dfs_search(problem541))
-print(ids_search(problem541))
+# print(ids_search(problem541))
