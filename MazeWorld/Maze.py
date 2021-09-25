@@ -60,6 +60,12 @@ class Maze:
         self.map = list("".join(lines))
 
     def index(self, x, y):
+        """
+        Returns the linear index corresponding the a position on the board.
+        :param x:
+        :param y:
+        :return:
+        """
         return (self.height - y - 1) * self.width + x
 
     # returns True if the location is a floor
@@ -93,8 +99,10 @@ class Maze:
         renderlist = list(self.map)
 
         robot_number = 0
+        # here we add the positions of the robots on the board to our linear index
         for index in range(0, len(self.robotloc), 2):
-
+            # if position == target:
+            #     break
             x = self.robotloc[index]
             y = self.robotloc[index + 1]
 
@@ -103,7 +111,7 @@ class Maze:
 
         return renderlist
 
-    def __repr__(self):
+    def __str__(self):
 
         # render robot locations into the map
         render_list = self.create_render_list()

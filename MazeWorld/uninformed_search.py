@@ -46,7 +46,7 @@ class SearchNode:
     #  I like to separate out backchaining, and the dfs path checking functions
 
 
-def bfs_search(search_problem) -> bool:
+def bfs_search(search_problem):
 
     print(f'BFS Search Initiated! Starting State: {search_problem.start_state}')
     # define the frontier as an empty FIFO queue
@@ -70,7 +70,7 @@ def bfs_search(search_problem) -> bool:
             solution_path: list = back_chaining(SearchNode=current_node)
             solution_path.reverse()
             print(f'Solution found! Path to solution: {solution_path}')
-            return True
+            return solution_path
 
         # goal not found, so we need to search the children of the current node.
         for child_state in search_problem.get_successors(state=current_state):
