@@ -6,7 +6,7 @@ class SearchSolution:
         self.nodes_visited = 0
         self.cost = 0
 
-    def __str__(self):
+    def __repr__(self):
         string = "----\n"
         string += "{:s}\n"
         string += "attempted with search method {:s}\n"

@@ -28,8 +28,8 @@ class Maze:
 
     # internal structure:
     #   self.walls: set of tuples with wall locations
-    #   self.width: number of columns
-    #   self.rows
+    #   self.width: number of columns in the maze
+    #   self.rows: number of rows in the maze
 
     def __init__(self, mazefilename):
 

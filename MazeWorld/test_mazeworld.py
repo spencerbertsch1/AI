@@ -10,18 +10,22 @@ def null_heuristic(state):
 
 # Test problems
 
-test_maze3 = Maze("maze3.maz")
-test_mp = MazeworldProblem(test_maze3, (1, 4, 1, 3, 1, 2))
+maze_test = Maze("maze_test.maz")
+test_maze_problem = MazeworldProblem(maze_test, goal_locations=(16, 3), start_states=(0, 0))
 
-print(test_mp.get_successors(test_mp.start_state))
+print(bfs_search(search_problem=test_maze_problem))
+
+# test_mp = MazeworldProblem(test_maze3, goal_locations=(1, 4, 1, 3, 1, 2), start_states=(0, 0))
+
+print(test_maze_problem.get_successors(test_maze_problem.start_state))
 
 # this should explore a lot of nodes; it's just uniform-cost search
-result = astar_search(test_mp, null_heuristic)
+result = astar_search(test_maze_problem, null_heuristic)
 print(result)
 
 # this should do a bit better:
-result = astar_search(test_mp, test_mp.manhattan_heuristic)
+result = astar_search(test_maze_problem, test_maze_problem.manhattan_heuristic)
 print(result)
-test_mp.animate_path(result.path)
+test_maze_problem.animate_path(result.path)
 
 # Your additional tests here:
