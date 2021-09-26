@@ -4,23 +4,27 @@ from Maze import Maze
 import os
 
 from uninformed_search import bfs_search
-from astar_search import astar_search
+from astar_search import astar_search, uniform_cost_search
+
 
 # null heuristic, useful for testing astar search without heuristic (uniform cost search).
-def null_heuristic(state):
+def null_heuristic():
     return 0
 
 # Test problems
+maze_test = Maze("mazes/maze_test3.maz")
+test_maze_problem = MazeworldProblem(maze_test, goal_locations=(32, 9), start_states=(0, 0))
 
-maze_test = Maze("maze_test2.maz")
-test_maze_problem = MazeworldProblem(maze_test, goal_locations=(28, 8), start_states=(0, 0))
+# maze_test = Maze("mazes/maze_test2.maz")
+# test_maze_problem = MazeworldProblem(maze_test, goal_locations=(28, 8), start_states=(0, 0))
 
-# maze_test = Maze("maze_test.maz")
+# maze_test = Maze("mazes/maze_test.maz")
 # test_maze_problem = MazeworldProblem(maze_test, goal_locations=(16, 3), start_states=(0, 0))
 
-print(test_maze_problem)
+# print(test_maze_problem)
 
-path: list = bfs_search(search_problem=test_maze_problem)
+# path: list = bfs_search(search_problem=test_maze_problem)
+path: list = uniform_cost_search(search_problem=test_maze_problem, heuristic_fn=null_heuristic)
 
 test_maze_problem.print_path(path=path)
 
