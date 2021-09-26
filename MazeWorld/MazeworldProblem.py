@@ -31,14 +31,14 @@ class MazeworldProblem:
             clear = "\n" * 20
             print(clear)
 
+    def __str__(self):
+        string = "MazeWorld problem: \n"
+        # print(self.maze)
+        return string
 
-    # def __str__(self):
-    #     string = "MazeWorld problem: \n"
-    #     return string
-    #
-    #     # TODO  ^^^ this functionality has been implemented above in the print_path method
-    #     # given a sequence of states (including robot turn), modify the maze and print it out.
-    #     #  (Be careful, this does modify the maze!)
+        # TODO  ^^^ this functionality has been implemented above in the print_path method
+        # given a sequence of states (including robot turn), modify the maze and print it out.
+        #  (Be careful, this does modify the maze!)
 
     def is_legal(self, all_possible_states: list) -> list:
         legal_states: list = []
@@ -52,8 +52,7 @@ class MazeworldProblem:
         return legal_states
 
     def get_successors(self, state: tuple):
-        # print(f'Finding potential next states for the current state: {state}')
-        # print(f'Maze information: Width: {self.maze.width}, Height: {self.maze.height}')
+
         all_successors: list = [(state[0]+1, state[1]), (state[0]-1, state[1]),
                                 (state[0], state[1]+1), (state[0], state[1]-1)]
 
