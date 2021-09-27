@@ -14,7 +14,6 @@ class AStarNode:
         self.path_cost = path_cost
 
     def priority(self):
-        # TODO should we just return the path cost + heuristic here?
         return self.path_cost + self.heuristic
 
     # comparison operator,
@@ -37,7 +36,7 @@ def backchain(node):
     return result
 
 
-def astar_search(search_problem, heuristic_fn):
+def astar_search_old(search_problem, heuristic_fn):
     # I'll get you started:
     start_node = AStarNode(search_problem.start_state, heuristic_fn(search_problem.start_state))
     pqueue = []
@@ -51,13 +50,16 @@ def astar_search(search_problem, heuristic_fn):
     # you write the rest:
 
 
-def get_states_from_frontier(frontier):
-    states = [x.state for x in frontier]
-    print(f'States currently in the frontier: {states}')
-    return states
+def get_states_from_frontier(frontier) -> list:
+    """
+    Small helper function that returns a list of states (tuples) given a frontier heap
+    :param frontier:
+    :return:
+    """
+    return [x.state for x in frontier]
 
 
-def uniform_cost_search(search_problem, heuristic_fn):
+def astar_search(search_problem, heuristic_fn):
     # define the starting node as an AStarNode
     start_node = AStarNode(state=search_problem.start_state,
                            heuristic=heuristic_fn(current_state=search_problem.start_state,
@@ -76,7 +78,6 @@ def uniform_cost_search(search_problem, heuristic_fn):
     visited_cost[start_node.state] = 0
 
     while len(frontier) != 0:
-        # TODO how does this know what the minimum node is?? What metric is it using here?
         current_node = heappop(frontier)
 
         # test to see if we're at the solution
@@ -89,13 +90,18 @@ def uniform_cost_search(search_problem, heuristic_fn):
         explored.add(current_node.state)
 
         for child_state in search_problem.get_successors(state=current_node.state):
+            # define transition cost
+            transition_cost = 1
+            if child_state == current_node.state:
+                transition_cost = 0  # <-- if we stay in the same place, we don't use any gas
+
             # we now need to create a new node!
             new_node = AStarNode(state=child_state,
                                  parent=current_node,
                                  heuristic=heuristic_fn(current_state=child_state,
                                                         goal_state=search_problem.goal_state),
-                                 transition_cost=1,
-                                 path_cost=len(backchain(current_node)))  # TODO <-- is this right?? Should path_cost be an instance variable for AStarNode?
+                                 transition_cost=transition_cost,
+                                 path_cost=current_node.path_cost + transition_cost)
             visited_cost[new_node.state] = new_node.path_cost
 
             frontier_states = get_states_from_frontier(frontier=frontier)
