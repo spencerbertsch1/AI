@@ -8,8 +8,8 @@ class MazeworldProblem:
 
     def __init__(self, maze, goal_locations: tuple, start_states: tuple):
         self.maze = maze
-        self.goal_state = goal_locations  # QUESTION!! <-- should we have multiple goal states?
-        self.start_state = start_states  # QUESTION!! <-- should we have multiple start states?
+        self.goal_state = goal_locations
+        self.start_state = start_states
 
     def print_path(self, path: list):
         # string = "MazeWorld problem: \n"
@@ -52,11 +52,37 @@ class MazeworldProblem:
         return legal_states
 
     def get_successors(self, state: tuple):
+        """
+        Simple get successors function for a robot in a maze
 
+        :param state:
+        :return:
+        """
         all_successors: list = [(state[0]+1, state[1]), (state[0]-1, state[1]),
-                                (state[0], state[1]+1), (state[0], state[1]-1)]
+                                (state[0], state[1]+1), (state[0], state[1]-1),
+                                (state[0], state[1])]
 
         return self.is_legal(all_possible_states=all_successors)
+
+
+    # def multirobot_get_successors(self, states: tuple):
+    #     """
+    #     get successors function for multiple robots in a maze. very similar to get_successors, but with the
+    #     addition of an option to stay in the same place
+    #     :param states:
+    #     :return:
+    #     """
+    #     num_robots = 1
+    #     if len(states) == 4:
+    #         num_robots = 2
+    #     else:
+    #         num_robots = 3
+    #
+    #     all_successors: list = [(states[0] + 1, states[1]), (states[0] - 1, states[1]),
+    #                             (states[0], states[1] + 1), (states[0], states[1] - 1),
+    #                             (states[0], states[1])]
+    #
+    #     return self.is_legal(all_possible_states=all_successors)
 
     # def animate_path(self, path: list):
     #     # reset the robot locations in the maze
@@ -73,10 +99,10 @@ class MazeworldProblem:
 # A bit of test code. You might want to add to it to verify that things
 #  work as expected.
 if __name__ == "__main__":
-    test_maze = Maze("maze_test.maz")
-    test_mp = MazeworldProblem(test_maze, (19, 2), start_states=(0, 0))
+    test_maze = Maze("mazes/multirobot_maze1.maz")
+    test_mp = MazeworldProblem(test_maze, goal_locations=(0, 3, 3, 6, 6, 4), start_states=(0, 0, 1, 6, 4, 5))
 
-    print(test_mp.get_successors((0, 0)))
+    print(test_mp.get_successors((1, 6)))
 
     # test_mp = MazeworldProblem(test_maze, (1, 4, 1, 3, 1, 2))  # <-- for testing multi robot, multi goal
     # print(test_mp.get_successors((0, 1, 0, 1, 2, 2, 1)))
