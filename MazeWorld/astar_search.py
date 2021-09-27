@@ -13,13 +13,9 @@ class AStarNode:
         self.transition_cost = transition_cost
         self.path_cost = path_cost
 
-    def get_path_cost(self):
-        # TODO how do we get the path cost from an AStarNode? We need it! Can we use backchain?
-        pass
-
     def priority(self):
-        # TODO should we backchoin here and sum the costs for all the transitions to get path cost?
-        return self.path_cost
+        # TODO should we just return the path cost + heuristic here?
+        return self.path_cost + self.heuristic
 
     # comparison operator,
     # needed for heappush and heappop to work with AstarNodes:
@@ -60,14 +56,20 @@ def get_states_from_frontier(frontier):
     print(f'States currently in the frontier: {states}')
     return states
 
+
 def uniform_cost_search(search_problem, heuristic_fn):
     # define the starting node as an AStarNode
-    start_node = AStarNode(state=search_problem.start_state, heuristic=heuristic_fn())
+    start_node = AStarNode(state=search_problem.start_state,
+                           heuristic=heuristic_fn(current_state=search_problem.start_state,
+                                                  goal_state=search_problem.goal_state))
     frontier = []  # <-- priority queue ordered by path cost, for us it is a heap.
     heappush(frontier, start_node)
     # our frontier needs to be a heap, so we can use heapify here to transform it
     heapify(frontier)
     explored = set()
+
+    # define a solution object that we will modify as we search
+    solution = SearchSolution(search_problem, "Astar with heuristic " + heuristic_fn.__name__)
 
     # we would usually use a heap for this, but we can just use a dict as it's laid out in the assignment
     visited_cost: dict = {}
@@ -80,9 +82,9 @@ def uniform_cost_search(search_problem, heuristic_fn):
         # test to see if we're at the solution
         if current_node.state == search_problem.goal_state:
             solution_path: list = backchain(node=current_node)
-            solution_path.reverse()
             print(f'Solution found! Path to solution: {solution_path}')
-            return solution_path  # <-- optionally we can return the solution path here
+            solution.solved = True
+            return solution_path
 
         explored.add(current_node.state)
 
@@ -90,7 +92,8 @@ def uniform_cost_search(search_problem, heuristic_fn):
             # we now need to create a new node!
             new_node = AStarNode(state=child_state,
                                  parent=current_node,
-                                 heuristic=heuristic_fn(),
+                                 heuristic=heuristic_fn(current_state=child_state,
+                                                        goal_state=search_problem.goal_state),
                                  transition_cost=1,
                                  path_cost=len(backchain(current_node)))  # TODO <-- is this right?? Should path_cost be an instance variable for AStarNode?
             visited_cost[new_node.state] = new_node.path_cost

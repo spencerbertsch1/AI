@@ -5,6 +5,7 @@ class SearchSolution:
         self.path = []
         self.nodes_visited = 0
         self.cost = 0
+        self.solved = False
 
     def __repr__(self):
         string = "----\n"

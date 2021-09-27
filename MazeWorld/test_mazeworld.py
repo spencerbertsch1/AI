@@ -11,20 +11,36 @@ from astar_search import astar_search, uniform_cost_search
 def null_heuristic():
     return 0
 
+
+def manhattan_heuristic(current_state, goal_state):
+    """
+    Function to return the manhattan distance (X1 - X2) + (Y1 - Y2) given two points [X1, Y1] and [X2, Y2]
+    :param current_state:
+    :param goal_state:
+    :return:
+    """
+    x1 = current_state[0]
+    y1 = current_state[1]
+    x2 = goal_state[0]
+    y2 = goal_state[1]
+
+    return (x1 - x2) + (y1 - y2)
+
+
 # Test problems
-maze_test = Maze("mazes/maze_test3.maz")
-test_maze_problem = MazeworldProblem(maze_test, goal_locations=(32, 9), start_states=(0, 0))
+# maze_test = Maze("mazes/maze_test3.maz")
+# test_maze_problem = MazeworldProblem(maze_test, goal_locations=(32, 9), start_states=(0, 0))
 
 # maze_test = Maze("mazes/maze_test2.maz")
 # test_maze_problem = MazeworldProblem(maze_test, goal_locations=(28, 8), start_states=(0, 0))
 
-# maze_test = Maze("mazes/maze_test.maz")
-# test_maze_problem = MazeworldProblem(maze_test, goal_locations=(16, 3), start_states=(0, 0))
+maze_test = Maze("mazes/maze_test.maz")
+test_maze_problem = MazeworldProblem(maze_test, goal_locations=(16, 3), start_states=(0, 0))
 
 # print(test_maze_problem)
 
 # path: list = bfs_search(search_problem=test_maze_problem)
-path: list = uniform_cost_search(search_problem=test_maze_problem, heuristic_fn=null_heuristic)
+path: list = uniform_cost_search(search_problem=test_maze_problem, heuristic_fn=manhattan_heuristic)
 
 test_maze_problem.print_path(path=path)
 
