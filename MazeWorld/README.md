@@ -17,12 +17,14 @@ Spencer Bertsch
     3. Then proceed to the following step.
 
 
-2. `cd` to the XXXX directory by running the following command:
-    1. `$ cd XXXX`
+2. `cd` to the MazeWorld directory by running the following command:
+    1. `$ cd MazeWorld`
 
 
-3. Run the following command to run the foxes.py file.
-    1. `$ python3 XXXX`
+3. Run the following command to run the test_mazeworld.py file.
+    1. `$ python3 test_mazeworld.py`
 
 
-4. You will see the output of each search algorithm applied to each of the test cases provided in the assignment. 
+4. You will see an animation of how the A* algorithm solves the multi-robot search problem as each robot is trying to navigate the environment and the other
+robots to find their goals. Different examples show different mazes, some of which start with several robots who are stuck in a tunnel
+and need to back out of the tunnel and rotate around to let a different robot in first so they can all reach their goals. 
