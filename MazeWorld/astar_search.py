@@ -38,7 +38,7 @@ def backchain(node):
 
 def astar_search_old(search_problem, heuristic_fn):
     # I'll get you started:
-    start_node = AStarNode(search_problem.start_state, heuristic_fn(search_problem.start_state))
+    start_node = AStarNode(search_problem.start_states, heuristic_fn(search_problem.start_states))
     pqueue = []
     heappush(pqueue, start_node)
 
@@ -60,14 +60,19 @@ def get_states_from_frontier(frontier) -> list:
 
 
 def astar_search(search_problem, heuristic_fn):
+    # we are given a tuple with start states, we need to add robot_turn to the beginning
+    start_states: list = [x for x in search_problem.start_states]
+    start_states.insert(0, 0)  # <-- insert 0 at the beginning of the tuple
+    s_states = tuple(start_states)
+
     # define the starting node as an AStarNode
-    start_node = AStarNode(state=search_problem.start_state,
-                           heuristic=heuristic_fn(current_state=search_problem.start_state,
-                                                  goal_state=search_problem.goal_state))
+    start_node = AStarNode(state=s_states,
+                           heuristic=heuristic_fn(current_state=s_states,
+                                                  goal_state=search_problem.goal_states))
     frontier = []  # <-- priority queue ordered by path cost, for us it is a heap.
     heappush(frontier, start_node)
     # our frontier needs to be a heap, so we can use heapify here to transform it
-    heapify(frontier)
+    heapify(frontier)  # <-- TODO replace the explored set all together with the visited_cost dict
     explored = set()
 
     # define a solution object that we will modify as we search
@@ -81,7 +86,7 @@ def astar_search(search_problem, heuristic_fn):
         current_node = heappop(frontier)
 
         # test to see if we're at the solution
-        if current_node.state == search_problem.goal_state:
+        if list(current_node.state)[1:] == list(search_problem.goal_states):
             solution_path: list = backchain(node=current_node)
             print(f'Solution found! Path to solution: {solution_path}')
             solution.solved = True
@@ -89,17 +94,17 @@ def astar_search(search_problem, heuristic_fn):
 
         explored.add(current_node.state)
 
-        for child_state in search_problem.get_successors(state=current_node.state):
+        for child_state in search_problem.get_successors(states=current_node.state, search_problem=search_problem):
             # define transition cost
             transition_cost = 1
-            if child_state == current_node.state:
+            if list(child_state)[1:] == list(current_node.state)[1:]:
                 transition_cost = 0  # <-- if we stay in the same place, we don't use any gas
 
             # we now need to create a new node!
             new_node = AStarNode(state=child_state,
                                  parent=current_node,
                                  heuristic=heuristic_fn(current_state=child_state,
-                                                        goal_state=search_problem.goal_state),
+                                                        goal_state=search_problem.goal_states),
                                  transition_cost=transition_cost,
                                  path_cost=current_node.path_cost + transition_cost)
             visited_cost[new_node.state] = new_node.path_cost

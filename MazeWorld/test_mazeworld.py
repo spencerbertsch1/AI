@@ -9,7 +9,7 @@ from astar_search import astar_search
 
 
 # null heuristic, useful for testing astar search without heuristic (uniform cost search).
-def null_heuristic():
+def null_heuristic(current_state, goal_state):
     return 0
 
 
@@ -20,12 +20,45 @@ def manhattan_heuristic(current_state, goal_state):
     :param goal_state:
     :return:
     """
-    x1 = current_state[0]
-    y1 = current_state[1]
-    x2 = goal_state[0]
-    y2 = goal_state[1]
+    # TODO once this working, clean this up so it's only 3 lines (one line per if/else)
+    if len(current_state) == 3:
+        x1 = current_state[1]
+        y1 = current_state[2]
+        x2 = goal_state[0]
+        y2 = goal_state[1]
 
-    return (x1 - x2) + (y1 - y2)
+        return abs(x1 - x2) + abs(y1 - y2)
+
+    elif len(current_state) == 5:
+        x1 = current_state[1]
+        y1 = current_state[2]
+        x2 = goal_state[0]
+        y2 = goal_state[1]
+
+        x3 = current_state[3]
+        y3 = current_state[4]
+        x4 = goal_state[2]
+        y4 = goal_state[3]
+
+        return ((abs(x1 - x2) + abs(y1 - y2)) + (abs(x3 - x4) + abs(y3 - y4)))/2
+
+    elif len(current_state) == 7:
+        x1 = current_state[1]
+        y1 = current_state[2]
+        x2 = goal_state[0]
+        y2 = goal_state[1]
+
+        x3 = current_state[3]
+        y3 = current_state[4]
+        x4 = goal_state[2]
+        y4 = goal_state[3]
+
+        x5 = current_state[5]
+        y5 = current_state[6]
+        x6 = goal_state[4]
+        y6 = goal_state[5]
+
+        return ((abs(x1 - x2) + abs(y1 - y2)) + (abs(x3 - x4) + abs(y3 - y4)) + (abs(x5 - x6) + abs(y5 - y6)))/3
 
 
 def euclidian_heuristic(current_state, goal_state):
@@ -50,20 +83,21 @@ def euclidian_heuristic(current_state, goal_state):
 # maze_test = Maze("mazes/maze_test2.maz")
 # test_maze_problem = MazeworldProblem(maze_test, goal_locations=(28, 8), start_states=(0, 0))
 
-maze_test = Maze("mazes/maze_test.maz")
-test_maze_problem = MazeworldProblem(maze_test, goal_locations=(16, 3), start_states=(0, 0))
+maze_test = Maze("mazes/maze3.maz")
+print(maze_test)
+test_maze_problem = MazeworldProblem(maze_test, goal_locations=(1,2,1,3,1,4), start_states=(1,0,1,1,2,1))
 
 # uncomment the next line to test BFS Search
 # path: list = bfs_search(search_problem=test_maze_problem)
 
 # uncomment the next line to test the A* Search
-path: list = astar_search(search_problem=test_maze_problem, heuristic_fn=manhattan_heuristic)
+path: list = astar_search(search_problem=test_maze_problem, heuristic_fn=null_heuristic)
 
 # uncomment the next line to print the animated path that was found using the search method above
-test_maze_problem.print_path(path=path)
+test_maze_problem.animate_path(path=path)
 
 
-
+# * multi robot test *
 # maze_test = Maze("mazes/maze_test3.maz")
 # test_mp = MazeworldProblem(maze_test, goal_locations=(1, 4, 1, 3, 1, 2), start_states=(0, 0))
 
