@@ -36,20 +36,6 @@ def backchain(node):
     return result
 
 
-def astar_search_old(search_problem, heuristic_fn):
-    # I'll get you started:
-    start_node = AStarNode(search_problem.start_states, heuristic_fn(search_problem.start_states))
-    pqueue = []
-    heappush(pqueue, start_node)
-
-    solution = SearchSolution(search_problem, "Astar with heuristic " + heuristic_fn.__name__)
-
-    visited_cost = {}
-    visited_cost[start_node.state] = 0
-
-    # you write the rest:
-
-
 def get_states_from_frontier(frontier) -> list:
     """
     Small helper function that returns a list of states (tuples) given a frontier heap
@@ -72,8 +58,8 @@ def astar_search(search_problem, heuristic_fn):
     frontier = []  # <-- priority queue ordered by path cost, for us it is a heap.
     heappush(frontier, start_node)
     # our frontier needs to be a heap, so we can use heapify here to transform it
-    heapify(frontier)  # <-- TODO replace the explored set all together with the visited_cost dict
-    explored = set()
+    heapify(frontier)
+    explored = set()  # <-- we could also remove the explored set and just reference the keys in the visited_cost dict
 
     # define a solution object that we will modify as we search
     solution = SearchSolution(search_problem, "Astar with heuristic " + heuristic_fn.__name__)
@@ -120,7 +106,6 @@ def astar_search(search_problem, heuristic_fn):
                 visited_cost[new_node.state] = new_node.path_cost
                 # and add the node to the frontier
                 heappush(frontier, new_node)
-
 
     print('no solution found.')
     return False

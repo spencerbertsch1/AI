@@ -11,26 +11,6 @@ class MazeworldProblem:
         self.goal_states = goal_locations
         self.start_states = start_states
 
-    def print_path(self, path: list):
-        # string = "MazeWorld problem: \n"
-
-        # annotate the map with the goal state
-        self.maze.map[self.maze.index(self.goal_states[0], self.goal_states[1])] = "$"
-
-        for state in path:
-            # store the old state
-            old_state = self.maze.robotloc
-            # update the location of the robot
-            self.maze.robotloc = [state[0], state[1]]
-
-            # update and print the new map
-            self.maze.map[self.maze.index(old_state[0], old_state[1])] = "1"
-
-            print(self.maze)
-            sleep(0.5)
-            clear = "\n" * 20
-            print(clear)
-
     def __str__(self):
         string = "MazeWorld problem: \n"
         # print(self.maze)

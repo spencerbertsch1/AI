@@ -80,12 +80,20 @@ def euclidian_heuristic(current_state, goal_state):
 # maze_test = Maze("mazes/maze_test3.maz")
 # test_maze_problem = MazeworldProblem(maze_test, goal_locations=(32, 9), start_states=(0, 0))
 
-# maze_test = Maze("mazes/maze_test2.maz")
-# test_maze_problem = MazeworldProblem(maze_test, goal_locations=(28, 8), start_states=(0, 0))
-
-maze_test = Maze("mazes/maze3.maz")
+# * WORKING MULTI-ROBOT SEARCH *
+maze_test = Maze("mazes/multirobot_maze4.maz")
 print(maze_test)
-test_maze_problem = MazeworldProblem(maze_test, goal_locations=(1,2,1,3,1,4), start_states=(1,0,1,1,2,1))
+test_maze_problem = MazeworldProblem(maze_test, goal_locations=(1, 6, 1, 5, 1, 4), start_states=(1, 0, 1, 3, 1, 2))
+
+# # * WORKING MULTI-ROBOT SEARCH *
+# maze_test = Maze("mazes/multirobot_maze3.maz")
+# print(maze_test)
+# test_maze_problem = MazeworldProblem(maze_test, goal_locations=(1, 4, 1, 3, 1, 2), start_states=(1,0,1,1,2,1))
+
+# # * WORKING MULTI-ROBOT SEARCH *
+# maze_test = Maze("mazes/maze3.maz")
+# print(maze_test)
+# test_maze_problem = MazeworldProblem(maze_test, goal_locations=(1, 4, 1, 3, 1, 2), start_states=(1,0,1,1,2,1))
 
 # uncomment the next line to test BFS Search
 # path: list = bfs_search(search_problem=test_maze_problem)
