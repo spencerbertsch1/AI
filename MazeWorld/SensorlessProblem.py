@@ -154,7 +154,8 @@ class SensorlessProblem:
         return legal_states
 
     def heuristic(self, current_state):
-        return 0
+        # return the number of tuples (X,Y spaces) still available in the state.
+        return len(current_state)
 
     def max_distance(self):
         pass
@@ -163,24 +164,23 @@ class SensorlessProblem:
         all_successors: set = set()
         for state in states:
             print(f'GETTING SUCCESSORS FOR: {state}')
-            if isinstance(state, int):
-                print('something')
             successors: list = [(state[0]+1, state[1]), (state[0]-1, state[1]), (state[0], state[1]+1),
                                     (state[0], state[1]-1), (state[0], state[1])]
             legal_successors: list = self.get_legal_states(state_list=successors)
             all_successors.update(legal_successors)
 
+        # TODO I think this code can be safely removed
         # create a long tuple (...) from the set of tuples {(...), (...), ...} that's returned by the
         # sensorless_get_successors function
-        if False:  # <-- TODO change this to True for experimentation...
-            # transform the set of tuples (all of length 2) into a single tuple that represents all the X,Y positions
-            # of the available
-            single_tuple_state: list = []
-            for single_state in all_successors:
-                for position in single_state:
-                    single_tuple_state.append(position)
-
-            return single_tuple_state
+        # if False:  # <-- TODO change this to True for experimentation...
+        #     # transform the set of tuples (all of length 2) into a single tuple that represents all the X,Y positions
+        #     # of the available
+        #     single_tuple_state: list = []
+        #     for single_state in all_successors:
+        #         for position in single_state:
+        #             single_tuple_state.append(position)
+        #
+        #     return single_tuple_state
 
         return all_successors
 
@@ -204,8 +204,10 @@ if __name__ == "__main__":
     test_problem = SensorlessProblem(test_maze3)
     start_state = test_problem.generate_initial_state(maze=test_maze3)
     all_successors = test_problem.get_successors(start_state)
+    for successor in all_successors:
+        print(successor)
 
-    path: list = sensorless_astar_search(search_problem=test_problem, heuristic_fn=test_problem.heuristic)
+    # path: list = sensorless_astar_search(search_problem=test_problem, heuristic_fn=test_problem.heuristic)
     # print(f'SOLUTION PATH LENGTH: {len(path)}')
 
     # print(all_successors)

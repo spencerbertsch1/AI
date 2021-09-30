@@ -16,7 +16,7 @@ in addition to the [X,Y] positions of all robots at any given time during their 
 
 2. An upper bound on the number of states in the system can be found by thinking about the way we represented the state. We represent the state
 with a tuple (k, m, m, ...) for a square maze of length m and k robots where the first robot is represented by 0. 
-The upper bound on the size of the state would be m\*m\*(k+1) if k starts with 0 as represented in my implementation, or (m\*\m*k). 
+The upper bound on the size of the state would be m\*m\*(k+1) if k starts with 0 as represented in my implementation, or (m\*m\*k). 
 
 
 
