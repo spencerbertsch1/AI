@@ -71,9 +71,17 @@ def sensorless_astar_search(search_problem, heuristic_fn):
             solution.solved = True
             return solution_path
 
-        explored.add(current_node.state)
+        explored.add(tuple(current_node.state))
 
-        for child_state in search_problem.get_successors(states=current_node.state, search_problem=search_problem):
+        # add check so we make sure we don't iterate through a single tuple of 2 ints
+        state_to_search = current_node.state
+        if isinstance(state_to_search, tuple):
+            print('converting state to set of a single tuple.')
+            s = set()
+            s.add(state_to_search)
+            state_to_search = s
+
+        for child_state in search_problem.get_successors(states=state_to_search):
             # we now need to create a new node!
             transition_cost = 1
             new_node = SensorlessAStarNode(state=child_state,
@@ -113,7 +121,7 @@ class SensorlessProblem:
 
     def __str__(self):
         string = "Blind robot problem: "
-        print(self.maze)
+        # print(self.maze)
         return string
 
         # given a sequence of states (including robot turn), modify the maze and print it out.
@@ -154,6 +162,9 @@ class SensorlessProblem:
     def get_successors(self, states):
         all_successors: set = set()
         for state in states:
+            print(f'GETTING SUCCESSORS FOR: {state}')
+            if isinstance(state, int):
+                print('something')
             successors: list = [(state[0]+1, state[1]), (state[0]-1, state[1]), (state[0], state[1]+1),
                                     (state[0], state[1]-1), (state[0], state[1])]
             legal_successors: list = self.get_legal_states(state_list=successors)
@@ -195,6 +206,6 @@ if __name__ == "__main__":
     all_successors = test_problem.get_successors(start_state)
 
     path: list = sensorless_astar_search(search_problem=test_problem, heuristic_fn=test_problem.heuristic)
-    print(f'SOLUTION PATH LENGTH: {len(path)}')
+    # print(f'SOLUTION PATH LENGTH: {len(path)}')
 
     # print(all_successors)
