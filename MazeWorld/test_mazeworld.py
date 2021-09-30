@@ -13,52 +13,53 @@ def null_heuristic(current_state, goal_state):
     return 0
 
 
-def manhattan_heuristic(current_state, goal_state):
+def manhattan_heuristic_better(current_state, goal_state):
     """
-    Function to return the manhattan distance (X1 - X2) + (Y1 - Y2) given two points [X1, Y1] and [X2, Y2]
+    A better implementation of the manhattan heuristic that can be used for states of any length, not just with
+    1, 2, or 3 robots.
+
     :param current_state:
     :param goal_state:
     :return:
     """
-    # TODO once this working, clean this up so it's only 3 lines (one line per if/else)
-    if len(current_state) == 3:
-        x1 = current_state[1]
-        y1 = current_state[2]
-        x2 = goal_state[0]
-        y2 = goal_state[1]
+    states = list(current_state)[1:]
+    goals = list(goal_state)
 
-        return abs(x1 - x2) + abs(y1 - y2)
+    h = []
+    for i in range(len(states)):
+        if i % 2 == 1:
+            continue
+        else:
+            x1 = states[i]
+            x2 = states[i+1]
+            y1 = goals[i]
+            y2 = goals[i+1]
+
+            h.append(abs(x1 - y1) + abs(x2 - y2))
+
+    return sum(h)/len(h)
+
+
+def manhattan_heuristic(current_state, goal_state):
+    """
+    Function to return the manhattan distance (X1 - X2) + (Y1 - Y2) given two points [X1, Y1] and [X2, Y2] as long as
+    there are only 1, 2, or 3 robots in the game. There is a better implementation of this function above.
+    :param current_state:
+    :param goal_state:
+    :return:
+    """
+    if len(current_state) == 3:
+        return abs(current_state[1] - goal_state[0]) + abs(current_state[2] - goal_state[1])
 
     elif len(current_state) == 5:
-        x1 = current_state[1]
-        y1 = current_state[2]
-        x2 = goal_state[0]
-        y2 = goal_state[1]
-
-        x3 = current_state[3]
-        y3 = current_state[4]
-        x4 = goal_state[2]
-        y4 = goal_state[3]
-
-        return ((abs(x1 - x2) + abs(y1 - y2)) + (abs(x3 - x4) + abs(y3 - y4)))/2
+        return ((abs(current_state[1] - goal_state[0]) + abs(current_state[2] - goal_state[1])) +
+                (abs(current_state[3] - goal_state[2]) + abs(current_state[4] - goal_state[3])))/2
 
     elif len(current_state) == 7:
-        x1 = current_state[1]
-        y1 = current_state[2]
-        x2 = goal_state[0]
-        y2 = goal_state[1]
-
-        x3 = current_state[3]
-        y3 = current_state[4]
-        x4 = goal_state[2]
-        y4 = goal_state[3]
-
-        x5 = current_state[5]
-        y5 = current_state[6]
-        x6 = goal_state[4]
-        y6 = goal_state[5]
-
-        return ((abs(x1 - x2) + abs(y1 - y2)) + (abs(x3 - x4) + abs(y3 - y4)) + (abs(x5 - x6) + abs(y5 - y6)))/3
+         h = ((abs(current_state[1] - goal_state[0]) + abs(current_state[2] - goal_state[1])) +
+                (abs(current_state[3] - goal_state[2]) + abs(current_state[4] - goal_state[3])) +
+                (abs(current_state[5] - goal_state[4]) + abs(current_state[6] - goal_state[5])))/3
+         return h
 
 
 def euclidian_heuristic(current_state, goal_state):
@@ -99,7 +100,7 @@ test_maze_problem = MazeworldProblem(maze_test, goal_locations=(1, 4, 1, 3, 1, 2
 # path: list = bfs_search(search_problem=test_maze_problem)
 
 # uncomment the next line to test the A* Search
-path: list = astar_search(search_problem=test_maze_problem, heuristic_fn=null_heuristic)
+path: list = astar_search(search_problem=test_maze_problem, heuristic_fn=manhattan_heuristic_better)
 print(f'SOLUTION PATH LENGTH: {len(path)}')
 
 # uncomment the next line to print the animated path that was found using the search method above
