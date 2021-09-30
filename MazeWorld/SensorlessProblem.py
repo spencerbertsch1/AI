@@ -17,13 +17,24 @@ class SensorlessAStarNode:
         self.path_cost = path_cost
 
     def goal_test(self) -> bool:
+        """
+        This is the updated sensorless_goal_test that checks to see if any of the sets in the list only contain a
+        single entry.
+
+        Remember that the states in this case are sets of tuples and get_successors returns a list of sets that
+        each contain many 2-length state tuples. This function simply takes a set and determines if its length is
+        1. If so, it returns true. It returns False otherwise.
+
+        :return: bool - True if the input state is of length 1, False otherwise
+        """
         if len(self.state) == 1:
             return True
         else:
             return False
 
     def priority(self):
-        return self.path_cost + self.heuristic
+        # TODO experiment with this by removing path_cost, might be interesting...
+        return self.heuristic + self.path_cost
 
     # comparison operator,
     # needed for heappush and heappop to work with AstarNodes:
@@ -74,14 +85,16 @@ def sensorless_astar_search(search_problem, heuristic_fn):
         explored.add(tuple(current_node.state))
 
         # add check so we make sure we don't iterate through a single tuple of 2 ints
-        state_to_search = current_node.state
-        if isinstance(state_to_search, tuple):
-            print('converting state to set of a single tuple.')
-            s = set()
-            s.add(state_to_search)
-            state_to_search = s
+        # This should never happen because we do the goal check above !
+        # state_to_search = current_node.state
+        # if isinstance(state_to_search, tuple):
+        #     print('converting state to set of a single tuple.')
+        #     s = set()
+        #     s.add(state_to_search)
+        #     state_to_search = s
+        state_to_search = tuple(current_node.state)
 
-        for child_state in search_problem.get_successors(states=state_to_search):
+        for child_state in search_problem.get_successors_sensorless(states=state_to_search):
             # we now need to create a new node!
             transition_cost = 1
             new_node = SensorlessAStarNode(state=child_state,
@@ -112,7 +125,6 @@ def sensorless_astar_search(search_problem, heuristic_fn):
 class SensorlessProblem:
 
     ## You write the good stuff here:
-    # TODO should we include start state or goal here? We don't know either if I'm correct...
     def __init__(self, maze):
         self.maze = maze
         self.width = self.maze.width
@@ -153,36 +165,56 @@ class SensorlessProblem:
 
         return legal_states
 
-    def heuristic(self, current_state):
-        # return the number of tuples (X,Y spaces) still available in the state.
-        return len(current_state)
-
     def max_distance(self):
         pass
 
-    def get_successors(self, states):
-        all_successors: set = set()
+        # north_successors: set = set()
+        # for state in states:
+        #     print(f'GETTING NORTH SUCCESSOR FOR: {state}')
+        #     successors: list = [(state[0]+1, state[1]), (state[0]-1, state[1]), (state[0], state[1]+1),
+        #                         (state[0], state[1]-1), (state[0], state[1])]
+        #     legal_successors: list = self.get_legal_states(state_list=successors)
+        #     all_successors.update(legal_successors)
+
+
+    def get_successors_sensorless(self, states):
+        """
+
+        :param states:
+        :return:
+        """
+        # GET SUCCESSORS
+        north_successors: set = set()
+        east_successors: set = set()
+        south_successors: set = set()
+        west_successors: set = set()
         for state in states:
-            print(f'GETTING SUCCESSORS FOR: {state}')
-            successors: list = [(state[0]+1, state[1]), (state[0]-1, state[1]), (state[0], state[1]+1),
-                                    (state[0], state[1]-1), (state[0], state[1])]
-            legal_successors: list = self.get_legal_states(state_list=successors)
-            all_successors.update(legal_successors)
+            print(f'GETTING NORTH SUCCESSOR FOR: {state}')
+            north_successor: list = [(state[0], state[1]+1)]
+            legal_north_successor: list = self.get_legal_states(state_list=north_successor)
+            north_successors.update(legal_north_successor)
 
-        # TODO I think this code can be safely removed
-        # create a long tuple (...) from the set of tuples {(...), (...), ...} that's returned by the
-        # sensorless_get_successors function
-        # if False:  # <-- TODO change this to True for experimentation...
-        #     # transform the set of tuples (all of length 2) into a single tuple that represents all the X,Y positions
-        #     # of the available
-        #     single_tuple_state: list = []
-        #     for single_state in all_successors:
-        #         for position in single_state:
-        #             single_tuple_state.append(position)
-        #
-        #     return single_tuple_state
+            print(f'GETTING EAST SUCCESSOR FOR: {state}')
+            east_successor: list = [(state[0]+1, state[1])]
+            legal_east_successor: list = self.get_legal_states(state_list=east_successor)
+            east_successors.update(legal_east_successor)
 
-        return all_successors
+            print(f'GETTING SOUTH SUCCESSOR FOR: {state}')
+            south_successor: list = [(state[0], state[1]-1)]
+            legal_south_successor: list = self.get_legal_states(state_list=south_successor)
+            south_successors.update(legal_south_successor)
+
+            print(f'GETTING WEST SUCCESSOR FOR: {state}')
+            west_successor: list = [(state[0]-1, state[1])]
+            legal_west_successor: list = self.get_legal_states(state_list=west_successor)
+            west_successors.update(legal_west_successor)
+
+        # generate a list of 4 tuples (N, E, S, W), each of which contain the (X,Y) coordinates of those moves!
+        n_successors: tuple = tuple(north_successors)
+        e_successors: tuple = tuple(east_successors)
+        s_successors: tuple = tuple(south_successors)
+        w_successors: tuple = tuple(west_successors)
+        return [n_successors, e_successors, s_successors, w_successors]
 
 
     def animate_path(self, path):
@@ -203,7 +235,7 @@ if __name__ == "__main__":
     test_maze3 = Maze("mazes/maze2.maz")
     test_problem = SensorlessProblem(test_maze3)
     start_state = test_problem.generate_initial_state(maze=test_maze3)
-    all_successors = test_problem.get_successors(start_state)
+    all_successors = test_problem.get_successors_sensorless(start_state)
     for successor in all_successors:
         print(successor)
 
