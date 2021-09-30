@@ -33,15 +33,20 @@ class SensorlessAStarNode:
 
 # use the sensorless AStarNode
 def sensorless_astar_search(search_problem, heuristic_fn):
+    """
+    A* for the sensorless problem.
 
-    # TODO
-    # create a long tuple (...) from the set of tuples {(...), (...), ...} that's returned by the
-    # sensorless_get_successors function
+    One big change between this construction and the A* that was made for the multirobot search is that we only have
+    one robot, and therefore one tuple of even length that represents the state.
+
+    :param search_problem:
+    :param heuristic_fn:
+    :return:
+    """
 
     # define the starting node as an AStarNode
-    start_node = SensorlessAStarNode(state=search_problem.start_states,
-                                     heuristic=heuristic_fn(current_state=search_problem.start_states,
-                                                  goal_state=search_problem.goal_states))
+    start_node = SensorlessAStarNode(state=search_problem.start_state,
+                                     heuristic=heuristic_fn(current_state=search_problem.start_state))
     frontier = []  # <-- priority queue ordered by path cost, for us it is a heap.
     heappush(frontier, start_node)
     # our frontier needs to be a heap, so we can use heapify here to transform it
@@ -53,13 +58,14 @@ def sensorless_astar_search(search_problem, heuristic_fn):
 
     # we would usually use a heap for this, but we can just use a dict as it's laid out in the assignment
     visited_cost: dict = {}
-    visited_cost[start_node.state] = 0
+    start_state_tuple = tuple(start_node.state)
+    visited_cost[start_state_tuple] = 0
 
     while len(frontier) != 0:
         current_node = heappop(frontier)
 
         # test to see if we're at the solution
-        if current_node.goal_test:
+        if current_node.goal_test():
             solution_path: list = backchain(node=current_node)
             print(f'Solution found! Path to solution: {solution_path}')
             solution.solved = True
@@ -72,11 +78,12 @@ def sensorless_astar_search(search_problem, heuristic_fn):
             transition_cost = 1
             new_node = SensorlessAStarNode(state=child_state,
                                            parent=current_node,
-                                           heuristic=heuristic_fn(current_state=child_state,
-                                                                  goal_state=search_problem.goal_states),
+                                           heuristic=heuristic_fn(current_state=child_state),
                                            transition_cost=transition_cost,
                                            path_cost=current_node.path_cost + transition_cost)
-            visited_cost[new_node.state] = new_node.path_cost
+            tuple_to_add = tuple(new_node.state)
+            print(f'ADDING {tuple_to_add} to visited dict!')
+            visited_cost[tuple_to_add] = new_node.path_cost
 
             frontier_states = get_states_from_frontier(frontier=frontier)
             if (new_node.state not in explored) & (new_node.state not in frontier_states):
@@ -93,15 +100,16 @@ def sensorless_astar_search(search_problem, heuristic_fn):
     print('no solution found.')
     return False
 
+
 class SensorlessProblem:
 
     ## You write the good stuff here:
     # TODO should we include start state or goal here? We don't know either if I'm correct...
-    def __init__(self, maze, start_state):
+    def __init__(self, maze):
         self.maze = maze
         self.width = self.maze.width
         self.height = self.maze.height
-        self.start_state = start_state
+        self.start_state = self.generate_initial_state(maze)
 
     def __str__(self):
         string = "Blind robot problem: "
@@ -111,11 +119,11 @@ class SensorlessProblem:
         # given a sequence of states (including robot turn), modify the maze and print it out.
         #  (Be careful, this does modify the maze!)
 
-    def generate_initial_state(self):
+    def generate_initial_state(self, maze):
         # create a list of all the possible states in the entire maze
         state = []
-        for i in range(self.width):
-            for j in range(self.height):
+        for i in range(maze.width):
+            for j in range(maze.height):
                 tuple_to_add: tuple = (i, j)
                 state.append(tuple_to_add)
 
@@ -137,7 +145,7 @@ class SensorlessProblem:
 
         return legal_states
 
-    def heuristic(self):
+    def heuristic(self, current_state):
         return 0
 
     def max_distance(self):
@@ -150,6 +158,18 @@ class SensorlessProblem:
                                     (state[0], state[1]-1), (state[0], state[1])]
             legal_successors: list = self.get_legal_states(state_list=successors)
             all_successors.update(legal_successors)
+
+        # create a long tuple (...) from the set of tuples {(...), (...), ...} that's returned by the
+        # sensorless_get_successors function
+        if False:  # <-- TODO change this to True for experimentation...
+            # transform the set of tuples (all of length 2) into a single tuple that represents all the X,Y positions
+            # of the available
+            single_tuple_state: list = []
+            for single_state in all_successors:
+                for position in single_state:
+                    single_tuple_state.append(position)
+
+            return single_tuple_state
 
         return all_successors
 
@@ -170,9 +190,9 @@ class SensorlessProblem:
 
 if __name__ == "__main__":
     test_maze3 = Maze("mazes/maze2.maz")
-    test_problem = SensorlessProblem(test_maze3, start_state=(1, 0))
-    # start_state = test_problem.generate_initial_state()
-    # all_successors = test_problem.get_successors(start_state)
+    test_problem = SensorlessProblem(test_maze3)
+    start_state = test_problem.generate_initial_state(maze=test_maze3)
+    all_successors = test_problem.get_successors(start_state)
 
     path: list = sensorless_astar_search(search_problem=test_problem, heuristic_fn=test_problem.heuristic)
     print(f'SOLUTION PATH LENGTH: {len(path)}')

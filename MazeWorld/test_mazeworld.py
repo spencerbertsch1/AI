@@ -81,14 +81,14 @@ def euclidian_heuristic(current_state, goal_state):
 # test_maze_problem = MazeworldProblem(maze_test, goal_locations=(32, 9), start_states=(0, 0))
 
 # * WORKING MULTI-ROBOT SEARCH *
-maze_test = Maze("mazes/multirobot_maze4.maz")
-print(maze_test)
-test_maze_problem = MazeworldProblem(maze_test, goal_locations=(1, 6, 1, 5, 1, 4), start_states=(1, 0, 1, 3, 1, 2))
+# maze_test = Maze("mazes/multirobot_maze5.maz")
+# print(maze_test)
+# test_maze_problem = MazeworldProblem(maze_test, goal_locations=(37, 38, 37, 37, 37, 36), start_states=(1, 1, 1, 2, 1, 3))
 
 # # * WORKING MULTI-ROBOT SEARCH *
-# maze_test = Maze("mazes/multirobot_maze3.maz")
-# print(maze_test)
-# test_maze_problem = MazeworldProblem(maze_test, goal_locations=(1, 4, 1, 3, 1, 2), start_states=(1,0,1,1,2,1))
+maze_test = Maze("mazes/multirobot_maze3.maz")
+print(maze_test)
+test_maze_problem = MazeworldProblem(maze_test, goal_locations=(1, 4, 1, 3, 1, 2), start_states=(1,0,1,1,2,1))
 
 # # * WORKING MULTI-ROBOT SEARCH *
 # maze_test = Maze("mazes/maze3.maz")
@@ -100,6 +100,7 @@ test_maze_problem = MazeworldProblem(maze_test, goal_locations=(1, 6, 1, 5, 1, 4
 
 # uncomment the next line to test the A* Search
 path: list = astar_search(search_problem=test_maze_problem, heuristic_fn=null_heuristic)
+print(f'SOLUTION PATH LENGTH: {len(path)}')
 
 # uncomment the next line to print the animated path that was found using the search method above
 test_maze_problem.animate_path(path=path)
