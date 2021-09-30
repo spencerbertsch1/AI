@@ -22,9 +22,9 @@ def sensorless_heuristic(current_state):
     available, the more costly the move.
 
     :param current_state: tuple of unique, 2-length tuples ((X1, Y1), (X2, Y2), ...)
-    :return: number of (X,Y) coordinates in the set
+    :return: number of (X,Y) coordinates in the outer tuple
     """
-    # return the number of tuples (X,Y spaces) still available in the state.
+    # return the number of tuples (X,Y spaces) still available in the complete state space.
     return len(current_state)
 
 
