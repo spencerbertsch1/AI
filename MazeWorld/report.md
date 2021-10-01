@@ -88,7 +88,8 @@ three robots (A, B, and C) coordinate to orient themselves so that they can ente
 ```
 
 There were two real keys to this problem: understanding that the heuristic should apply to the robots as a whole, and the get_successors function should 
-store the information regarding which robot's turn it is to move. 
+store the information regarding which robot's turn it is to move. See the **Appendix** at the end of this report to see a full multi-robot search 
+spet-by-step. 
 
 ## Blind Robot Evaluation
 After much experimentation with the heuristic function and implementation, the blind robot functionality essentially works as expected. 
