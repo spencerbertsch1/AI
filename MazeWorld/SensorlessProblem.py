@@ -9,7 +9,7 @@ class SensorlessAStarNode:
     # each search node except the root has a parent node
     # and all search nodes wrap a state object
 
-    def __init__(self, state, heuristic, parent=None, transition_cost=0, path_cost=0, direction=None):
+    def __init__(self, state, heuristic, direction=None, parent=None, transition_cost=0, path_cost=0):
         self.state = state
         self.heuristic = heuristic
         self.parent = parent
@@ -89,7 +89,7 @@ def sensorless_astar_search(search_problem, heuristic_fn):
 
         # test to see if we're at the solution
         if current_node.goal_test():
-            solution_path: list = sensorless_backchain(node=current_node)
+            solution_path: list = sensorless_backchain(node=current_node)[1:]
             print(f'Solution found! Path to solution: {solution_path}')
             solution.solved = True
             return solution_path

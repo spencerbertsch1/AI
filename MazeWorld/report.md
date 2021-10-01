@@ -91,9 +91,9 @@ There were two real keys to this problem: understanding that the heuristic shoul
 store the information regarding which robot's turn it is to move. 
 
 ## Blind Robot Evaluation
-After many hours of changing the heuristic function and implementation, the blind robot functionality essentially works as expected. 
+After much experimentation with the heuristic function and implementation, the blind robot functionality essentially works as expected. 
 
-Lets imagine a trivial maze with no blocks and only floor space. The robot could reduce the state space by either a row or column by simply 
+Let's imagine a trivial maze with no blocks and only floor space. The robot could reduce the state space by either a row or column by simply 
 moving either north or south, then moving either east or west until there is only one remaining space left. That is the result we
 see when running test_sensorless.py on the trivial sensorless maze: 
 ```
@@ -106,11 +106,11 @@ And we can see that we get the expected output below. Note that the solution len
 SensorlessNode was initialized with a direction of None. 
 
 ```
-Solution found! Path to solution: [None, 'North', 'North', 'East', 'East', 'East']
-SOLUTION PATH LENGTH: 6
+Solution found! Path to solution: ['North', 'North', 'East', 'East', 'East']
+SOLUTION PATH LENGTH: 5
 ```
 
-The solutions for nontivial sensorless problems always seem to be missing the last direction in the path. (See below). It looks like the sensorless A* search always 
+The solutions for nontrivial sensorless problems always seem to be missing the last direction in the path. (See below). It looks like the sensorless A* search always 
 converges on the correct solution, but it doesn't print the last move (direction) in the path. I'm still trying to figure out why! 
 
 ```
@@ -121,13 +121,14 @@ converges on the correct solution, but it doesn't print the last move (direction
 This input, as seen from our quiz a few days ago, renders the following output: 
 
 ```
-Solution found! Path to solution: [None, 'North', 'East']
-SOLUTION PATH LENGTH: 3
+Solution found! Path to solution: ['North', 'East']
+SOLUTION PATH LENGTH: 2
 ```
 
-We all know the real answer is North, East, East, so where is that last 'East'? If I had a little more time I'm sure I could fix the bug!  
+We all know the real answer is North, East, East, but the result is giving the path with all but the last value. Still, the algorithm moves in the correct 
+direction and collapses the state space to a single coordinate, but the path is still missing its last direction element. 
 
-# Discussion Questions
+# Discussion Questions Responses
 
 ## Multi-robot coordination problem
 

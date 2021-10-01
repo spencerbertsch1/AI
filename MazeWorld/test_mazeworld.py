@@ -43,7 +43,9 @@ def manhattan_heuristic_better(current_state, goal_state):
 def manhattan_heuristic(current_state, goal_state):
     """
     Function to return the manhattan distance (X1 - X2) + (Y1 - Y2) given two points [X1, Y1] and [X2, Y2] as long as
-    there are only 1, 2, or 3 robots in the game. There is a better implementation of this function above.
+    there are only 1, 2, or 3 robots in the game.
+
+    There is a better implementation of this function above called manhattan_heuristic_better.
     :param current_state:
     :param goal_state:
     :return:
@@ -56,15 +58,18 @@ def manhattan_heuristic(current_state, goal_state):
                 (abs(current_state[3] - goal_state[2]) + abs(current_state[4] - goal_state[3])))/2
 
     elif len(current_state) == 7:
-         h = ((abs(current_state[1] - goal_state[0]) + abs(current_state[2] - goal_state[1])) +
+        return ((abs(current_state[1] - goal_state[0]) + abs(current_state[2] - goal_state[1])) +
                 (abs(current_state[3] - goal_state[2]) + abs(current_state[4] - goal_state[3])) +
                 (abs(current_state[5] - goal_state[4]) + abs(current_state[6] - goal_state[5])))/3
-         return h
 
 
 def euclidian_heuristic(current_state, goal_state):
     """
     Function to return the manhattan distance (X1 - X2) + (Y1 - Y2) given two points [X1, Y1] and [X2, Y2]
+
+    Note that this heuristic function can only be applied to a single-robot problem. See  the
+    manhattan_heuristic_better function above for an example of a heuristic that can be applied to a maze with
+    any number of robots.
     :param current_state:
     :param goal_state:
     :return:
