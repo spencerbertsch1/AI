@@ -7,6 +7,60 @@ Spencer Bertsch
 
 # Description
 
+1. How do your implemented algorithms work?
+
+### Multi-Robot Coordination Problem
+The multi-robot coordination problem is a problem in which more than one (k) robots are initialized in a maze and each is trying to
+get to a given goal. Each of the robots can't travel over a wall or over another robot. In order to solve this using A* we needed to implement 
+a heuristic function *h(n)* which found the best position for robot k to optimize not only that robot's position relative to its goal, but the 
+overall location of all robots and all goals. For this reason, the heuristic used was the mean heuristic for each robot in the maze; my implementation 
+simply used the mean Manhattan heuristic for each robot in the maze. 
+
+
+The other important aspect of this implementation was the *get_successors* function. 
+This function allowed us to take a state representing each robot's position, and which robot was going to move next, and let us iteratively update the correct robot's position.
+The state in this problem is represented by an odd-length tuple starting with an integer representing which of the robots should be moved next, and then pairs of (X,Y)
+coordinates representing the positions of each respective robot. 
+
+
+The actual A* algorithm was also an important part of the implementation. As we learned in class and read in the textbook, A* functions by taking both 
+the heuristic *h(n)* and the cost *c* into account. For the multi-robot search problem, the robots burned one unit of gas if they moved, and zero units of gas
+if they stayed still. This transition cost, along with the mean Manhattan heuristic, were the components that allowed our A* to solve this problem. 
+
+
+### Sensorless Robot Problem (Pacman Physics) 
+The Sensorless Robot Search problem is an interesting problem with a different heuristic *h(n)* and a different *get_successors* function than 
+the multi-robot search proboem seen above. For the sensorless problem, the state was simply represented as a tuple of tuples, the latter of which 
+represent all of the (X,Y) coordinates that the robot could be in. As A* searched through the state space moving the robot North, East, South, or West, 
+the length of the state shrank accordingly as spaces were removed from possibility. The appropriate heuristic, therefore, was to examine the 
+number of (X,Y) positions in the state. The fewer the positions in the state, the closer we are to the goal. 
+
+The *get_successors* function was also an important aspect of the sensorless-robot problem. As mentioned, the state exists as a tuple of 2-length tuples, each 
+of which represent the possible (X,Y) coordinates of the robot. The get_successors function is divided into four parts, one for North, one for East, 
+one for South, and one for West. At any given time, the successor state would be all the possible places that the robot could travel if it moves in any one of those
+four directions. If the robot was in an illegal space after it moved, then the *get_successors* function would keep the initial state in the successors, but 
+if the robot was in a legal space after it moved, then the get successors function would remove the initial (X,Y) coordinate from the 
+set of possible successors. This process was repeated through A* until only one space was left. As A* searched, the heuristic pushed the search into the direction that
+minimized the number of (X,Y) coordinates still in the state until it hit a state with only one remaining (X,Y) coordinate, at which time the search terminated and the path was returned. 
+
+
+2. What design decisions did you make? 
+
+We were given skeleton code for the problem set, but there were still several design decisions that helped me complete the project. 
+One thing was to create a similar copy of the A* search algorithm specifically for the sensorless robot problem. I initially started using a single 
+A* function and passing in a `sensorless` bool which could be used as a switch to activate several `if sensorless: ...do something` logical components in the 
+A* function. After starting down this road, I realized there were so many changes that needed to be made to the A* algorithm that it would be easier to 
+create a copy that was tailored specifically for the sensorless-robot problem. 
+
+One interesting addition to the SensorlessAStarNode class was the addition of the path instance variable so that we could store the directions (North, 
+East, South, West) that the robot travelled so that it could be sure of where it was in the maze. This was the path that was printed at the end after the 
+SensorlessSearch finished.
+
+3. How you laid out the problems?
+
+I laid out the problems by structuring most of the Sensorless code in the SensorlessProblem.py file, and most of the multi-robot search code in the 
+astar_search.py and MazeworldProblem.py files. As seen in the README.md file which is also in the MazeWorld directory, the two frameworks can be tested by 
+running either the test_mazeworld.py file as a script, or running the test_sensorless.py file as a script. The heuristics are also defined in these two files. 
 
 # Evaluation
 
