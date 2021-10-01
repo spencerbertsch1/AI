@@ -29,7 +29,7 @@ def sensorless_heuristic(current_state):
 
 
 # * SENSORLESS SEARCH *
-test_maze3 = Maze("mazes/sensorless_maze.maz")
+test_maze3 = Maze("mazes/sensorless_maze2.maz")
 test_problem = SensorlessProblem(test_maze3)
 start_state = test_problem.generate_initial_state(maze=test_maze3)
 all_successors = test_problem.get_successors_sensorless(start_state)

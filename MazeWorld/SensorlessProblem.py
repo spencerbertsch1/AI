@@ -217,8 +217,7 @@ class SensorlessProblem:
         w_successors: tuple = tuple(west_successors)
         return [n_successors, e_successors, s_successors, w_successors]
 
-
-    def animate_path(self, path):
+    def animate_path_sensorless(self, path):
         # reset the robot locations in the maze
         self.maze.robotloc = tuple(self.start_state)
 
