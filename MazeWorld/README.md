@@ -20,11 +20,13 @@ Spencer Bertsch
 2. `cd` to the MazeWorld directory by running the following command:
     1. `$ cd MazeWorld`
 
-
+### To Run Multi-Robot Search: 
 3. Run the following command to run the test_mazeworld.py file.
     1. `$ python3 test_mazeworld.py`
 
 
-4. You will see an animation of how the A* algorithm solves the multi-robot search problem as each robot is trying to navigate the environment and the other
-robots to find their goals. Different examples show different mazes, some of which start with several robots who are stuck in a tunnel
-and need to back out of the tunnel and rotate around to let a different robot in first so they can all reach their goals. 
+### To Sensorless Search:
+4. Run the following command to run the test_sensorless.py file.
+    1. `$ python3 test_sensorless.py`
+
+    
