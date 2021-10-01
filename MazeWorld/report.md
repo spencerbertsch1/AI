@@ -77,9 +77,12 @@ We all know the real answer is North, East, East, so where is that last 'East'? 
 
 ## Multi-robot coordination problem
 
-1. You would need 2 * k numbers, or (2 * number_of_robots) numbers to represent the robot state of the system. Each robot has an [X,Y] coordinate
-and each robot is free to move in any direction as long as it's not being blocked by another robot or by a wall. We need to store the original map
-in addition to the [X,Y] positions of all robots at any given time during their exploration. 
+1. Representing the state of the system correctly is one of the most important aspects of getting this problem right. The state of the system 
+requires (2 * k robots) + 1 integers, or (2 * k robots) + 1 pieces of information about the state. This is clearly an odd number, so the smallest 
+state would consist of 3 integers: (robot_to_move, X_position, Y_position). In this case there is only a single robot, so the first integer would
+always be zero. As the number of robots in the game increases, then we would increase the number of ints in the state from 3 to 5, then to 7, then to 9
+and so on. Each robot adds an additional X, Y coordinate to the state and an additional increment to the first int in the state telling the A* algorithm 
+which robot's turn it is to move next. Structuring the state in this way is one of the keys of setting up the multi-robot coordination problem correctly.
 
 
 2. An upper bound on the number of states in the system can be found by thinking about the way we represented the state. We represent the state
@@ -87,13 +90,44 @@ with a tuple (k, m, m, ...) for a square maze of length m and k robots where the
 The upper bound on the size of the state would be m\*m\*(k+1) if k starts with 0 as represented in my implementation, or (m\*m\*k). 
 
 
+3. As the number of wall squares increases, collisions will increase as well. Boxing the robots in so that they are stuck in hallways or paths will force robots to 
+collide and potentially back out of a hallway in order to reorient themselves to reach the desired goal. In terms of an expression, I 
+would probably need to run a simulation in which I generate random, large mazes with differing wall densities and measure the number of 
+robot-robot collisions that take place during the search for each maze. Without doing this, I could say that the number of collisions can 
+be expressed by *collisions = (alpha(w)/n) + epsilon* for some small constant epsilon and a scaling factor alpha. Epsilon and alpha in this case would 
+depend on *n*, and the larger *n* is the smaller epsilon would be. Similarly, we include an *n* term when we consider *w* so that we can get the relative density 
+of the maze instead of simple the number of walls.
 
 
-6. The 8-puzzle in the book is a special case of this problem because each numbered square in the 8-puzze can be treated as a robot! Each numbered square 
+4. Good question, I think that BFS would probably not be a good solution here because it would likely cause the machine to run out of memory. 
+We know that if n is 100, there are very few walls, and k=10, then each iteration will likely present a very large state space. We know that BFS
+holds all previous states in memory, giving it a space complexity of O(b^d). With 10 robots capable of moving North, South, East, or West, the 
+branching factor could be as large as 40, and the depth of the shallowest solution (in the worst case) would be 99 moves north or south, and 99 moves east or west
+for a single robot, which makes depth = 198. This means that the space complexity for this problem would be on the order of 1.6*10^317 bytes assuming 1000 bytes per node in the BFS graph.
+
+
+5. In addition to understanding how to represent the state space for the problem, understanding the right way to represent the heuristic is for multi-robot search
+is a key to success. There are many admissible or consistent heuristic that can be used for a simple two-dimensional puzzle such as this, but 
+an example of a monotonic (consistent) heuristic that I used was the mean manhattan distance for all robots to all goals. Remember that monotonicity or 
+consistency just means that the heuristic at any node *n* is not greater than the heuristic at the next node *n'* plus the cost of reaching *n'*.
+
+<p align="center">
+    h(n) ≤ h(n') + c
+</p>
+
+5. (Continued) The mean manhattan distance for all robots is monotonic because the fuel needed to move one square is 1. In the worst case, even if the 
+robot is moving in the exact opposite direction from its goal (which does sometimes happen), consistency is held because the cost would be 1
+and the new heuristic *h(n') would increase by 1, allowing the inequality to hold strongly. For the mean manhattan heuristic, and the manhattan, heuristic in general,
+moving laterally also yields the same result in which the cost increase is added to the additional heuristic, allowing the inequality to strongly hold. In the case where the robot is 
+moving directly towards its goal, then the *h(n')* term would be one less than *h(n)*, but the cost *c* in this case would be exactly 1, allowing the 
+inequality to hold.
+
+
+5. The 8-puzzle in the book is a special case of this problem because each numbered square in the 8-puzze can be treated as a robot! Each numbered square 
 has a starting state and a goal state and each needs to work together to get into the goal state. I think that A* and our implementation could be used to 
 implement the 8-puzzle. As discussed in class, a good heuristic to use would be the overall manhattan distance for the all game pieces and all goal states. 
 
-7. The 8-puzzle can be represented by two mutually disjoint sets which can be represented by solvable start states and unsolvable start states. XXXXX TODO 
+6. The 8-puzzle can be represented by two mutually disjoint sets which can be represented by solvable start states and unsolvable start states. XXXXX TODO 
 
 
 # APPENDIX
