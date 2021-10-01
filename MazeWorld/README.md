@@ -25,7 +25,7 @@ Spencer Bertsch
     1. `$ python3 test_mazeworld.py`
 
 
-### To Sensorless Search:
+### To Run Sensorless Search:
 4. Run the following command to run the test_sensorless.py file.
     1. `$ python3 test_sensorless.py`
 
