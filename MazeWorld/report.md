@@ -125,8 +125,9 @@ Solution found! Path to solution: ['North', 'East']
 SOLUTION PATH LENGTH: 2
 ```
 
-We all know the real answer is North, East, East, but the result is giving the path with all but the last value. Still, the algorithm moves in the correct 
-direction and collapses the state space to a single coordinate, but the path is still missing its last direction element. 
+We know that the real answer is [West, North, West, West], and a sub optimal solution could be [North, East, East, South, West], so the algorithm is going 
+in the correct direction and it capable of reducing the state space to a single coordinate, but it doesn't track the path in the correct way. I'm still looking 
+into this issue. 
 
 # Discussion Questions Responses
 
