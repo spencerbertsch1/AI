@@ -108,8 +108,9 @@ for a single robot, which makes depth = 198. This means that the space complexit
 
 5. In addition to understanding how to represent the state space for the problem, understanding the right way to represent the heuristic is for multi-robot search
 is a key to success. There are many admissible or consistent heuristic that can be used for a simple two-dimensional puzzle such as this, but 
-an example of a monotonic (consistent) heuristic that I used was the mean manhattan distance for all robots to all goals. Remember that monotonicity or 
-consistency just means that the heuristic at any node *n* is not greater than the heuristic at the next node *n'* plus the cost of reaching *n'*.
+an example of a monotonic (consistent) heuristic that I used was the mean manhattan distance for all robots to all goals. 
+This was crucial for success in the multi-robot search problem: the heuristic needs to reflect all robots and all goals, not an iteration of each robot and its respective goal! 
+Remember that monotonicity or consistency just means that the heuristic at any node *n* is not greater than the heuristic at the next node *n'* plus the cost of reaching *n'*.
 
 <p align="center">
     h(n) ≤ h(n') + c
@@ -125,15 +126,21 @@ inequality to hold.
 
 5. The 8-puzzle in the book is a special case of this problem because each numbered square in the 8-puzze can be treated as a robot! Each numbered square 
 has a starting state and a goal state and each needs to work together to get into the goal state. I think that A* and our implementation could be used to 
-implement the 8-puzzle. As discussed in class, a good heuristic to use would be the overall manhattan distance for the all game pieces and all goal states. 
+implement the 8-puzzle. As discussed in class, a good heuristic to use would be the overall manhattan distance for the all game pieces and all goal states, 
+which is the exact heuristic that I implemented for the multi-robot search problem. 
 
-6. The 8-puzzle can be represented by two mutually disjoint sets which can be represented by solvable start states and unsolvable start states. XXXXX TODO 
+
+6. The 8-puzzle can be represented by two mutually disjoint sets which can be represented by robots that can move and robots that cannot move at any given time. The two sets
+can be thought of the robots that can move (robots that are not boxed in), and the robots that can't move (robots that are boxed in). The robots that "can't" move 
+have the only option of staying in place and burning no gas in the process. The robots that can move will have more than the trivial child state. We could
+easily modify our program to print the disjoint sets on every iteration of the *get_successors* function in order to simply observe
+which robots are capable of only staying in the same place, and which robots can move towards the goal in order to improve their heuristic. 
 
 
 # APPENDIX
 
 ### Multi-Robot Search Complete Example 
-Please see below for a complete example of a multi-robot search problem whereall three robots needed to shift their orientation in order to achieve the goal state. 
+Please see below for a complete example of a multi-robot search problem in which all three robots needed to shift their orientation in order to achieve the goal state. 
 
 ```
 #######
