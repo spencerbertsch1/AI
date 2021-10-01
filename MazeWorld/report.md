@@ -5,6 +5,57 @@ CS 276, Artificial Intelligence
 Fall 2021, Dartmouth College  
 Spencer Bertsch
 
+# Description
+
+
+# Evaluation
+
+## Multi-Robot Coordination Problem
+The multi-robot coordination proboem is working as expected. The robots seem to work together, moving out of tunnels and reorienting themselves 
+in the correct way before re-entering tight spaces so that they can all reach their intended targets. See below for a somewhat long example of how 
+three robots (A, B, and C) coordinate to orient themselves so that they can enter the tunnel in the correct allignment. 
+
+```
+#######
+#.#####
+#.#####
+#C#####
+#B....#
+#A#####
+
+...
+
+#######
+#A#####
+#B#####
+#C#####
+#.....#
+#.#####
+```
+
+There were two real keys to this problem: understanding that the heuristic should apply to the robots as a whole, and the get_successors function should 
+store the information regarding which robot's turn it is to move. 
+
+## Blind Robot Evaluation
+After many hours of changing the heuristic function and implementation, the blind robot functionality works as expected!
+
+Lets imagine a trivial maze with no blocks and only floor space. The robot could reduce the state space by either a row or column by simply 
+moving either north or south, then moving either east or west until there is only one remaining space left. That is the result we
+see when running test_sensorless.py on the trivial sensorless maze: 
+```
+....
+....
+....
+```
+
+And we can see that we get the expected output below. Note that the solution length is one larger than it should be because the initial 
+SensorlessNode was initialized with a direction of None. 
+
+```
+Solution found! Path to solution: [None, 'North', 'North', 'East', 'East', 'East']
+SOLUTION PATH LENGTH: 6
+```
+
 # Discussion Questions
 
 ## Multi-robot coordination problem
@@ -26,3 +77,234 @@ has a starting state and a goal state and each needs to work together to get int
 implement the 8-puzzle. As discussed in class, a good heuristic to use would be the overall manhattan distance for the all game pieces and all goal states. 
 
 7. The 8-puzzle can be represented by two mutually disjoint sets which can be represented by solvable start states and unsolvable start states. XXXXX TODO 
+
+
+# APPENDIX
+
+### Multi-Robot Search Complete Example 
+Please see below for a complete example of a multi-robot search problem whereall three robots needed to shift their orientation in order to achieve the goal state. 
+
+```
+#######
+#.#####
+#.#####
+#C#####
+#B....#
+#A#####
+
+MazeWorld problem:
+
+#######
+#.#####
+#.#####
+#C#####
+#B....#
+#A#####
+
+MazeWorld problem:
+
+#######
+#.#####
+#.#####
+#C#####
+#.B...#
+#A#####
+
+MazeWorld problem:
+
+#######
+#.#####
+#.#####
+#C#####
+#.B...#
+#A#####
+
+MazeWorld problem:
+
+#######
+#.#####
+#.#####
+#C#####
+#AB...#
+#.#####
+
+MazeWorld problem:
+
+#######
+#.#####
+#.#####
+#C#####
+#A.B..#
+#.#####
+
+MazeWorld problem:
+
+#######
+#.#####
+#.#####
+#C#####
+#A.B..#
+#.#####
+
+MazeWorld problem:
+
+#######
+#.#####
+#.#####
+#C#####
+#.AB..#
+#.#####
+
+MazeWorld problem:
+
+#######
+#.#####
+#.#####
+#C#####
+#.AB..#
+#.#####
+
+MazeWorld problem:
+
+#######
+#.#####
+#.#####
+#.#####
+#CAB..#
+#.#####
+
+MazeWorld problem:
+
+#######
+#.#####
+#.#####
+#.#####
+#CAB..#
+#.#####
+
+MazeWorld problem:
+
+#######
+#.#####
+#.#####
+#.#####
+#CAB..#
+#.#####
+
+MazeWorld problem:
+
+#######
+#.#####
+#.#####
+#.#####
+#.AB..#
+#C#####
+
+MazeWorld problem:
+
+#######
+#.#####
+#.#####
+#.#####
+#A.B..#
+#C#####
+
+MazeWorld problem:
+
+#######
+#.#####
+#.#####
+#.#####
+#AB...#
+#C#####
+
+MazeWorld problem:
+
+#######
+#.#####
+#.#####
+#.#####
+#AB...#
+#C#####
+
+MazeWorld problem:
+
+#######
+#.#####
+#.#####
+#A#####
+#.B...#
+#C#####
+
+MazeWorld problem:
+
+#######
+#.#####
+#.#####
+#A#####
+#B....#
+#C#####
+
+MazeWorld problem:
+
+#######
+#.#####
+#.#####
+#A#####
+#B....#
+#C#####
+
+MazeWorld problem:
+
+#######
+#.#####
+#A#####
+#.#####
+#B....#
+#C#####
+
+MazeWorld problem:
+
+#######
+#.#####
+#A#####
+#B#####
+#.....#
+#C#####
+
+MazeWorld problem:
+
+#######
+#.#####
+#A#####
+#B#####
+#C....#
+#.#####
+
+MazeWorld problem:
+
+#######
+#A#####
+#.#####
+#B#####
+#C....#
+#.#####
+
+MazeWorld problem:
+
+#######
+#A#####
+#B#####
+#.#####
+#C....#
+#.#####
+
+MazeWorld problem:
+
+#######
+#A#####
+#B#####
+#C#####
+#.....#
+#.#####
+```

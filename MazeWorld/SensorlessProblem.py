@@ -2,19 +2,20 @@ from Maze import Maze
 from time import sleep
 from heapq import heappush, heappop, heapify
 from astar_search import backchain, get_states_from_frontier
-from SearchSolution import SearchSolution
+from SearchSolution import SensorlessSearchSolution
 
 
 class SensorlessAStarNode:
     # each search node except the root has a parent node
     # and all search nodes wrap a state object
 
-    def __init__(self, state, heuristic, parent=None, transition_cost=0, path_cost=0):
+    def __init__(self, state, heuristic, parent=None, transition_cost=0, path_cost=0, direction=None):
         self.state = state
         self.heuristic = heuristic
         self.parent = parent
         self.transition_cost = transition_cost
         self.path_cost = path_cost
+        self.direction = direction
 
     def goal_test(self) -> bool:
         """
@@ -42,6 +43,17 @@ class SensorlessAStarNode:
         return self.priority() < other.priority()
 
 
+def sensorless_backchain(node):
+    result = []
+    current = node
+    while current:
+        result.append(current.direction)
+        current = current.parent
+
+    result.reverse()
+    return result
+
+
 # use the sensorless AStarNode
 def sensorless_astar_search(search_problem, heuristic_fn):
     """
@@ -65,7 +77,7 @@ def sensorless_astar_search(search_problem, heuristic_fn):
     explored = set()  # <-- we could also remove the explored set and just reference the keys in the visited_cost dict
 
     # define a solution object that we will modify as we search
-    solution = SearchSolution(search_problem, "Astar with heuristic " + heuristic_fn.__name__)
+    solution = SensorlessSearchSolution(search_problem, "Astar with heuristic " + heuristic_fn.__name__)
 
     # we would usually use a heap for this, but we can just use a dict as it's laid out in the assignment
     visited_cost: dict = {}
@@ -77,31 +89,32 @@ def sensorless_astar_search(search_problem, heuristic_fn):
 
         # test to see if we're at the solution
         if current_node.goal_test():
-            solution_path: list = backchain(node=current_node)
+            solution_path: list = sensorless_backchain(node=current_node)
             print(f'Solution found! Path to solution: {solution_path}')
             solution.solved = True
             return solution_path
 
         explored.add(tuple(current_node.state))
 
-        # add check so we make sure we don't iterate through a single tuple of 2 ints
-        # This should never happen because we do the goal check above !
-        # state_to_search = current_node.state
-        # if isinstance(state_to_search, tuple):
-        #     print('converting state to set of a single tuple.')
-        #     s = set()
-        #     s.add(state_to_search)
-        #     state_to_search = s
+        # we need to make sure that the state is a tuple of tuples
         state_to_search = tuple(current_node.state)
 
-        for child_state in search_problem.get_successors_sensorless(states=state_to_search):
+        # create a direction map to create the sensorless path
+        direction_map: dict = {
+            0: 'North',
+            1: 'East',
+            2: 'South',
+            3: 'West'}
+
+        for i, child_state in enumerate(search_problem.get_successors_sensorless(states=state_to_search)):
             # we now need to create a new node!
             transition_cost = 1
             new_node = SensorlessAStarNode(state=child_state,
                                            parent=current_node,
                                            heuristic=heuristic_fn(current_state=child_state),
                                            transition_cost=transition_cost,
-                                           path_cost=current_node.path_cost + transition_cost)
+                                           path_cost=current_node.path_cost + transition_cost,
+                                           direction=direction_map[i])
             tuple_to_add = tuple(new_node.state)
             print(f'ADDING {tuple_to_add} to visited dict!')
             visited_cost[tuple_to_add] = new_node.path_cost
@@ -164,18 +177,6 @@ class SensorlessProblem:
                     legal_states.append(state)
 
         return legal_states
-
-    def max_distance(self):
-        pass
-
-        # north_successors: set = set()
-        # for state in states:
-        #     print(f'GETTING NORTH SUCCESSOR FOR: {state}')
-        #     successors: list = [(state[0]+1, state[1]), (state[0]-1, state[1]), (state[0], state[1]+1),
-        #                         (state[0], state[1]-1), (state[0], state[1])]
-        #     legal_successors: list = self.get_legal_states(state_list=successors)
-        #     all_successors.update(legal_successors)
-
 
     def get_successors_sensorless(self, states):
         """
