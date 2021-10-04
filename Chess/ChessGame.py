@@ -9,9 +9,11 @@ class ChessGame:
     def make_move(self):
 
         player = self.players[1 - int(self.board.turn)]
-        move = player.choose_move(self.board)
-
+        move = player.choose_move(board=self.board)
         self.board.push(move)  # Make the move
+
+    def undo_move(self):
+        self.board.pop()  # undo the last move that was made on the board
 
     def is_game_over(self):
         return self.board.is_game_over()

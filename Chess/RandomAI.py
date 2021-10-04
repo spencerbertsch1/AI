@@ -1,8 +1,9 @@
-#import chess
+# import chess
 import random
 from time import sleep
 
-class RandomAI():
+
+class RandomAI:
     def __init__(self):
         pass
 

@@ -11,9 +11,12 @@ from ChessGame import ChessGame
 
 import sys
 
+# Set the max depth for depth limited minimax here
+MAX_DEPTH: int = 2
 
 player1 = HumanPlayer()
-player2 = RandomAI()
+# player2 = RandomAI()
+player2 = MinimaxAI(max_depth=MAX_DEPTH)
 
 game = ChessGame(player1, player2)
 

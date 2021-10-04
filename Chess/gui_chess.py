@@ -50,8 +50,6 @@ class ChessGui:
         self.display_board()
 
 
-
-
 if __name__ == "__main__":
 
     random.seed(1)
