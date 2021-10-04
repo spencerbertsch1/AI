@@ -42,10 +42,27 @@ class MinimaxAI:
             2: 3,  # Knight
             3: 3,  # Bishop
             4: 3,  # Rook
-            5: 5   # Queen
+            5: 9   # Queen
         }
 
-        return 0
+        white_total: int = 0
+        black_total: int = 0
+        # find the total board utility for each color based on the lookup table above
+        for k, v in piece_value_lookup.items():
+            white_total = white_total + (len(board.pieces(piece_type=k, color=True)) * piece_value_lookup[k])
+            black_total = black_total + (len(board.pieces(piece_type=k, color=False)) * piece_value_lookup[k])
+
+        # if the utility is equal, we return 0 - the exact center of utility between -1 and 1
+        if white_total == black_total:
+            return 0
+
+        # if white's utility is greater, we use TanH to get a value between 0 and 1
+        elif white_total > black_total:
+            return math.tanh(white_total / black_total)
+
+        # # if black's utility is greater, we use TanH to get a value between 0 and 1
+        else:
+            return math.tanh(black_total / white_total)
 
     def cutoff_test(self, board, depth):
         """
