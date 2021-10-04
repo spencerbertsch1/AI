@@ -92,7 +92,9 @@ def sensorless_astar_search(search_problem, heuristic_fn):
             solution_path: list = sensorless_backchain(node=current_node)[1:]
             print(f'Solution found! Path to solution: {solution_path}')
             solution.solved = True
-            return solution_path
+            solution.path = solution_path
+            solution.cost = len(solution_path)
+            return solution
 
         explored.add(tuple(current_node.state))
 
@@ -116,13 +118,14 @@ def sensorless_astar_search(search_problem, heuristic_fn):
                                            path_cost=current_node.path_cost + transition_cost,
                                            direction=direction_map[i])
             tuple_to_add = tuple(new_node.state)
-            print(f'ADDING {tuple_to_add} to visited dict!')
+            # print(f'ADDING {tuple_to_add} to visited dict!')
             visited_cost[tuple_to_add] = new_node.path_cost
 
             frontier_states = get_states_from_frontier(frontier=frontier)
             if (new_node.state not in explored) & (new_node.state not in frontier_states):
                 # if the new child node is not the solution, we add it to the frontier for further exploring
                 heappush(frontier, new_node)
+                solution.nodes_visited = solution.nodes_visited + 1
 
             # elif the new state is in the frontier and the node in the frontier has a cheaper path cost, swap them
             elif (new_node.state in frontier_states) & (visited_cost[new_node.state] > new_node.path_cost):
