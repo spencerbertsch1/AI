@@ -71,13 +71,14 @@ three robots (A, B, and C) coordinate to orient themselves so that they can ente
 
 ```
 #######
-#.#####
-#.#####
 #C#####
-#B....#
+#B#####
+#.#####
+#.....#
 #A#####
 
-...
+   |
+   v
 
 #######
 #A#####
@@ -87,9 +88,27 @@ three robots (A, B, and C) coordinate to orient themselves so that they can ente
 #.#####
 ```
 
+See the solution output for the above example below. We can see that although there were a large number of nodes visited, the 
+solution length was only 31 moves, some of which consisted of robots staying in the same place. We can also see that the cost of the 
+solution was *less* than the solution length. This makes sense because several actions taken by the robots during the search were to 
+stay in the same place and 'burn no gas' in the process. A cost of 21 signifies that robots physically moved positions 21 times during 
+the search. 
+
+```
+attempted with search method Astar with heuristic manhattan_heuristic_better
+number of nodes visited: 1037
+solution length: 31
+cost: 21
+path: [(0, 1, 0, 1, 3, 1, 4), ..., (0, 1, 4, 1, 3, 1, 2)]
+```
+
 There were two real keys to this problem: understanding that the heuristic should apply to the robots as a whole, and the get_successors function should 
 store the information regarding which robot's turn it is to move. See the **Appendix** at the end of this report to see a full multi-robot search 
-spet-by-step. 
+laid out step-by-step. If anyone is interested in running other examples of multi-robot search using my code, feel free to uncomment some of the calls to different
+mazes in the test_mazeworld.py file. Some example mazes are very large and take a long time to converge on a solution, but most of them are small enough to 
+see the robots seemingly working together to arrive at the optimal solution. Again I would say the two biggest insights that allowed me to implement 
+a working multi-robot search framework were realizing teh heuristic needed to take all robots into account simultaneously, and representing the state
+as an odd-length tuple that included information about which robot's turn it was to move next. 
 
 ## Blind Robot Evaluation
 After much experimentation with the heuristic function and implementation, the blind robot solution is working exactly as expected. 
@@ -145,6 +164,31 @@ also a viable solution, but it costs one more than the optimal solution which wa
 See above for a diagram depicting the optimal path found by the SensorlessA* algorithm in this example. If anyone wants to run the 
 sensorless robot problem with other mazes, I added a few others and commented them out in the test_sensorless.py file. Feel free to 
 uncomment a few others and look at the solutions. 
+
+
+One last thing I will say in this section is how the time and space complexity of A* really shows itself in these problems. With the above example, 
+we only had six available spaces to move, and we checked 24 nodes in the process of finding the correct solution. 
+
+```
+...#...#..
+.#...#...#
+...#...#..
+```
+With the above maze, however, we have 23 open floor spaces in a grid of overall size 30. The number of search nodes created by A* in this case was 7,411 as seen below. 
+Because all nodes are held in memory, I can see how increasing the number of available search spaces even to 100 could cause a machine to run out of memory. We know from 
+the textbook that a more optimal heuristic function will cause the A* search to be more optimal (causing A* to search through fewer states and create fewer nodes in memory).
+In our case, we can see that using a Manhattan distance heuristic still leaves us with a O(b^d) space complexity and although our branching factor is 
+quite small in the case, *b=4*, the distance to the shallowest solution can be quite large for larger mazes. 
+
+```
+Blind robot problem:
+attempted with search method Astar with heuristic sensorless_heuristic
+number of nodes visited: 7411
+solution length: 17
+cost: 17
+path: ['West', 'South', 'South', 'West', 'North', 'West', 'North', 'West', 
+'North', 'West', 'West', 'South', 'West', 'West', 'South', 'West', 'West']
+```
 
 # Discussion Questions Responses
 
