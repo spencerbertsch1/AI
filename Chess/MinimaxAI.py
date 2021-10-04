@@ -74,8 +74,8 @@ class MinimaxAI:
         :return:
         """
         if board.is_game_over():
-            print(f'Chess game complete!')
-            return 1
+            return -1
+        # TODO return 0 or 1 depending on who won!
         elif depth >= self.max_depth:
             # print(f'Max depth reached, evaluating current board state at depth {depth}.')
             return self.evaluate_board(board=board)
