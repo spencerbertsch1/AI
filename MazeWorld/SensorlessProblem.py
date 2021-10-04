@@ -193,25 +193,44 @@ class SensorlessProblem:
         south_successors: set = set()
         west_successors: set = set()
         for state in states:
-            print(f'GETTING NORTH SUCCESSOR FOR: {state}')
+            print(f' ---------- {state} ---------- ')
+            if state == (1, 1):
+                print('something')
             north_successor: list = [(state[0], state[1]+1)]
             legal_north_successor: list = self.get_legal_states(state_list=north_successor)
-            north_successors.update(legal_north_successor)
+            print(f'GETTING NORTH SUCCESSOR FOR: {state}: {legal_north_successor}')
+            # if the north successor is ILLEGAL, we have run into a north wall and we add the current state:
+            if len(legal_north_successor) == 0:
+                north_successors.add(state)
+            else:
+                north_successors.update(legal_north_successor)
 
-            print(f'GETTING EAST SUCCESSOR FOR: {state}')
             east_successor: list = [(state[0]+1, state[1])]
             legal_east_successor: list = self.get_legal_states(state_list=east_successor)
-            east_successors.update(legal_east_successor)
+            print(f'GETTING EAST SUCCESSOR FOR: {state}: {legal_east_successor}')
+            # if the east successor is ILLEGAL, we have run into an east wall and we add the current state:
+            if len(legal_east_successor) == 0:
+                east_successors.add(state)
+            else:
+                east_successors.update(legal_east_successor)
 
-            print(f'GETTING SOUTH SUCCESSOR FOR: {state}')
             south_successor: list = [(state[0], state[1]-1)]
             legal_south_successor: list = self.get_legal_states(state_list=south_successor)
-            south_successors.update(legal_south_successor)
+            print(f'GETTING SOUTH SUCCESSOR FOR: {state}: {legal_south_successor}')
+            # if the south successor is ILLEGAL, we have run into a south wall and we add the current state:
+            if len(legal_south_successor) == 0:
+                south_successors.add(state)
+            else:
+                south_successors.update(legal_south_successor)
 
-            print(f'GETTING WEST SUCCESSOR FOR: {state}')
             west_successor: list = [(state[0]-1, state[1])]
             legal_west_successor: list = self.get_legal_states(state_list=west_successor)
-            west_successors.update(legal_west_successor)
+            print(f'GETTING WEST SUCCESSOR FOR: {state}: {legal_west_successor}')
+            # if the west successor is ILLEGAL, we have run into a west wall and we add the current state:
+            if len(legal_west_successor) == 0:
+                west_successors.add(state)
+            else:
+                west_successors.update(legal_west_successor)
 
         # generate a list of 4 tuples (N, E, S, W), each of which contain the (X,Y) coordinates of those moves!
         n_successors: tuple = tuple(north_successors)
