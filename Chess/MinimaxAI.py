@@ -58,7 +58,7 @@ class MinimaxAI:
 
         # if white's utility is greater, we use TanH to get a value between 0 and 1
         elif white_total > black_total:
-            return math.tanh(white_total / black_total)
+            return -math.tanh(white_total / black_total)
 
         # # if black's utility is greater, we use TanH to get a value between 0 and 1
         else:
