@@ -75,8 +75,11 @@ def astar_search(search_problem, heuristic_fn):
         if list(current_node.state)[1:] == list(search_problem.goal_states):
             solution_path: list = backchain(node=current_node)
             print(f'Solution found! Path to solution: {solution_path}')
+            # calculate the amount of gas burned
+            solution.cost = len(set([x[1:] for x in solution_path]))
             solution.solved = True
-            return solution_path
+            solution.path = solution_path
+            return solution
 
         explored.add(current_node.state)
 
@@ -99,6 +102,7 @@ def astar_search(search_problem, heuristic_fn):
             if (new_node.state not in explored) & (new_node.state not in frontier_states):
                 # if the new child node is not the solution, we add it to the frontier for further exploring
                 heappush(frontier, new_node)
+                solution.nodes_visited = solution.nodes_visited + 1
 
             # elif the new state is in the frontier and the node in the frontier has a cheaper path cost, swap them
             elif (new_node.state in frontier_states) & (visited_cost[new_node.state] > new_node.path_cost):

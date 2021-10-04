@@ -91,7 +91,7 @@ def euclidian_heuristic(current_state, goal_state):
 # # * WORKING MULTI-ROBOT SEARCH *
 maze_test = Maze("mazes/multirobot_maze3.maz")
 print(maze_test)
-test_maze_problem = MazeworldProblem(maze_test, goal_locations=(1, 4, 1, 3, 1, 2), start_states=(1,0,1,1,1,2))
+test_maze_problem = MazeworldProblem(maze_test, goal_locations=(1, 4, 1, 3, 1, 2), start_states=(1,0,1,3,1,4))
 
 
 # # * WORKING MULTI-ROBOT SEARCH *
@@ -101,7 +101,6 @@ test_maze_problem = MazeworldProblem(maze_test, goal_locations=(1, 4, 1, 3, 1, 2
 
 
 # keep these lines uncommented
-path: list = astar_search(search_problem=test_maze_problem, heuristic_fn=manhattan_heuristic_better)
-print(f'SOLUTION PATH LENGTH: {len(path)}')
-test_maze_problem.animate_path(path=path)
-
+solution = astar_search(search_problem=test_maze_problem, heuristic_fn=manhattan_heuristic_better)
+print(solution)
+test_maze_problem.animate_path(path=solution.path)
