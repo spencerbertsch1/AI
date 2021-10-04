@@ -65,7 +65,7 @@ running either the test_mazeworld.py file as a script, or running the test_senso
 # Evaluation
 
 ## Multi-Robot Coordination Problem
-The multi-robot coordination proboem is working as expected. The robots seem to work together, moving out of tunnels and reorienting themselves 
+The multi-robot coordination problem is working as expected. The robots seem to work together, moving out of tunnels and reorienting themselves 
 in the correct way before re-entering tight spaces so that they can all reach their intended targets. See below for a somewhat long example of how 
 three robots (A, B, and C) coordinate to orient themselves so that they can enter the tunnel in the correct allignment. 
 
@@ -92,7 +92,7 @@ store the information regarding which robot's turn it is to move. See the **Appe
 spet-by-step. 
 
 ## Blind Robot Evaluation
-After much experimentation with the heuristic function and implementation, the blind robot functionality essentially works as expected. 
+After much experimentation with the heuristic function and implementation, the blind robot solution is working exactly as expected. 
 
 Let's imagine a trivial maze with no blocks and only floor space. The robot could reduce the state space by either a row or column by simply 
 moving either north or south, then moving either east or west until there is only one remaining space left. That is the result we
@@ -107,12 +107,16 @@ And we can see that we get the expected output below. Note that the solution len
 SensorlessNode was initialized with a direction of None. 
 
 ```
-Solution found! Path to solution: ['North', 'North', 'East', 'East', 'East']
-SOLUTION PATH LENGTH: 5
+Blind robot problem: 
+attempted with search method Astar with heuristic sensorless_heuristic
+number of nodes visited: 19
+solution length: 5
+cost: 5
+path: ['North', 'North', 'East', 'East', 'East']
 ```
 
-The solutions for nontrivial sensorless problems always seem to be missing the last direction in the path. (See below). It looks like the sensorless A* search always 
-converges on the correct solution, but it doesn't print the last move (direction) in the path. I'm still trying to figure out why! 
+It's more fun to look at nontrivial examples! Let's examine the example from our second quiz in which we had six legal squares in the maze, 
+and two blocks that the search needs to get around. (See below for diagram). 
 
 ```
 ...#
@@ -122,13 +126,25 @@ converges on the correct solution, but it doesn't print the last move (direction
 This input, as seen from our quiz a few days ago, renders the following output: 
 
 ```
-Solution found! Path to solution: ['North', 'East']
-SOLUTION PATH LENGTH: 2
+Blind robot problem: 
+attempted with search method Astar with heuristic sensorless_heuristic
+number of nodes visited: 24
+solution length: 4
+cost: 4
+path: ['West', 'North', 'West', 'West']
 ```
 
-We know that the real answer is [West, North, West, West], and a sub optimal solution could be [North, East, East, South, West], so the algorithm is going 
-in the correct direction and it capable of reducing the state space to a single coordinate, but it doesn't track the path in the correct way. I'm still looking 
-into this issue. 
+As we can see from the output, the SensorlessA* algorithm was able to find the correct path to the solution. Not only did it 
+find a path that reduced the size of the state space to 1, but it actually found the shortest path to do so. (North, East, East, South, East) is 
+also a viable solution, but it costs one more than the optimal solution which was found by the sensorless robot implementation here.
+
+<p align="center">
+    <img src="https://github.com/spencerbertsch1/AI/blob/main/MazeWorld/docs/sensorless_img.png?raw=true" alt="sensorless_diagram" width="50%"/>
+</p>
+
+See above for a diagram depicting the optimal path found by the SensorlessA* algorithm in this example. If anyone wants to run the 
+sensorless robot problem with other mazes, I added a few others and commented them out in the test_sensorless.py file. Feel free to 
+uncomment a few others and look at the solutions. 
 
 # Discussion Questions Responses
 
@@ -192,6 +208,11 @@ can be thought of the robots that can move (robots that are not boxed in), and t
 have the only option of staying in place and burning no gas in the process. The robots that can move will have more than the trivial child state. We could
 easily modify our program to print the disjoint sets on every iteration of the *get_successors* function in order to simply observe
 which robots are capable of only staying in the same place, and which robots can move towards the goal in order to improve their heuristic. 
+
+
+## Blind Robot Problem with Pacman Physics
+
+# TODO TODO TODO !
 
 
 # APPENDIX

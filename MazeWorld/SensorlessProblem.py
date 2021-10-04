@@ -181,10 +181,14 @@ class SensorlessProblem:
 
         return legal_states
 
-    def get_successors_sensorless(self, states):
+    def get_successors_sensorless(self, states, verbose: bool = False):
         """
+        Get successors function for the sensorless robot search.
+        Looks North, East, South, and West and only returns the pruned state space (only returns the spaces that are
+        either free, or spaces that are against a wall.)
 
         :param states:
+        :param verbose: True if you want to see all of the successors as they are generated
         :return:
         """
         # GET SUCCESSORS
@@ -193,12 +197,12 @@ class SensorlessProblem:
         south_successors: set = set()
         west_successors: set = set()
         for state in states:
-            print(f' ---------- {state} ---------- ')
-            if state == (1, 1):
-                print('something')
+            if verbose:
+                print(f' ---------- {state} ---------- ')
             north_successor: list = [(state[0], state[1]+1)]
             legal_north_successor: list = self.get_legal_states(state_list=north_successor)
-            print(f'GETTING NORTH SUCCESSOR FOR: {state}: {legal_north_successor}')
+            if verbose:
+                print(f'GETTING NORTH SUCCESSOR FOR: {state}: {legal_north_successor}')
             # if the north successor is ILLEGAL, we have run into a north wall and we add the current state:
             if len(legal_north_successor) == 0:
                 north_successors.add(state)
@@ -207,7 +211,8 @@ class SensorlessProblem:
 
             east_successor: list = [(state[0]+1, state[1])]
             legal_east_successor: list = self.get_legal_states(state_list=east_successor)
-            print(f'GETTING EAST SUCCESSOR FOR: {state}: {legal_east_successor}')
+            if verbose:
+                print(f'GETTING EAST SUCCESSOR FOR: {state}: {legal_east_successor}')
             # if the east successor is ILLEGAL, we have run into an east wall and we add the current state:
             if len(legal_east_successor) == 0:
                 east_successors.add(state)
@@ -216,7 +221,8 @@ class SensorlessProblem:
 
             south_successor: list = [(state[0], state[1]-1)]
             legal_south_successor: list = self.get_legal_states(state_list=south_successor)
-            print(f'GETTING SOUTH SUCCESSOR FOR: {state}: {legal_south_successor}')
+            if verbose:
+                print(f'GETTING SOUTH SUCCESSOR FOR: {state}: {legal_south_successor}')
             # if the south successor is ILLEGAL, we have run into a south wall and we add the current state:
             if len(legal_south_successor) == 0:
                 south_successors.add(state)
@@ -225,7 +231,8 @@ class SensorlessProblem:
 
             west_successor: list = [(state[0]-1, state[1])]
             legal_west_successor: list = self.get_legal_states(state_list=west_successor)
-            print(f'GETTING WEST SUCCESSOR FOR: {state}: {legal_west_successor}')
+            if verbose:
+                print(f'GETTING WEST SUCCESSOR FOR: {state}: {legal_west_successor}')
             # if the west successor is ILLEGAL, we have run into a west wall and we add the current state:
             if len(legal_west_successor) == 0:
                 west_successors.add(state)
@@ -237,6 +244,7 @@ class SensorlessProblem:
         e_successors: tuple = tuple(east_successors)
         s_successors: tuple = tuple(south_successors)
         w_successors: tuple = tuple(west_successors)
+
         return [n_successors, e_successors, s_successors, w_successors]
 
     def animate_path_sensorless(self, path):

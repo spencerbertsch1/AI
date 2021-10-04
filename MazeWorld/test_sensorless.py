@@ -29,8 +29,8 @@ def sensorless_heuristic(current_state):
 
 
 # * SENSORLESS SEARCH *
-# test_maze = Maze("mazes/sensorless_maze.maz")
-test_maze = Maze("mazes/sensorless_maze2.maz")  # <-- uncomment to see results on another maze
+test_maze = Maze("mazes/sensorless_maze.maz")
+# test_maze = Maze("mazes/sensorless_maze2.maz")  # <-- uncomment to see results on another maze
 test_problem = SensorlessProblem(test_maze)
 
 solution = sensorless_astar_search(search_problem=test_problem, heuristic_fn=sensorless_heuristic)
