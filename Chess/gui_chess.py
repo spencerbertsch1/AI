@@ -59,8 +59,9 @@ if __name__ == "__main__":
     # to do: gui does not work well with HumanPlayer, due to input() use on stdin conflict
     #   with event loop.
 
-    player1 = RandomAI()
-    player2 = RandomAI()
+    player1 = HumanPlayer()
+    # player2 = RandomAI()
+    player2 = MinimaxAI(max_depth=2)
 
     game = ChessGame(player1, player2)
     gui = ChessGui(player1, player2)
