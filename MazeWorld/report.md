@@ -212,7 +212,30 @@ which robots are capable of only staying in the same place, and which robots can
 
 ## Blind Robot Problem with Pacman Physics
 
-# TODO TODO TODO !
+1. The heuristic that I chose to use for the Sensorless A* search was the number of coordinates still left in the state space. 
+As the search progressed, the number of remaining (X,Y) coordinates available in the state space was reduced, causing the heuristic function
+*h(n)* to decrease linearly in proportion to the number of coordinates pruned from each action taken. The heuristic in this case, unlike many 
+admissible heuristics, is exactly in line with the objective function. The fewer the number of coordinates still in the state, the closer the 
+search is to the goal. There are circumstances, however, in which decreasing the number of coordinates in the state space might be possibe in the short
+term, but it would be better to choose another route with better long term payoffs. If I'm understanding the definition 
+of 'optimistic' correctly from the textbook, this heuristic is indeed optimistic.
+
+
+   **"Admissible heuristics are by nature optimistic because they think the cost of solving the problem is less than it actually is."**
+    - *Page 94, Artificial Intelligence, A Modern Approach 3rd Edition, Stuart Russel, Peter Norvig*
+
+1. (Continued) This conclusion was drawn directly from the definition of 'optimistic' from the textbook, see above. The heuristic assumes that the search problem 
+is solely to reduce the number of coordinates in the state, but it might be the case that in order to find the best path we need to delay the 
+reduction of states temporarily and search the remainder of the state space. In other situations, however, the heuristic is *not* 
+optimistic; for example if the maze was relatively simple and the heuristic was able to provide a perfect proxy for the cost
+at each state, then the heuristic would be perfect and therefore not optimistic. The description of this problem mentioned the 
+idea of removing or pruning states from the state space after running into North, East, South, or West walls. This is the reason that
+the heuristic I described above works so well! If we are able to remove three coordinates from the state instead of two, then the heuristic 
+will show that it's advantageous to move in the first direction, pruning our state space by three coordinates. Other heuristics could involve things such as 
+adding information about the number of available squares that are close together, perhaps a more widespread spread out distribution of available coordinates 
+would cause the search to slow down - or maybe it would cause it to accelerate! There are several heuristic functions that we could try, but I think 
+the one that I implemented makes the most logical sense for this problem. 
+
 
 
 # APPENDIX
@@ -221,50 +244,115 @@ which robots are capable of only staying in the same place, and which robots can
 Please see below for a complete example of a multi-robot search problem in which all three robots needed to shift their orientation in order to achieve the goal state. 
 
 ```
+MazeWorld problem: 
+
 #######
-#.#####
-#.#####
 #C#####
+#B#####
+#.#####
+#.....#
+#A#####
+
+MazeWorld problem: 
+
+#######
+#C#####
+#B#####
+#.#####
+#.....#
+#A#####
+
+MazeWorld problem: 
+
+#######
+#C#####
+#.#####
+#B#####
+#.....#
+#A#####
+
+MazeWorld problem: 
+
+#######
+#C#####
+#.#####
+#B#####
+#.....#
+#A#####
+
+MazeWorld problem: 
+
+#######
+#C#####
+#.#####
+#B#####
+#.....#
+#A#####
+
+MazeWorld problem: 
+
+#######
+#C#####
+#.#####
+#.#####
 #B....#
 #A#####
 
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
-#.#####
-#.#####
 #C#####
+#.#####
+#.#####
 #B....#
 #A#####
 
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
-#.#####
-#.#####
 #C#####
+#.#####
+#.#####
+#B....#
+#A#####
+
+MazeWorld problem: 
+
+#######
+#C#####
+#.#####
+#.#####
 #.B...#
 #A#####
 
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
 #.#####
-#.#####
 #C#####
+#.#####
 #.B...#
 #A#####
 
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
 #.#####
-#.#####
 #C#####
+#.#####
 #AB...#
 #.#####
 
-MazeWorld problem:
+MazeWorld problem: 
+
+#######
+#.#####
+#C#####
+#.#####
+#A.B..#
+#.#####
+
+MazeWorld problem: 
 
 #######
 #.#####
@@ -273,16 +361,7 @@ MazeWorld problem:
 #A.B..#
 #.#####
 
-MazeWorld problem:
-
-#######
-#.#####
-#.#####
-#C#####
-#A.B..#
-#.#####
-
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
 #.#####
@@ -291,7 +370,7 @@ MazeWorld problem:
 #.AB..#
 #.#####
 
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
 #.#####
@@ -300,7 +379,7 @@ MazeWorld problem:
 #.AB..#
 #.#####
 
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
 #.#####
@@ -309,7 +388,7 @@ MazeWorld problem:
 #CAB..#
 #.#####
 
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
 #.#####
@@ -318,7 +397,7 @@ MazeWorld problem:
 #CAB..#
 #.#####
 
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
 #.#####
@@ -327,7 +406,7 @@ MazeWorld problem:
 #CAB..#
 #.#####
 
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
 #.#####
@@ -336,7 +415,7 @@ MazeWorld problem:
 #.AB..#
 #C#####
 
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
 #.#####
@@ -345,7 +424,7 @@ MazeWorld problem:
 #A.B..#
 #C#####
 
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
 #.#####
@@ -354,7 +433,7 @@ MazeWorld problem:
 #AB...#
 #C#####
 
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
 #.#####
@@ -363,7 +442,7 @@ MazeWorld problem:
 #AB...#
 #C#####
 
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
 #.#####
@@ -372,7 +451,7 @@ MazeWorld problem:
 #.B...#
 #C#####
 
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
 #.#####
@@ -381,7 +460,7 @@ MazeWorld problem:
 #B....#
 #C#####
 
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
 #.#####
@@ -390,7 +469,7 @@ MazeWorld problem:
 #B....#
 #C#####
 
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
 #.#####
@@ -399,7 +478,7 @@ MazeWorld problem:
 #B....#
 #C#####
 
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
 #.#####
@@ -408,7 +487,7 @@ MazeWorld problem:
 #.....#
 #C#####
 
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
 #.#####
@@ -417,7 +496,7 @@ MazeWorld problem:
 #C....#
 #.#####
 
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
 #A#####
@@ -426,7 +505,7 @@ MazeWorld problem:
 #C....#
 #.#####
 
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
 #A#####
@@ -435,7 +514,7 @@ MazeWorld problem:
 #C....#
 #.#####
 
-MazeWorld problem:
+MazeWorld problem: 
 
 #######
 #A#####
