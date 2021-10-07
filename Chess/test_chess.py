@@ -15,8 +15,8 @@ import sys
 MAX_DEPTH: int = 2
 
 player1 = HumanPlayer()
-# player2 = RandomAI()
-player2 = MinimaxAI(max_depth=MAX_DEPTH)
+# player1 = MinimaxAI(max_depth=MAX_DEPTH, use_ids_search=False)
+player2 = AlphaBetaAI(max_depth=MAX_DEPTH)
 
 game = ChessGame(player1, player2)
 

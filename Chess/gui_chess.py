@@ -8,6 +8,7 @@ import sys
 import chess, chess.svg
 from RandomAI import RandomAI
 from MinimaxAI import MinimaxAI
+from AlphaBetaAI import AlphaBetaAI
 from ChessGame import ChessGame
 from HumanPlayer import HumanPlayer
 
@@ -59,9 +60,11 @@ if __name__ == "__main__":
     # to do: gui does not work well with HumanPlayer, due to input() use on stdin conflict
     #   with event loop.
 
-    player1 = HumanPlayer()
-    # player2 = RandomAI()
-    player2 = MinimaxAI(max_depth=2)
+    MAX_DEPTH = 2
+    # player1 = HumanPlayer()
+    player1 = RandomAI()
+    player2 = MinimaxAI(max_depth=MAX_DEPTH, use_ids_search=True)
+    # player2 = AlphaBetaAI(max_depth=MAX_DEPTH)
 
     game = ChessGame(player1, player2)
     gui = ChessGui(player1, player2)
