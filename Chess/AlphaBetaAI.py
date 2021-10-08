@@ -1,3 +1,8 @@
+# Spencer Bertsch
+# October 2021
+# Code adapted from Assignment 3
+# CS 276 @ Dartmouth College
+
 import chess
 import math
 import random
@@ -34,8 +39,8 @@ class AlphaBetaAI:
         print(f'NODES VISITED: {self.nodes_visited}')
 
         if len(moves) == 0:
-            print('CHECKMATE???')
-            print(board)
+            print('Looks like we lost...')
+            return False
 
         if random_best:
             # instead of picking the first max value (argmax) lets choose a random max value!

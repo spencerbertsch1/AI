@@ -1,3 +1,8 @@
+# Spencer Bertsch
+# October 2021
+# Code adapted from Assignment 3
+# CS 276 @ Dartmouth College
+
 import chess
 
 
@@ -9,7 +14,7 @@ class ChessGame:
     def make_move(self):
 
         player = self.players[1 - int(self.board.turn)]
-        move = player.choose_move(board=self.board)
+        move = player.choose_move(board=self.board)  # random_best = True
         self.board.push(move)  # Make the move
 
     def undo_move(self):

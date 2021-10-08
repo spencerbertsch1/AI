@@ -1,3 +1,8 @@
+# Spencer Bertsch
+# October 2021
+# Code adapted from Assignment 3
+# CS 276 @ Dartmouth College
+
 # brew install pyqt
 from PyQt5 import QtGui, QtSvg
 from PyQt5.QtCore import *
@@ -53,18 +58,22 @@ class ChessGui:
 
 if __name__ == "__main__":
 
-    random.seed(1)
+    random.seed(3)
 
-    #player_ronda = RandomAI()
-
-    # to do: gui does not work well with HumanPlayer, due to input() use on stdin conflict
-    #   with event loop.
-
+    # DEFINE MAX DEPTH
     MAX_DEPTH = 2
+
+    # PLAYER 1
     # player1 = HumanPlayer()
     player1 = RandomAI()
-    player2 = MinimaxAI(max_depth=MAX_DEPTH, use_ids_search=True)
-    # player2 = AlphaBetaAI(max_depth=MAX_DEPTH)
+    # player1 = MinimaxAI(max_depth=MAX_DEPTH, use_ids_search=False)
+    # player1 = AlphaBetaAI(max_depth=2)
+
+    # PLAYER 2
+    # player2 = HumanPlayer()
+    # player2 = RandomAI()
+    # player2 = MinimaxAI(max_depth=MAX_DEPTH, use_ids_search=True)
+    player2 = AlphaBetaAI(max_depth=MAX_DEPTH)
 
     game = ChessGame(player1, player2)
     gui = ChessGui(player1, player2)

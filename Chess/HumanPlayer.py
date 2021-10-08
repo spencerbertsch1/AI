@@ -1,3 +1,8 @@
+# Spencer Bertsch
+# October 2021
+# Code adapted from Assignment 3
+# CS 276 @ Dartmouth College
+
 import chess
 
 class HumanPlayer():
