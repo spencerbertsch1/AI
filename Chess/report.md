@@ -12,7 +12,7 @@ This report contains three sections, as seen below:
 
 # Description
 
-* How do your implemented algorithms work? 
+1. How do your implemented algorithms work? 
 
 ### Minimax 
 
@@ -45,11 +45,32 @@ O(b^(3m/4)), which is still much better than the vanilla Minimax's O(b^m).
 
 Same as minimax, but we run for multiple depths and choose the best utility for all depths. 
 
-### 
 
-* What design decisions did you make?
+2. What design decisions did you make?
 
-For Minimax IDS-Search, I stored all of the 'best_moves' in an outer dictionary so that I could keep track of if/how they changed. Doing this allowed me to 
+For Minimax IDS-Search, I stored all the 'best_moves' in an outer dictionary so that I could keep track of if/how they changed. Doing this allowed me to 
 look at how the utility function was calculating the relative utility of different moves on the same board because it had the capability to explore to different 
 depths. I know the assignment mentioned that it would also be a good idea to create an instance variable *self.best_move*, and although this would also be a perfectly 
 reasonable implementation, using a dictionary instead allowed me to easily keep track of how the best move changes as MAX_DEPTH changes. 
+
+
+
+# Evaluation
+
+1. Do your implemented algorithms actually work? How well? 
+
+Testing the performance of the different implementations of minimax and alpha beta pruning was initially a difficult task, but by examining factors such as 
+the number of nodes visited along with doing timed performance tests, it was easy to see how well each algorithm performed. 
+
+Depth-limited Minimax performs as expected.
+
+When the MAX_DEPTH is set to 1, the Minimax player can clearly see a single turn ahead, but no more. It will trade a queen for a pawn if that looks like the 
+best move in that position, even if that places the queen in a very vulnerable position later on. When MAX_DEPTH is set to 2, Depth-limited Minimax displays much better 
+performance. It plays more definsively, keeping most important players back until there is a clear opportunity to take an opponent's piece without sacrificing anything. 
+
+Alpha Beta performs the same as Minimax under identical conditions, but Alpha Beta is much faster. 
+
+TODO show that they play the same (screenshots) 
+
+TODO performance test with timings (table)
+TODO performance test with number of nodes visited (table)
