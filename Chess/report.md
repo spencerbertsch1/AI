@@ -59,18 +59,72 @@ reasonable implementation, using a dictionary instead allowed me to easily keep 
 
 1. Do your implemented algorithms actually work? How well? 
 
-Testing the performance of the different implementations of minimax and alpha beta pruning was initially a difficult task, but by examining factors such as 
-the number of nodes visited along with doing timed performance tests, it was easy to see how well each algorithm performed. 
+Depth-limited Minimax, Alpha Beta pruning, and Minimax with depth-limited search all perform as expected.
 
-Depth-limited Minimax performs as expected.
+
+### Depth-limited Minimax
+
+Testing the performance of the different implementations of minimax and alpha beta pruning was initially a difficult task, but by examining factors such as
+the number of nodes visited along with doing timed performance tests, it was easy to see how well each algorithm performed.
 
 When the MAX_DEPTH is set to 1, the Minimax player can clearly see a single turn ahead, but no more. It will trade a queen for a pawn if that looks like the 
 best move in that position, even if that places the queen in a very vulnerable position later on. When MAX_DEPTH is set to 2, Depth-limited Minimax displays much better 
-performance. It plays more definsively, keeping most important players back until there is a clear opportunity to take an opponent's piece without sacrificing anything. 
+performance. It plays more defensively, keeping most important players back until there is a clear opportunity to take an opponent's piece without sacrificing anything. 
 
-Alpha Beta performs the same as Minimax under identical conditions, but Alpha Beta is much faster. 
+### Alpha Beta Pruning
 
-TODO show that they play the same (screenshots) 
+Alpha Beta performs the same as Minimax under identical conditions, but Alpha Beta is much faster visiting far fewer nodes and requiring 
+much less time to run. In order to ensure the algorithm performs the same as Minimax (makes the same decisions in the same situations), I ran 
+a series of manual tests by playing games between a human_player (me) and either Minimax or Alpha Beta. See the appendix for a few of the decisions 
+that were made by Minimax and by Alpha Beta, showing that they made the same decisions in the same environment. 
+
+
 
 TODO performance test with timings (table)
 TODO performance test with number of nodes visited (table)
+
+One thing that took me a while to figure out, that I initially mistook for a bug, was that the Minimax or Alpha Beta algorithm seemed to make
+misplays in the late game. After most of the opposing player's pieces were taken, the Minimax or Alpha Beta algorithm would miss the opportunity
+to take a high value piece from the opposing team and move a rook or pawn on the other side of the board instead. The reason for this behavior is that the
+utility function values putting the opponent in check above all else, so later in the game when the opposing player's king is exposed more often, the
+Minimax or Alpha Beta player would ignore all opportunities to take knights, rooks, bishops, or even queens if it meant they could put the other
+player in check.
+
+Although this was generally an acceptable way to play, it allowed the opponent to make much more aggressive plays, putting their
+queen in danger in order to take an important piece as long as they could protect their king from check mate. In order to counteract this, I experimentally
+changed the utility associated with putting the opponent in check until other plays such as taking their queen were more valuable. This strategy
+worked somewhat well, but each methodology has trade-offs. Ultimately a better solution would be to have a dynamic utility function that is
+better at representing the state of the board. The textbook describes other pitfalls of the simplistic approach that we have
+implemented including the horizon problem, and I can see that using an algorithm with learned parameters that are updated through repeated simulation
+might be better equipped to deal with difficult utility calculations. 
+
+# Appendix
+
+This is an example of how the Minimax and Alpha Beta algorithms make the same decision with identical board states. In this case white is a human player, 
+and black is Minimax or Alpha Beta. For this first move (white d2d4), the Minimax or Alpha Beta chooses the first of many moves with max utility, pushing 
+their knight into the board. 
+
+<p align="center">
+    <img src="https://github.com/spencerbertsch1/AI/blob/main/Chess/docs/1.png?raw=true" alt="sensorless_diagram" width="50%"/>
+</p>
+
+Similar to the first move, white advances the pawn and the Minimax / Alpha Beta algorithm chooses one of the many max utility moves which happens to 
+be to continue to advance their knight. 
+
+<p align="center">
+    <img src="https://github.com/spencerbertsch1/AI/blob/main/Chess/docs/2.png?raw=true" alt="sensorless_diagram" width="50%"/>
+</p>
+
+This is where things start to get interesting, now that there is a clear move that increases the utility for black, the Minimax / Alpha Beta algorithms 
+take the white pawn with no drawbacks. 
+
+<p align="center">
+    <img src="https://github.com/spencerbertsch1/AI/blob/main/Chess/docs/3.png?raw=true" alt="sensorless_diagram" width="50%"/>
+</p>
+
+Lastly, after a very foolish move by white leaving the queen exposed, the Minimax / Alpha Beta algorithms move in and take the queen with the bishop, 
+largely increasing the relative utility for black. 
+
+<p align="center">
+    <img src="https://github.com/spencerbertsch1/AI/blob/main/Chess/docs/4.png?raw=true" alt="sensorless_diagram" width="50%"/>
+</p>
