@@ -31,20 +31,25 @@ run for different MAX_DEPTH values for depth-limited minimax.
 ### Depth-Limited Minimax
 
 Same as above, but we just make sure to add the MAX_DEPTH to the minimax so that we don't have to search the entire tree. For a game such as chess where 
-b=35 and m~=100, so the time needed to explore the entire space would be incredibly large, making the problem intractable. 
+b=35 and m~=100, so the time needed to explore the entire space would be incredibly large, making the problem intractable. In order to solve this problem,
+we used depth-limited Minimax, an algorithm that has an additional check in the recursive function that checks whether the depth of the tree is greater than 
+some MAX_DEPTH threshold. If it is, then it only explores the tree up until that threshold is reached and no further. Implementing depth-limited Minimax is crucial 
+because chess has such a large branching factor and such a deep tree. The performance (speed and nodes visited) for searches with MAX_DEPTH of 1, 2, and 3 are shown below. 
 
 ### Alpha Beta Pruning
 
-Same as MiniMax but with a few added constraints that gave a significant performance increase to the run time of the algorithm.
-(See imperical time tests for examples of increased performance)
-
-Note that node ordering would increase the performance even more to O(b^(m/2)), but with random ordering I acheived performance closer to 
-O(b^(3m/4)), which is still much better than the vanilla Minimax's O(b^m). 
+Same as MiniMax but with a few added constraints that gave a significant performance increase to the run time of the algorithm. The idea behind Alpha Beta pruning 
+is that there are entire subtrees that we don't have to search as long as we know that the Minimax algorithm will never consider those nodes. In order to do the 
+bookkeeping for these nodes, we use two ints *alpha* and *beta*. 
+Note that node ordering would increase the performance even more to O(b^(m/2)), but with random ordering I achieved performance closer to 
+O(b^(3m/4)), which is still much better than the vanilla Minimax's O(b^m). See below for a table showing the time and search space performance improvements
+achieved with Alpha Beta pruning over Minimax. 
 
 ### Iterative Deepening Minimax 
 
-Same as minimax, but we run for multiple depths and choose the best utility for all depths. 
-
+Iterative deepening minimax works the same way as minimax, but we run the algorithm for multiple depths and choose the best utility for all depths. This implementation was similar to the 
+iterative deepening search we saw in the Chickens_and_Foxes assignment, but instead of returning the single solution and exiting when the solution is found, we return the solution and continue searching 
+until the MAX_DEPTH has been reached. When that occurs, the best_move is then found and returned so that the move can be made. 
 
 2. What design decisions did you make?
 
@@ -59,8 +64,36 @@ reasonable implementation, using a dictionary instead allowed me to easily keep 
 
 1. Do your implemented algorithms actually work? How well? 
 
-Depth-limited Minimax, Alpha Beta pruning, and Minimax with depth-limited search all perform as expected.
+Depth-limited Minimax, Alpha Beta pruning, and Minimax with depth-limited search all perform as expected. See the below tables for a comparison of the 
+run times and nodes visited for each different search under the same board conditions. 
 
+### Max Depth: 1
+
+|                             | Measured Time (sec) | Nodes Visited |
+|-----------------------------|---------------------|---------------|
+| Depth-Limited Minimax       | 0.049               | 497           |
+| Alpha Beta Pruning          | 0.049               | 497           |
+| Iterative-Deepening Minimax | 0.050               | 497           |
+
+
+### Max Depth: 2
+
+|                             | Measured Time (sec) | Nodes Visited |
+|-----------------------------|---------------------|---------------|
+| Depth-Limited Minimax       | 0.952               | 13,081        |
+| Alpha Beta Pruning          | 0.262               | 3,270         |
+| Iterative-Deepening Minimax | 1.016               | 13,578        |
+
+### Max Depth: 3
+
+|                             | Measured Time (sec) | Nodes Visited |
+|-----------------------------|---------------------|---------------|
+| Depth-Limited Minimax       | 16.164              | 227,601       |
+| Alpha Beta Pruning          | 1.130               | 15,077        |
+| Iterative-Deepening Minimax | 16.899              | 241,179       |
+
+We can see that with Alpha Beta pruning in place, the number of nodes searched and the time taken to find the best move is significantly better than 
+the Depth-limited minimax and the iterative deepening minimax. 
 
 ### Depth-limited Minimax
 
@@ -79,9 +112,7 @@ a series of manual tests by playing games between a human_player (me) and either
 that were made by Minimax and by Alpha Beta, showing that they made the same decisions in the same environment. 
 
 
-
-TODO performance test with timings (table)
-TODO performance test with number of nodes visited (table)
+### Additional Notes 
 
 One thing that took me a while to figure out, that I initially mistook for a bug, was that the Minimax or Alpha Beta algorithm seemed to make
 misplays in the late game. After most of the opposing player's pieces were taken, the Minimax or Alpha Beta algorithm would miss the opportunity
