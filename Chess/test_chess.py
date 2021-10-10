@@ -12,12 +12,14 @@ from HumanPlayer import HumanPlayer
 from MinimaxAI import MinimaxAI
 from AlphaBetaAI import AlphaBetaAI
 from ChessGame import ChessGame
+import time
 
 
 import sys
 
 # DEFINE MAX DEPTH
-MAX_DEPTH = 2
+MAX_DEPTH = 3
+DISPLAY_TIME = False
 
 # PLAYER 1
 player1 = HumanPlayer()
@@ -35,7 +37,11 @@ game = ChessGame(player1, player2)
 
 while not game.is_game_over():
     print(game)
+    tic = time.time()
     game.make_move()
+    toc = time.time()
+    if DISPLAY_TIME:
+        print(f'TIME TAKEN: {round(toc-tic, 3)} seconds.')
 
 
 #print(hash(str(game.board)))

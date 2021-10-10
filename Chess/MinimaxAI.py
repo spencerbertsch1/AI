@@ -40,6 +40,7 @@ class MinimaxAI:
 
             # print(actions_dict)
             print(f'NODES VISITED: {self.nodes_visited}')
+            self.nodes_visited = 0
 
             if len(moves) == 0:
                 print('CHECKMATE???')
@@ -217,6 +218,7 @@ class MinimaxAI:
 
             # print(actions_dict)
             print(f'NODES VISITED: {self.nodes_visited}')
+            self.nodes_visited = 0
 
             #
             best_move = max(actions_dict, key=actions_dict.get)

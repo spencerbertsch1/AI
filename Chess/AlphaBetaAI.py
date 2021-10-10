@@ -37,6 +37,7 @@ class AlphaBetaAI:
 
         print(actions_dict)
         print(f'NODES VISITED: {self.nodes_visited}')
+        self.nodes_visited = 0
 
         if len(moves) == 0:
             print('Looks like we lost...')
