@@ -14,7 +14,10 @@ Spencer Bertsch
         1. `$ conda create -n CS-276 python=3.8`
     2. Then activate the new environment by running the following command:
         1. `$ conda activate CS-276`
-    3. Then proceed to the following step.
+    3. cd into the AI directory and install the necessary requirements by running the following commands: 
+       1. `$ cd AI` 
+       2. `$ pip install -r requirements.txt`
+    4. Then proceed to the following step.
 
 
 2. `cd` to the Chess directory by running the following command:
