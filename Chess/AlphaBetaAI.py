@@ -10,9 +10,10 @@ import random
 
 class AlphaBetaAI:
 
-    def __init__(self, max_depth):
+    def __init__(self, max_depth, move_ordering):
         self.max_depth = max_depth
         self.nodes_visited = 0
+        self.move_ordering = move_ordering
 
     def choose_move(self, board, random_best: bool = False):
         """
@@ -26,9 +27,9 @@ class AlphaBetaAI:
         :return:
         """
 
-        # moves = list(board.legal_moves)
+        moves = list(board.legal_moves)
         # we can also call the simple method for node reordering to test how much quicker we can make Alpha Beta
-        moves = self.node_reorder(board=board)
+        # moves = self.node_reorder(board=board)
 
         print(f'Searching through {len(moves)} moves!')
         actions_dict: dict = {}
@@ -106,7 +107,6 @@ class AlphaBetaAI:
         if board.is_game_over():
 
             if board.is_checkmate():
-                # TODO maybe switch these!
                 if min_or_max == 'min':
                     return -100
                 elif min_or_max == 'max':
@@ -138,7 +138,13 @@ class AlphaBetaAI:
             return self.cutoff_test(board, depth, min_or_max='max')
 
         v = -math.inf
-        moves = list(board.legal_moves)
+
+        if self.move_ordering:
+            # add move reordering
+            moves = self.node_reorder(board=board, is_max=True)
+        else:
+            moves = list(board.legal_moves)
+
         for move in moves:
             # Make the move
             board.push(move)
@@ -168,7 +174,13 @@ class AlphaBetaAI:
             return self.cutoff_test(board, depth, min_or_max='min')
 
         v = math.inf
-        moves = list(board.legal_moves)
+
+        if self.move_ordering:
+            # add move reordering
+            moves = self.node_reorder(board=board, is_max=False)
+        else:
+            moves = list(board.legal_moves)
+
         for move in moves:
             # Make the move
             board.push(move)
@@ -184,12 +196,13 @@ class AlphaBetaAI:
 
         return v
 
-    def node_reorder(self, board) -> list:
+    def node_reorder(self, board, is_max: bool) -> list:
         """
         Function to order the next moves based on their utility so we search the best moves first, and the
         worst moves last
 
         :param board:
+        :param is_max:
         :return:
         """
         utility_dict = {}
@@ -205,6 +218,8 @@ class AlphaBetaAI:
 
         # create the list of sorted moves that we will search through
         sorted_moves_list = list(sorted_dict.keys())
-        sorted_moves_list.reverse()
+
+        if is_max:
+            sorted_moves_list.reverse()
 
         return sorted_moves_list
