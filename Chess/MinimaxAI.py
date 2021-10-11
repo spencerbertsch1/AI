@@ -95,14 +95,12 @@ class MinimaxAI:
         else:
             return black_total - white_total
 
-
-    def cutoff_test(self, board, depth):
+    def cutoff_test(self, board):
         """
-        Helper function for MiniMax that determines if the chess game has been won by either party or we have reached
-        the maximum depth in our search tree.
+        Helper function for MiniMax that determines if the chess game has been won by either party. If
+        not then we return the utility at the current position
 
         :param board:
-        :param depth:
         :return:
         """
 
@@ -134,7 +132,7 @@ class MinimaxAI:
 
         # check to see if we need to stop searching if the depth > max depth
         if depth >= self.max_depth:
-            return self.cutoff_test(board, depth)
+            return self.cutoff_test(board)
 
         v = -math.inf
         moves = list(board.legal_moves)
@@ -161,7 +159,7 @@ class MinimaxAI:
 
         # check to see if we need to stop searching if the depth > max depth
         if depth >= self.max_depth:
-            return self.cutoff_test(board, depth)
+            return self.cutoff_test(board)
 
         v = math.inf
         moves = list(board.legal_moves)
