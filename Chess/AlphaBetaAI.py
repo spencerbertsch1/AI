@@ -26,7 +26,10 @@ class AlphaBetaAI:
         :return:
         """
 
-        moves = list(board.legal_moves)
+        # moves = list(board.legal_moves)
+        # we can also call the simple method for node reordering to test how much quicker we can make Alpha Beta
+        moves = self.node_reorder(board=board)
+
         print(f'Searching through {len(moves)} moves!')
         actions_dict: dict = {}
         for move in moves:
@@ -85,16 +88,10 @@ class AlphaBetaAI:
 
         # if white's utility is greater, we use TanH to get a value between -1 and 0
         elif white_total > black_total:
-            # if black_total == 0:
-            #     return -100
-            # else:
             return -white_total
 
         # # if black's utility is greater, we use TanH to get a value between 0 and 1
         else:
-            # if white_total == 0:
-            #     return 100
-            # else:
             return black_total
 
     def cutoff_test(self, board, depth, min_or_max: str):
@@ -186,3 +183,28 @@ class AlphaBetaAI:
             beta = min(beta, v)
 
         return v
+
+    def node_reorder(self, board) -> list:
+        """
+        Function to order the next moves based on their utility so we search the best moves first, and the
+        worst moves last
+
+        :param board:
+        :return:
+        """
+        utility_dict = {}
+        moves = list(board.legal_moves)
+        for move in moves:
+            board.push(move)
+            move_utility = self.evaluate_board(board=board)
+            board.pop()
+            utility_dict[move] = move_utility
+
+        # sort the utility dictionary by the utility values associated with each move
+        sorted_dict = {k: v for k, v in sorted(utility_dict.items(), key=lambda item: item[1])}
+
+        # create the list of sorted moves that we will search through
+        sorted_moves_list = list(sorted_dict.keys())
+        sorted_moves_list.reverse()
+
+        return sorted_moves_list
