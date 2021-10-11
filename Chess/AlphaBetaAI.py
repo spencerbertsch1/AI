@@ -6,14 +6,16 @@
 import chess
 import math
 import random
+import sys
 
 
 class AlphaBetaAI:
 
-    def __init__(self, max_depth, move_ordering):
+    def __init__(self, max_depth, move_ordering, player1):
         self.max_depth = max_depth
         self.nodes_visited = 0
         self.move_ordering = move_ordering
+        self.player1 = player1
 
     def choose_move(self, board, random_best: bool = False):
         """
@@ -44,8 +46,9 @@ class AlphaBetaAI:
         self.nodes_visited = 0
 
         if len(moves) == 0:
-            print('Looks like we lost...')
-            return False
+            print('Minimax AI has been defeated!!!')
+            print(board)
+            sys.exit(0)
 
         if random_best:
             # instead of picking the first max value (argmax) lets choose a random max value!
@@ -64,7 +67,7 @@ class AlphaBetaAI:
 
     def evaluate_board(self, board):
         """
-
+        Function to calculate the utility of a board from the perspective of a certain player
         :param board:
         :return:
         """
@@ -87,15 +90,13 @@ class AlphaBetaAI:
         if white_total == black_total:
             return 0
 
-        # if white's utility is greater, we use TanH to get a value between -1 and 0
-        elif white_total > black_total:
-            return -white_total
-
-        # # if black's utility is greater, we use TanH to get a value between 0 and 1
+        # AI is the white player
+        if self.player1:
+            return white_total - black_total
         else:
-            return black_total
+            return black_total - white_total
 
-    def cutoff_test(self, board, depth, min_or_max: str):
+    def cutoff_test(self, board):
         """
         Helper function for MiniMax that determines if the chess game has been won by either party or we have reached
         the maximum depth in our search tree.
@@ -104,25 +105,23 @@ class AlphaBetaAI:
         :param depth:
         :return:
         """
-        if board.is_game_over():
 
-            if board.is_checkmate():
-                if min_or_max == 'min':
-                    return -100
-                elif min_or_max == 'max':
-                    return 100
-                else:
-                    raise Exception(f'min_or_max argument needs to be either \'min\' or \'max\', not {min_or_max}')
-            elif board.is_stalemate():
-                return 0
+        if board.is_checkmate():
+            # if player and turn are the same value then we lose
+            if board.turn == self.player1:  # True and True represent white and white
+                # AI loses
+                return -1000
 
-            print('WE SHOULDN\'t BE HERE... EVALUATING BOARD...')
-            return self.evaluate_board(board=board)
+            # if player and turn are different values we win
+            if board.turn != self.player1:
+                # AI wins
+                return 1000
 
-        elif depth >= self.max_depth:
-            return self.evaluate_board(board=board)
+        elif board.is_stalemate():
+            return 0
+
         else:
-            return None
+            return self.evaluate_board(board=board)
 
     def max_value(self, board, depth, alpha, beta):
         """
@@ -133,9 +132,9 @@ class AlphaBetaAI:
         """
         self.nodes_visited = self.nodes_visited + 1
 
-        # check to see if we need to stop searching
-        if self.cutoff_test(board, depth, min_or_max='max') is not None:
-            return self.cutoff_test(board, depth, min_or_max='max')
+        # check to see if we need to stop searching if the depth > max depth
+        if depth >= self.max_depth:
+            return self.cutoff_test(board, depth)
 
         v = -math.inf
 
@@ -169,9 +168,9 @@ class AlphaBetaAI:
         """
         self.nodes_visited = self.nodes_visited + 1
 
-        # check to see if we need to stop searching
-        if self.cutoff_test(board=board, depth=depth, min_or_max='min') is not None:
-            return self.cutoff_test(board, depth, min_or_max='min')
+        # check to see if we need to stop searching if the depth > max depth
+        if depth >= self.max_depth:
+            return self.cutoff_test(board)
 
         v = math.inf
 

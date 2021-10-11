@@ -66,7 +66,7 @@ class MinimaxAI:
 
     def evaluate_board(self, board):
         """
-
+        Function to calculate the utility of a board from the perspective of a certain player
         :param board:
         :return:
         """
