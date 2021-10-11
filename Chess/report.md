@@ -64,9 +64,7 @@ Depth-limited Minimax, Alpha Beta pruning, and Minimax with depth-limited search
 
 We can see that with Alpha Beta pruning, the number of nodes searched and the time taken to find the best move is significantly better than 
 the Depth-limited minimax and the iterative deepening minimax. We can also see that using iterative deepening gives us different 
-suggested best moves from Minimax as the search space is explored with differing max depths. Some strange behavior that I should note is that 
-the Alpha Beta algorithm searches slightly more nodes instead of fewer nodes when move ordering is turned on. This is discussed later on 
-in the **Alpha Beta Pruning** section. 
+suggested best moves from Minimax as the search space is explored with differing max depths. 
 
 ### Depth-limited Minimax
 
@@ -86,13 +84,13 @@ that were made by Minimax and by Alpha Beta, showing that they made the same dec
 
 |                    | Move 1              | Move2               | Move 3               |
 |--------------------|---------------------|---------------------|----------------------|
-| With Reordering    | 2,005 Nodes Visited | 2,224 Nodes Visited | 2,5061 Nodes Visited |
-| Without Reordering | 2,005 Nodes Visited | 2,032 Nodes Visited | 2,778 Nodes Visited  |
+| With Reordering    | 2,005 Nodes Visited | 2,032 Nodes Visited | 4,778 Nodes Visited |
+| Without Reordering | 1,651 Nodes Visited | 1,497 Nodes Visited | 2,150 Nodes Visited  |
 
-We can see that after implementing a simple move reordering, the number of nodes visited increases slightly.
+We can see that after implementing a simple move reordering, the number of nodes visited by up to 50%.
 Perfect node ordering should increase the performance even more to O(b^(m/2)), and with random we should achieve performance closer to
-O(b^(3m/4)), which is still much better than the vanilla Minimax's O(b^m). Although there were significant gains seen 
-by implementing Alpha Beta pruning instead of Minimax, the move ordering hasn't increased the performance of the algorithm. 
+O(b^(3m/4)), which is still much better than the vanilla Minimax's O(b^m). There were significant gains seen 
+by implementing Alpha Beta pruning instead of Minimax, and implementing move ordering increased the algorithm's performance even further. 
 
 ### Iterative Deepening Minimax 
 
@@ -140,6 +138,7 @@ and the board state is evaluated purely on the weighted average of white and bla
 always prefers to take higher value pieces so that the board will be in a better state after the move has taken place. 
 As MAX_DEPTH increases, the evaluation function is called more, causing the time taken to search to increase dramatically. 
 
+# TODO discuss information about check, stalemate, and checkmate 
 
 3. (alpha-beta)
 The Alpha Beta algorithm is performing as expected, except the move ordering is causing the number of nodes searched to increase slightly instead of 
