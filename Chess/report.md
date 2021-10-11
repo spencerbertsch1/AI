@@ -129,7 +129,9 @@ See the below tables for a comparison of the run times and nodes visited for eac
 | Iterative-Deepening Minimax | 16.899              | 241,179       |
 
 1. (Minimax and Cutoff test)
-See above tables to see how each algorithm performed in terms of calls made to Minimax and the time taken.
+See above tables to see how each algorithm performed in terms of calls made to Minimax and the time taken. We can see that 
+the number of nodes visited using Minimax and Iterative Deepening was far greater than the number of nodes visited using 
+Alpha Beta pruning. 
 
 
 2. (evaluation function)
