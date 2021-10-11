@@ -153,13 +153,21 @@ See the table in the **Evaluation** section to see a detailed outline of how mov
 Iterative deepening works by finding the best move at different depths, then choosing the move that has the highest utility among them. 
 
 <p align="center">
-    <img src="https://github.com/spencerbertsch1/AI/blob/main/Chess/docs/id_1.png?raw=true" alt="sensorless_diagram" width="40%"/>
+    <img src="https://github.com/spencerbertsch1/AI/blob/main/Chess/docs/id_2.png?raw=true" alt="sensorless_diagram" width="40%"/>
 </p>
 
-We can see in the above example that when depth=1, the Iterative Deepening Minimax algorithm chooses to use the knight in f6 to take the pawn in e4. The 
-algorithm can only see one move ahead, so it chooses the move that will score it the most points right away. Alternatively, when depth=2, 
-the Iterative Deepening Minimax algorithm chooses to advance the knight in b8 so that on successive turns it can take the pawn in position d4. Here we can see the 
-different tactics being used by the Minimax when different depths are used. 
+We can see in the above example that when depth=1, the Iterative Deepening Minimax algorithm can't see far forward enough to 
+see any moves that have a non-zero utility. It chooses to move the rook in h8 into the g8 position. This move signifies the Minimax algorithm
+couldn't find a move that had a good utility, so it's just returning the first zero utility move: moving the rook slightly in a safe way.
+
+| Iterative Deepening Depth | Move | Utility Score |
+|---------------------------|------|---------------|
+| Max Depth 1               | h8g8 | 0             |
+| Max Depth 2               | h6g4 | 1.029         |
+
+When iterative deepening continues and max depth is increased to 2, however, we can see that the utility associated with advancing the knight is 
+1.029 which is greater than the initial move with a max utility of 0. This better move is the one that gets returned by the 
+Iterative Deepening Minimax algorithm. 
 
 ### Additional Notes 
 

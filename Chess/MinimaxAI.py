@@ -220,7 +220,7 @@ class MinimaxAI:
             print(f'NODES VISITED: {self.nodes_visited}')
             self.nodes_visited = 0
 
-            #
+            # find the best move overall (for all depths)
             best_move = max(actions_dict, key=actions_dict.get)
             max_move_val = max(actions_dict.items(), key=lambda x: x[1])[1]
             best_moves_all_depths[best_move] = max_move_val

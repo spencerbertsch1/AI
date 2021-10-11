@@ -58,7 +58,7 @@ class ChessGui:
 
 if __name__ == "__main__":
 
-    random.seed(3)
+    random.seed(5)
 
     # DEFINE MAX DEPTH
     MAX_DEPTH = 2
