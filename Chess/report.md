@@ -40,10 +40,7 @@ because chess has such a large branching factor and such a deep tree. The perfor
 
 Same as MiniMax but with a few added constraints that gave a significant performance increase to the run time of the algorithm. The idea behind Alpha Beta pruning 
 is that there are entire subtrees that we don't have to search as long as we know that the Minimax algorithm will never consider those nodes. In order to do the 
-bookkeeping for these nodes, we use two ints *alpha* and *beta*. 
-Note that node ordering would increase the performance even more to O(b^(m/2)), but with random ordering I achieved performance closer to 
-O(b^(3m/4)), which is still much better than the vanilla Minimax's O(b^m). See below for a table showing the time and search space performance improvements
-achieved with Alpha Beta pruning over Minimax. 
+bookkeeping for these nodes, we use two ints *alpha* and *beta*.
 
 ### Iterative Deepening Minimax 
 
@@ -59,41 +56,17 @@ depths. I know the assignment mentioned that it would also be a good idea to cre
 reasonable implementation, using a dictionary instead allowed me to easily keep track of how the best move changes as MAX_DEPTH changes. 
 
 
-
 # Evaluation
 
 1. Do your implemented algorithms actually work? How well? 
 
-Depth-limited Minimax, Alpha Beta pruning, and Minimax with depth-limited search all perform as expected. See the below tables for a comparison of the 
-run times and nodes visited for each different search under the same board conditions. 
+Depth-limited Minimax, Alpha Beta pruning, and Minimax with depth-limited search all perform essentially as expected. 
 
-### Max Depth: 1
-
-|                             | Measured Time (sec) | Nodes Visited |
-|-----------------------------|---------------------|---------------|
-| Depth-Limited Minimax       | 0.049               | 497           |
-| Alpha Beta Pruning          | 0.049               | 497           |
-| Iterative-Deepening Minimax | 0.050               | 497           |
-
-
-### Max Depth: 2
-
-|                             | Measured Time (sec) | Nodes Visited |
-|-----------------------------|---------------------|---------------|
-| Depth-Limited Minimax       | 0.952               | 13,081        |
-| Alpha Beta Pruning          | 0.262               | 3,270         |
-| Iterative-Deepening Minimax | 1.016               | 13,578        |
-
-### Max Depth: 3
-
-|                             | Measured Time (sec) | Nodes Visited |
-|-----------------------------|---------------------|---------------|
-| Depth-Limited Minimax       | 16.164              | 227,601       |
-| Alpha Beta Pruning          | 1.130               | 15,077        |
-| Iterative-Deepening Minimax | 16.899              | 241,179       |
-
-We can see that with Alpha Beta pruning in place, the number of nodes searched and the time taken to find the best move is significantly better than 
-the Depth-limited minimax and the iterative deepening minimax. 
+We can see that with Alpha Beta pruning, the number of nodes searched and the time taken to find the best move is significantly better than 
+the Depth-limited minimax and the iterative deepening minimax. We can also see that using iterative deepening gives us different 
+suggested best moves from Minimax as the search space is explored with differing max depths. Some strange behavior that I should note is that 
+the Alpha Beta algorithm searches slightly more nodes instead of fewer nodes when move ordering is turned on. This is discussed later on 
+in the **Alpha Beta Pruning** section. 
 
 ### Depth-limited Minimax
 
@@ -111,6 +84,82 @@ much less time to run. In order to ensure the algorithm performs the same as Min
 a series of manual tests by playing games between a human_player (me) and either Minimax or Alpha Beta. See the appendix for a few of the decisions 
 that were made by Minimax and by Alpha Beta, showing that they made the same decisions in the same environment. 
 
+|                    | Move 1              | Move2               | Move 3               |
+|--------------------|---------------------|---------------------|----------------------|
+| With Reordering    | 2,005 Nodes Visited | 2,224 Nodes Visited | 2,5061 Nodes Visited |
+| Without Reordering | 2,005 Nodes Visited | 2,032 Nodes Visited | 2,778 Nodes Visited  |
+
+We can see that after implementing a simple move reordering, the number of nodes visited increases slightly.
+Perfect node ordering should increase the performance even more to O(b^(m/2)), and with random we should achieve performance closer to
+O(b^(3m/4)), which is still much better than the vanilla Minimax's O(b^m). Although there were significant gains seen 
+by implementing Alpha Beta pruning instead of Minimax, the move ordering hasn't increased the performance of the algorithm. 
+
+### Iterative Deepening Minimax 
+
+Iterative deepening minimax performs similarly to minimax, but finds the best_move over several maximum depths before returning the *absolute* best_move. There 
+are many ways to implement iterative deepening, but the way that I chose to keep track of the absolute best move over multiple MAX_DEPTH values was to simply store the 
+move and utility value for each depth in a dictionary, then return the absolute_best_move. 
+
+# Description
+
+See the below tables for a comparison of the run times and nodes visited for each different search under the same board conditions.
+
+### Max Depth: 1
+
+|                             | Measured Time (sec) | Nodes Visited |
+|-----------------------------|---------------------|---------------|
+| Depth-Limited Minimax       | 0.049               | 497           |
+| Alpha Beta Pruning          | 0.049               | 497           |
+| Iterative-Deepening Minimax | 0.050               | 497           |
+
+### Max Depth: 2
+
+|                             | Measured Time (sec) | Nodes Visited |
+|-----------------------------|---------------------|---------------|
+| Depth-Limited Minimax       | 0.952               | 13,081        |
+| Alpha Beta Pruning          | 0.262               | 3,270         |
+| Iterative-Deepening Minimax | 1.016               | 13,578        |
+
+### Max Depth: 3
+
+|                             | Measured Time (sec) | Nodes Visited |
+|-----------------------------|---------------------|---------------|
+| Depth-Limited Minimax       | 16.164              | 227,601       |
+| Alpha Beta Pruning          | 1.130               | 15,077        |
+| Iterative-Deepening Minimax | 16.899              | 241,179       |
+
+1. (Minimax and Cutoff test)
+See above tables to see how each algorithm performed in terms of calls made to Minimax and the time taken.
+
+
+2. (evaluation function)
+The evaluation function uses a concept described in the textbook in which each piece is given a certain weight (1-Pawn, 3-Rook, 3-Knight, 3-Bishop, 9-Queen)
+and the board state is evaluated purely on the weighted average of white and black before and after the move in question is made. The Minimax algorithm
+always prefers to take higher value pieces so that the board will be in a better state after the move has taken place. 
+As MAX_DEPTH increases, the evaluation function is called more, causing the time taken to search to increase dramatically. 
+
+
+3. (alpha-beta)
+The Alpha Beta algorithm is performing as expected, except the move ordering is causing the number of nodes searched to increase slightly instead of 
+decrease. I also tried reversing the list returned by the move_ordering method, and I got the same number of nodes searched as the 
+traditional Alpha Beta pruning algorithm. That leads me to believe that the best case scenario in terms of moves searches is 
+achieved with the unordered list of moves using Alpha Beta pruning, but as mentioned above, we know from the textbook that
+perfect node ordering should increase the performance even more to O(b^(m/2)), and with random we should achieve performance closer to
+O(b^(3m/4)). 
+
+See the table in the **Evaluation** section to see a detailed outline of how move-ordering affected the number of nodes searched. 
+
+3. (iterative deepening)
+Iterative deepening works by finding the best move at different depths, then choosing the move that has the highest utility among them. 
+
+<p align="center">
+    <img src="https://github.com/spencerbertsch1/AI/blob/main/Chess/docs/id_1.png?raw=true" alt="sensorless_diagram" width="40%"/>
+</p>
+
+We can see in the above example that when depth=1, the Iterative Deepening Minimax algorithm chooses to use the knight in f6 to take the pawn in e4. The 
+algorithm can only see one move ahead, so it chooses the move that will score it the most points right away. Alternatively, when depth=2, 
+the Minimax algorithm chooses to advance the knight in b8 so that on successive turns it can take the pawn in position d4. Here we can see the 
+different tactics being used by the Minimax when different depths are used. As the game grows more complex. 
 
 ### Additional Notes 
 
@@ -136,26 +185,26 @@ and black is Minimax or Alpha Beta. For this first move (white d2d4), the Minima
 their knight into the board. 
 
 <p align="center">
-    <img src="https://github.com/spencerbertsch1/AI/blob/main/Chess/docs/1.png?raw=true" alt="sensorless_diagram" width="50%"/>
+    <img src="https://github.com/spencerbertsch1/AI/blob/main/Chess/docs/1.png?raw=true" alt="sensorless_diagram" width="40%"/>
 </p>
 
 Similar to the first move, white advances the pawn and the Minimax / Alpha Beta algorithm chooses one of the many max utility moves which happens to 
 be to continue to advance their knight. 
 
 <p align="center">
-    <img src="https://github.com/spencerbertsch1/AI/blob/main/Chess/docs/2.png?raw=true" alt="sensorless_diagram" width="50%"/>
+    <img src="https://github.com/spencerbertsch1/AI/blob/main/Chess/docs/2.png?raw=true" alt="sensorless_diagram" width="40%"/>
 </p>
 
 This is where things start to get interesting, now that there is a clear move that increases the utility for black, the Minimax / Alpha Beta algorithms 
 take the white pawn with no drawbacks. 
 
 <p align="center">
-    <img src="https://github.com/spencerbertsch1/AI/blob/main/Chess/docs/3.png?raw=true" alt="sensorless_diagram" width="50%"/>
+    <img src="https://github.com/spencerbertsch1/AI/blob/main/Chess/docs/3.png?raw=true" alt="sensorless_diagram" width="40%"/>
 </p>
 
 Lastly, after a very foolish move by white leaving the queen exposed, the Minimax / Alpha Beta algorithms move in and take the queen with the bishop, 
 largely increasing the relative utility for black. 
 
 <p align="center">
-    <img src="https://github.com/spencerbertsch1/AI/blob/main/Chess/docs/4.png?raw=true" alt="sensorless_diagram" width="50%"/>
+    <img src="https://github.com/spencerbertsch1/AI/blob/main/Chess/docs/4.png?raw=true" alt="sensorless_diagram" width="40%"/>
 </p>
