@@ -104,27 +104,27 @@ See the below tables for a comparison of the run times and nodes visited for eac
 
 ### Max Depth: 1
 
-|                             | Measured Time (sec) | Nodes Visited |
-|-----------------------------|---------------------|---------------|
-| Depth-Limited Minimax       | 0.049               | 497           |
-| Alpha Beta Pruning          | 0.049               | 497           |
-| Iterative-Deepening Minimax | 0.050               | 497           |
+|                                 | Measured Time (sec) | Nodes Visited |
+|---------------------------------|---------------------|---------------|
+| Depth-Limited Minimax           | 0.049               | 497           |
+| Alpha Beta Pruning (no reorder) | 0.049               | 497           |
+| Iterative-Deepening Minimax     | 0.050               | 497           |
 
 ### Max Depth: 2
 
-|                             | Measured Time (sec) | Nodes Visited |
-|-----------------------------|---------------------|---------------|
-| Depth-Limited Minimax       | 0.952               | 13,081        |
-| Alpha Beta Pruning          | 0.262               | 3,270         |
-| Iterative-Deepening Minimax | 1.016               | 13,578        |
+|                                 | Measured Time (sec) | Nodes Visited |
+|---------------------------------|---------------------|---------------|
+| Depth-Limited Minimax           | 0.952               | 13,081        |
+| Alpha Beta Pruning (no reorder) | 0.262               | 3,270         |
+| Iterative-Deepening Minimax     | 1.016               | 13,578        |
 
 ### Max Depth: 3
 
-|                             | Measured Time (sec) | Nodes Visited |
-|-----------------------------|---------------------|---------------|
-| Depth-Limited Minimax       | 16.164              | 227,601       |
-| Alpha Beta Pruning          | 1.130               | 15,077        |
-| Iterative-Deepening Minimax | 16.899              | 241,179       |
+|                                 | Measured Time (sec) | Nodes Visited |
+|---------------------------------|---------------------|---------------|
+| Depth-Limited Minimax           | 16.164              | 227,601       |
+| Alpha Beta Pruning (no reorder) | 1.130               | 15,077        |
+| Iterative-Deepening Minimax     | 16.899              | 241,179       |
 
 1. (Minimax and Cutoff test)
 See above tables to see how each algorithm performed in terms of calls made to Minimax and the time taken. We can see that 
