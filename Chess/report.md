@@ -40,7 +40,9 @@ because chess has such a large branching factor and such a deep tree. The perfor
 
 Alpha Beta Pruning works generally the same way as MiniMax, but with a few added constraints that gave a significant performance increase to the run time of the algorithm. The idea behind Alpha Beta pruning 
 is that there are entire subtrees that we don't have to search as long as we know that the Minimax algorithm will never consider those nodes. In order to do the 
-bookkeeping for these nodes, we use two ints *alpha* and *beta* that we pass along to the min() and max() functions.
+bookkeeping for these nodes, we use two ints *alpha* and *beta* that we pass along to the min() and max() functions. In addition to the original Alpha Beta 
+Pruning algorithm seen in the textbook, move ordering has also been used to further increase the performance by reducing the number of nodes checked during 
+search. 
 
 ### Iterative Deepening Minimax 
 
