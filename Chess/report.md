@@ -60,10 +60,11 @@ reasonable implementation, using a dictionary instead allowed me to easily keep 
 
 1. Do your implemented algorithms actually work? How well? 
 
-Depth-limited Minimax, Alpha Beta pruning, and Minimax with depth-limited search all perform essentially as expected. 
+Depth-limited Minimax, Alpha Beta pruning (with and without move ordering), and Minimax with depth-limited search all perform exactly as expected. 
 
 We can see that with Alpha Beta pruning, the number of nodes searched and the time taken to find the best move is significantly better than 
-the Depth-limited minimax and the iterative deepening minimax. We can also see that using iterative deepening gives us different 
+the Depth-limited minimax and the iterative deepening minimax. For Alpha Beta Pruning, we can see that adding move ordering increases the performance 
+of the algorithm by reducing the number of nodes that get visited during the search. We can also see that using iterative deepening gives us different 
 suggested best moves from Minimax as the search space is explored with differing max depths. 
 
 ### Depth-limited Minimax
@@ -84,13 +85,13 @@ that were made by Minimax and by Alpha Beta, showing that they made the same dec
 
 |                    | Move 1              | Move2               | Move 3               |
 |--------------------|---------------------|---------------------|----------------------|
-| With Reordering    | 2,005 Nodes Visited | 2,032 Nodes Visited | 4,778 Nodes Visited |
-| Without Reordering | 1,651 Nodes Visited | 1,497 Nodes Visited | 2,150 Nodes Visited  |
+| Without Reordering | 2,005 Nodes Visited | 2,032 Nodes Visited | 4,778 Nodes Visited |
+| With Reordering    | 1,651 Nodes Visited | 1,497 Nodes Visited | 2,150 Nodes Visited  |
 
-We can see that after implementing a simple move reordering, the number of nodes visited by up to 50%.
+We can see that after implementing a simple move reordering, the number of nodes visited was reduced by up to around 50%.
 Perfect node ordering should increase the performance even more to O(b^(m/2)), and with random we should achieve performance closer to
 O(b^(3m/4)), which is still much better than the vanilla Minimax's O(b^m). There were significant gains seen 
-by implementing Alpha Beta pruning instead of Minimax, and implementing move ordering increased the algorithm's performance even further. 
+by implementing Alpha Beta pruning instead of Minimax, and implementing move ordering increased the algorithm's performance even further, as seen in the above table. 
 
 ### Iterative Deepening Minimax 
 
@@ -133,24 +134,24 @@ Alpha Beta pruning.
 
 
 2. (evaluation function)
-The evaluation function uses a concept described in the textbook in which each piece is given a certain weight (1-Pawn, 3-Rook, 3-Knight, 3-Bishop, 9-Queen)
+The evaluation function was one of the key concepts in this assignment. The evaluation function uses a concept described in the textbook in which each piece is given a certain weight (1-Pawn, 3-Rook, 3-Knight, 3-Bishop, 9-Queen)
 and the board state is evaluated purely on the weighted average of white and black before and after the move in question is made. The Minimax algorithm
 always prefers to take higher value pieces so that the board will be in a better state after the move has taken place. 
-As MAX_DEPTH increases, the evaluation function is called more, causing the time taken to search to increase dramatically. 
+As MAX_DEPTH increases, the evaluation function is called more, causing the time taken to search to increase dramatically.
+In order to determine whether it was the white or black player's turn, I used *board.turn* in conjunction with a new instance variable 
+*player1* which was True if the current player is white. With that it was easy to calculate the utility for either the white or black player 
+depending on the weighted sum of the pieces still on the board. 
 
-# TODO discuss information about check, stalemate, and checkmate 
 
 3. (alpha-beta)
-The Alpha Beta algorithm is performing as expected, except the move ordering is causing the number of nodes searched to increase slightly instead of 
-decrease. I also tried reversing the list returned by the move_ordering method, and I got the same number of nodes searched as the 
-traditional Alpha Beta pruning algorithm. That leads me to believe that the best case scenario in terms of moves searches is 
-achieved with the unordered list of moves using Alpha Beta pruning, but as mentioned above, we know from the textbook that
+The Alpha Beta algorithm is performing as expected. As mentioned above, we know from the textbook that
 perfect node ordering should increase the performance even more to O(b^(m/2)), and with random we should achieve performance closer to
-O(b^(3m/4)). 
+O(b^(3m/4)). See the table in the **Evaluation** section to see a detailed outline of how move-ordering affected the number of nodes searched. 
+We can see from that table that when we use move ordering and have a MAX_DEPTH of 2, the number of nodes searched is still decreased by around half
+in some cases. This is the type of behavior that we would expect to see after implementing move ordering in the Alpha Beta algorithm. 
 
-See the table in the **Evaluation** section to see a detailed outline of how move-ordering affected the number of nodes searched. 
 
-3. (iterative deepening)
+5. (iterative deepening)
 Iterative deepening works by finding the best move at different depths, then choosing the move that has the highest utility among them. 
 
 <p align="center">

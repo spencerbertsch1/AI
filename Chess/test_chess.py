@@ -18,20 +18,20 @@ import time
 import sys
 
 # DEFINE MAX DEPTH
-MAX_DEPTH = 3
+MAX_DEPTH = 2
 DISPLAY_TIME = False
 
 # PLAYER 1
 player1 = HumanPlayer()
 # player1 = RandomAI()
 # player1 = MinimaxAI(max_depth=MAX_DEPTH, use_ids_search=False)
-# player1 = AlphaBetaAI(max_depth=2)
+# player1 = AlphaBetaAI(max_depth=MAX_DEPTH)
 
 # PLAYER 2
 # player2 = HumanPlayer()
 # player2 = RandomAI()
-player2 = MinimaxAI(max_depth=MAX_DEPTH, use_ids_search=False)
-# player2 = AlphaBetaAI(max_depth=MAX_DEPTH)
+# player2 = MinimaxAI(max_depth=MAX_DEPTH, use_ids_search=True, player1=False)
+player2 = AlphaBetaAI(max_depth=MAX_DEPTH, move_ordering=True, player1=False)
 
 game = ChessGame(player1, player2)
 

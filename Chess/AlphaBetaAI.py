@@ -134,7 +134,7 @@ class AlphaBetaAI:
 
         # check to see if we need to stop searching if the depth > max depth
         if depth >= self.max_depth:
-            return self.cutoff_test(board, depth)
+            return self.cutoff_test(board)
 
         v = -math.inf
 

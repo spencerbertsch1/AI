@@ -58,22 +58,22 @@ class ChessGui:
 
 if __name__ == "__main__":
 
-    random.seed(5)
+    random.seed(2)
 
     # DEFINE MAX DEPTH
     MAX_DEPTH = 2
 
     # PLAYER 1
-    player1 = HumanPlayer()
-    # player1 = RandomAI()
+    # player1 = HumanPlayer()
+    player1 = RandomAI()
     # player1 = MinimaxAI(max_depth=MAX_DEPTH, use_ids_search=False)
-    # player1 = AlphaBetaAI(max_depth=2)
+    # player1 = AlphaBetaAI(max_depth=MAX_DEPTH)
 
     # PLAYER 2
     # player2 = HumanPlayer()
     # player2 = RandomAI()
-    player2 = MinimaxAI(max_depth=MAX_DEPTH, use_ids_search=False)
-    # player2 = AlphaBetaAI(max_depth=MAX_DEPTH)
+    # player2 = MinimaxAI(max_depth=MAX_DEPTH, use_ids_search=False, player1=False)
+    player2 = AlphaBetaAI(max_depth=MAX_DEPTH, move_ordering=True, player1=False)
 
     game = ChessGame(player1, player2)
     gui = ChessGui(player1, player2)
