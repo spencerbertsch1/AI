@@ -158,8 +158,8 @@ Iterative deepening works by finding the best move at different depths, then cho
 
 We can see in the above example that when depth=1, the Iterative Deepening Minimax algorithm chooses to use the knight in f6 to take the pawn in e4. The 
 algorithm can only see one move ahead, so it chooses the move that will score it the most points right away. Alternatively, when depth=2, 
-the Minimax algorithm chooses to advance the knight in b8 so that on successive turns it can take the pawn in position d4. Here we can see the 
-different tactics being used by the Minimax when different depths are used. As the game grows more complex. 
+the Iterative Deepening Minimax algorithm chooses to advance the knight in b8 so that on successive turns it can take the pawn in position d4. Here we can see the 
+different tactics being used by the Minimax when different depths are used. 
 
 ### Additional Notes 
 
