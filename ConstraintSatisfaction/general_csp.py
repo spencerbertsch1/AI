@@ -84,8 +84,6 @@ class CSP:
                 # see if any constraints are violated
 
 
-
-
 # some test code - this section can be safely ignored or removed.
 if __name__ == "__main__":
 
@@ -103,8 +101,13 @@ if __name__ == "__main__":
          }
 
     # define the constraints
+    # write a function that takes 2 countries and their colors and returns True if that is ok, False if it's illegal
     c = [('SA', 'WA'), ('SA', 'NT'), ('SA', 'Q'), ('SA', 'NSW'), ('SA', 'WA'),
          ('SA', 'V'), ('WA', 'NT'), ('NT', 'Q'), ('Q', 'NSW'), ('NSW', 'V')]
+
+    # could also define c as a dictionary... TODO
+    C = {'SA': ['WA', 'NT', 'Q', 'NSW', 'WA', 'V'],
+         'WA': ['NT']}
 
     m_csp = CSP(x=x, d=d, c=c)
     print(m_csp.backtracking_search(csp=m_csp))
