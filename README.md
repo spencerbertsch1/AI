@@ -16,7 +16,7 @@ Artificial Intelligence - Dartmouth Fall 2021
 * [Alpha Beta Pruning](https://github.com/spencerbertsch1/AI/blob/main/Chess/AlphaBetaAI.py)
 * [Iterative Deepening Minimax](https://github.com/spencerbertsch1/AI/blob/main/Chess/MinimaxAI.py)
 
-Constraint Satisfaction Problems
-* Map Coloring 
-* Circuit Optimization 
+[Constraint Satisfaction Problems](https://github.com/spencerbertsch1/AI/tree/main/ConstraintSatisfaction)
+* [Map Coloring CSP](https://github.com/spencerbertsch1/AI/blob/main/ConstraintSatisfaction/general_csp.py)
+* [Circuit Optimization CSP](https://github.com/spencerbertsch1/AI/blob/main/ConstraintSatisfaction/general_csp.py)
 
