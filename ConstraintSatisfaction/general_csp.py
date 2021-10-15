@@ -6,10 +6,11 @@
 
 class CSP:
 
-    def __init__(self, x, d, c):
+    def __init__(self, x, d, c, verbose: bool):
         self.x = x
         self.d = d
         self.c = c
+        self.verbose = verbose
 
     def __repr__(self):
         return '\n'.join([
@@ -71,7 +72,6 @@ class CSP:
             # here we use .get with the assignment dict to provide a default value for the lookup (avoiding key errors)
             val1 = assignment.get(constraint[0], float('nan'))  # <-- use float('nan') because [nan != nan]
             val2 = assignment.get(constraint[1], float('nan'))
-            print(f'checking {val1}, {val2}')
             if val1 == val2:
                 answer = False
 
@@ -88,6 +88,10 @@ class CSP:
         pass
 
     def backtracking_search(self):
+        """
+        Wrapper function for backtracking
+        :return: either False, or a feasible solution to the CSP
+        """
         return self.backtrack(assignment={})
 
     def backtrack(self, assignment):
@@ -99,15 +103,15 @@ class CSP:
         :return: either a valid assignment or False if none exists
         """
         # if assignment is complete, then we return the assignment here
-        if set(assignment) == set(self.x):  # TODO <-- double check that this works
+        if set(assignment) == set(self.x):
             return assignment
 
         var = self.select_unassigned_variable(assignment=assignment)
-        print(var)
 
         for value in self.order_domain_values(var=var, assignment=assignment):
             # test whether or not the value is consistent with the assignment
-            print(f'Testing whether or not {value} is consistent with the assignment: {assignment}')
+            if self.verbose:
+                print(f'Testing whether or not {value} is consistent with the assignment: {assignment}')
 
             # add value to test assignment
             test_assignment = assignment
@@ -127,7 +131,7 @@ class CSP:
                 if result is not False:
                     return result
 
-            del assignment[var]  # <-- TODO maybe this shouldn't be here?... but maybe it should...
+            del assignment[var]
 
         return False
 
