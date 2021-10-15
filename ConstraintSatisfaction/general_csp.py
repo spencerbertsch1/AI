@@ -89,34 +89,27 @@ class CSP:
         else:
             # circuit problem
             answer = True
-            # here we loop through the assignment itself and just make sure that nothing is overlapping...
-            reset_board = [['.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-                           ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-                           ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.']]
-            board = reset_board.copy()
+            ll, ul, lr, ur = [], [], [], []
+            # first step, find all the corners of each piece!
+            for piece, lower_left in assignment.items():
+                upper_left = (lower_left[0], (lower_left[1] + piece[1]-1))
+                lower_right = ((lower_left[0] + piece[0] - 1), lower_left[1])
+                upper_right = ((lower_left[0] + piece[0] - 1), (lower_left[1] + piece[1]-1))
+                ll.append(lower_left)
+                ul.append(upper_left)
+                lr.append(lower_right)
+                ur.append(upper_right)
+                if self.verbose:
+                    print(f'PIECE: {piece}, Lower left position: {lower_left} \n upper_left: {upper_left} '
+                          f'\n lower_right: {lower_right} \n upper_right: {upper_right}')
 
-            piece_names = ['a', 'b', 'c', 'e']
-
-            ii = 0
-            for piece, position in assignment.items():
-                print(f'Updating the values in the board for piece {piece_names[ii], piece} in position {position}.')
-                for x in range(piece[0]):
-                    # we are starting from the lower left index, not the upper left, so we loop backwards over [y]
-                    for y in range(piece[1]):
-                        new_x: int = x + position[0]
-                        new_y: int = y + position[1]
-                        print(f'CHECKING x:{new_x}, y:{new_y}')
-                        if board[new_x][new_y] == '.':
-                            # nothing is overlapping so far...
-                            board[new_x][new_y] = piece_names[ii]
-                            # self.pretty_print_board(board=board)
-                        else:
-                            # alas something is overlapping...
-                            # we could just return False here - it would be much faster
-                            return False
-
-                self.pretty_print_board(board=board)
-                ii += 1
+            # iterate over ll, ul, lr, ur and make sure none of the shapes in there overlap
+            for i in range(len(ll)):
+                # only one shape can't overlap with itself
+                if len(ll) < 2:
+                    return True
+                # we need to test all the shapes and make sure they don't overlap!!
+                pass
 
         return answer
 
