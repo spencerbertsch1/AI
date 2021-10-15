@@ -59,6 +59,16 @@ class CSP:
         # TODO is this right?? Where do we use the assignment here?
         return domains
 
+    @ staticmethod
+    def pretty_print_board(board):
+        """
+        Small helper function to help us visualize the board
+        :param board:
+        :return:
+        """
+        for row in reversed(board):
+            print(row, '\n')
+
     def test_consistency(self, assignment) -> bool:
         """
         returns True if the assignment is consistent and doesn't violate any constraints.
@@ -79,9 +89,34 @@ class CSP:
         else:
             # circuit problem
             answer = True
-            # TODO here we could loop through the assignment itself and just make sure that nothing is overlapping...
-            # if overlapping
-                # answer = False
+            # here we loop through the assignment itself and just make sure that nothing is overlapping...
+            reset_board = [['.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+                           ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+                           ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.']]
+            board = reset_board.copy()
+
+            piece_names = ['a', 'b', 'c', 'e']
+
+            ii = 0
+            for piece, position in assignment.items():
+                print(f'Updating the values in the board for piece {piece_names[ii], piece} in position {position}.')
+                for x in range(piece[0]):
+                    # we are starting from the lower left index, not the upper left, so we loop backwards over [y]
+                    for y in range(piece[1]):
+                        new_x: int = x + position[0]
+                        new_y: int = y + position[1]
+                        print(f'CHECKING x:{new_x}, y:{new_y}')
+                        if board[new_x][new_y] == '.':
+                            # nothing is overlapping so far...
+                            board[new_x][new_y] = piece_names[ii]
+                            # self.pretty_print_board(board=board)
+                        else:
+                            # alas something is overlapping...
+                            # we could just return False here - it would be much faster
+                            return False
+
+                self.pretty_print_board(board=board)
+                ii += 1
 
         return answer
 
@@ -119,7 +154,7 @@ class CSP:
         for value in self.order_domain_values(var=var, assignment=assignment):
             # test whether or not the value is consistent with the assignment
             if self.verbose:
-                print(f'Testing whether or not {value} is consistent with the assignment: {assignment}')
+                print(f'Testing whether or not {var, value} is consistent with the current assignment: {assignment}')
 
             # add value to test assignment
             test_assignment = assignment
