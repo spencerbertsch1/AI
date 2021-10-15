@@ -66,14 +66,14 @@ class CSP:
         :param csp:
         :return: bool
         """
-        # TODO how should we do this? We could iterate over each k-v pair in the assignment dict and then
-        # TODO iterate over all the constraints to ensure they never match, seems costly but maybe that's the best move
         answer = True
-        for var, value in assignment.items():
-            for constraint in self.c:
-                if ((var == constraint[0]) & (value == constraint[1])) | \
-                   ((var == constraint[1]) & (value == constraint[0])):
-                    answer = False
+        for constraint in self.c:
+            # here we use .get with the assignment dict to provide a default value for the lookup (avoiding key errors)
+            val1 = assignment.get(constraint[0], float('nan'))  # <-- use float('nan') because [nan != nan]
+            val2 = assignment.get(constraint[1], float('nan'))
+            print(f'checking {val1}, {val2}')
+            if val1 == val2:
+                answer = False
 
         return answer
 
