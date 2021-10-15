@@ -10,8 +10,6 @@ class CSP:
         self.x = x
         self.d = d
         self.c = c
-        self.assigned_variables = set()
-        self.unassigned_variables = set(self.x) - self.assigned_variables
 
     def __repr__(self):
         return '\n'.join([
@@ -20,13 +18,12 @@ class CSP:
             f'Constraints: {self.c}'
         ])
 
-    @ staticmethod
-    def select_unassigned_variable(csp):
+    def select_unassigned_variable(self, assignment):
         # maybe we should remove var from the unassigned variables here
-        # TODO wouldn't it be easier to just pass the assignment into this function instead of keeping track in the CSP?
-
-        val = list(csp.unassigned_variables)[1]
-        return val
+        # TODO this is where we can implement heuristic to improve performance !
+        unassigned_vars = set(self.x) - set(assignment.keys())
+        var = list(unassigned_vars)[0]
+        return var
 
     def revise(self, csp, X, Y):
         """
@@ -49,18 +46,18 @@ class CSP:
         """
         pass
 
-    def order_domain_values(self, var, assignment, csp):
+    def order_domain_values(self, var, assignment):
         """
         Order domain values method - similar to the get_successors method in DFS
         :param csp:
         :return:
         """
         # get all the possible values that can belong to that variable
-        domains = csp.d[var]
+        domains = self.d[var]
         # TODO is this right?? Where do we use the assignment here?
         return domains
 
-    def test_consistency(self, assignment, csp) -> bool:
+    def test_consistency(self, assignment) -> bool:
         """
         returns True if the assignment is consistent and doesn't violate any constraints.
         returns False otherwise.
@@ -73,7 +70,7 @@ class CSP:
         # TODO iterate over all the constraints to ensure they never match, seems costly but maybe that's the best move
         answer = True
         for var, value in assignment.items():
-            for constraint in csp.c:
+            for constraint in self.c:
                 if ((var == constraint[0]) & (value == constraint[1])) | \
                    ((var == constraint[1]) & (value == constraint[0])):
                     answer = False
@@ -90,10 +87,10 @@ class CSP:
         """
         pass
 
-    def backtracking_search(self, csp):
-        return self.backtrack(assignment={}, csp=csp)
+    def backtracking_search(self):
+        return self.backtrack(assignment={})
 
-    def backtrack(self, assignment, csp):
+    def backtrack(self, assignment):
         """
         Implement recursive backtracking search
 
@@ -102,13 +99,13 @@ class CSP:
         :return: either a valid assignment or False if none exists
         """
         # if assignment is complete, then we return the assignment here
-        if set(assignment) == set(csp.x):  # TODO <-- double check that this works
+        if set(assignment) == set(self.x):  # TODO <-- double check that this works
             return assignment
 
-        var = self.select_unassigned_variable(csp=csp)
+        var = self.select_unassigned_variable(assignment=assignment)
         print(var)
 
-        for value in self.order_domain_values(var=var, assignment=assignment, csp=csp):
+        for value in self.order_domain_values(var=var, assignment=assignment):
             # test whether or not the value is consistent with the assignment
             print(f'Testing whether or not {value} is consistent with the assignment: {assignment}')
 
@@ -117,7 +114,7 @@ class CSP:
             test_assignment[var] = value
 
             # see if any constraints are violated
-            if self.test_consistency(assignment=test_assignment, csp=csp):
+            if self.test_consistency(assignment=test_assignment):
 
                 # add value to assignment
                 assignment[var] = value
@@ -125,7 +122,7 @@ class CSP:
                 # # TODO add inference code later...
                 # inferences = self.inference(csp=csp, var=var, value=value)
                 # if inferences:
-                result = self.backtrack(assignment, csp)
+                result = self.backtrack(assignment=assignment)
 
                 if result is not False:
                     return result
@@ -152,4 +149,4 @@ if __name__ == "__main__":
          ('SA', 'V'), ('WA', 'NT'), ('NT', 'Q'), ('Q', 'NSW'), ('NSW', 'V')]
 
     m_csp = CSP(x=x, d=d, c=c)
-    print(m_csp.backtracking_search(csp=m_csp))
+    print(m_csp.backtracking_search())
