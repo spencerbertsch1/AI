@@ -20,7 +20,7 @@ c = [('SA', 'WA'), ('SA', 'NT'), ('SA', 'Q'), ('SA', 'NSW'), ('SA', 'WA'),
 
 if __name__ == "__main__":
     print('Testing Constraint Satisfaction: Map Coloring')
-    m_csp = CSP(x=x, d=d, c=c, verbose=False)
+    m_csp = CSP(x=x, d=d, c=c, verbose=False, csp_problem='map_coloring')
     print('MAP COLORING SOLUTION:')
     print(m_csp.backtracking_search())
 

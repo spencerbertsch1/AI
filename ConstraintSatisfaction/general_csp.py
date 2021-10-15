@@ -6,11 +6,12 @@
 
 class CSP:
 
-    def __init__(self, x, d, c, verbose: bool):
+    def __init__(self, x, d, c, verbose: bool, csp_problem: str):
         self.x = x
         self.d = d
         self.c = c
         self.verbose = verbose
+        self.csp_problem = csp_problem
 
     def __repr__(self):
         return '\n'.join([
@@ -67,13 +68,20 @@ class CSP:
         :param csp:
         :return: bool
         """
-        answer = True
-        for constraint in self.c:
-            # here we use .get with the assignment dict to provide a default value for the lookup (avoiding key errors)
-            val1 = assignment.get(constraint[0], float('nan'))  # <-- use float('nan') because [nan != nan]
-            val2 = assignment.get(constraint[1], float('nan'))
-            if val1 == val2:
-                answer = False
+        if self.csp_problem == 'map_coloring':
+            answer = True
+            for constraint in self.c:
+                # here we use .get() with the assignment to provide a default value for the lookup (avoiding key errors)
+                val1 = assignment.get(constraint[0], float('nan'))  # <-- use float('nan') because [nan != nan]
+                val2 = assignment.get(constraint[1], float('nan'))
+                if val1 == val2:
+                    answer = False
+        else:
+            # circuit problem
+            answer = True
+            # TODO here we could loop through the assignment itself and just make sure that nothing is overlapping...
+            # if overlapping
+                # answer = False
 
         return answer
 
@@ -140,17 +148,25 @@ class CSP:
 if __name__ == "__main__":
 
     # define the variables
-    x = {'WA', 'NT', 'Q', 'NSW', 'V', 'SA', 'T'}
+    # length tuple ()
+    x = {(3, 2), (5, 2), (2, 3), (7, 1)}
 
     # define the domains
-    doms = ['red', 'green', 'blue']
-    # we might need something like this in the future vvv
-    d = {'WA': doms, 'NT': doms, 'Q': doms, 'NSW': doms, 'V': doms, 'SA': doms, 'T': doms}
+    a_domain = [(0, 0), (0, 1), (1, 0), (1, 1), (2, 0), (2, 1), (3, 0), (3, 1), (4, 0), (4, 1), (5, 0), (5, 1),
+                (6, 0), (6, 1), (7, 0), (7, 1)]
+    b_domain = [(0, 0), (0, 1), (1, 0), (1, 1), (2, 0), (2, 1), (3, 0), (3, 1), (4, 0), (4, 1), (5, 0), (5, 1)]
+    c_domain = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0)]
+    e_domain = [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2), (2, 0), (2, 1), (2, 2), (3, 0), (3, 1), (3, 2)]
+
+    # define domains for each variable in the CSP
+    d = {(3, 2): a_domain, (5, 2): b_domain, (2, 3): c_domain, (7, 1): e_domain}
 
     # define the constraints
-    # write a function that takes 2 countries and their colors and returns True if that is ok, False if it's illegal
-    c = [('SA', 'WA'), ('SA', 'NT'), ('SA', 'Q'), ('SA', 'NSW'), ('SA', 'WA'),
-         ('SA', 'V'), ('WA', 'NT'), ('NT', 'Q'), ('Q', 'NSW'), ('NSW', 'V')]
+    # there would be an incredibly huge number of constraints for this problem... how could we represent them?
+    c = []
 
-    m_csp = CSP(x=x, d=d, c=c)
+    # assignment will have the position of the lower left corner of each piece
+    # for example: assignment = {(3, 2): (0, 0), (5, 2): (1, 1)}
+
+    m_csp = CSP(x=x, d=d, c=c, verbose=True, csp_problem='circuits')
     print(m_csp.backtracking_search())
