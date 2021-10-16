@@ -4,14 +4,29 @@
 # CS 276 @ Dartmouth College
 
 
+class Solution:
+
+    def __init__(self, problem_type: str):
+        self.problem_type = problem_type
+        self.nodes_visited = 0
+        self.answer = None
+
+    def __repr__(self):
+        s = f'Constraint Satisfaction Problem: {self.problem_type} \n' \
+            f'Nodes Visited: {self.nodes_visited} \n' \
+            f'Answer: {self.answer}'
+        return s
+
+
 class CSP:
 
-    def __init__(self, x, d, c, verbose: bool, csp_problem: str):
+    def __init__(self, x, d, c, verbose: bool, csp_problem: str, solution):
         self.x = x
         self.d = d
         self.c = c
         self.verbose = verbose
         self.csp_problem = csp_problem
+        self.solution = solution
 
     def __repr__(self):
         return '\n'.join([
@@ -89,12 +104,15 @@ class CSP:
         else:
             # circuit problem
             answer = True
+            piece_names: dict = {0: 'a', 1: 'b', 2: 'c', 3: 'e'}
             ll, ul, lr, ur = [], [], [], []
             # first step, find all the corners of each piece!
             for piece, lower_left in assignment.items():
                 upper_left = (lower_left[0], (lower_left[1] + piece[1]-1))
                 lower_right = ((lower_left[0] + piece[0] - 1), lower_left[1])
                 upper_right = ((lower_left[0] + piece[0] - 1), (lower_left[1] + piece[1]-1))
+
+                # save the corners of each piece outside the loop
                 ll.append(lower_left)
                 ul.append(upper_left)
                 lr.append(lower_right)
@@ -103,13 +121,27 @@ class CSP:
                     print(f'PIECE: {piece}, Lower left position: {lower_left} \n upper_left: {upper_left} '
                           f'\n lower_right: {lower_right} \n upper_right: {upper_right}')
 
-            # iterate over ll, ul, lr, ur and make sure none of the shapes in there overlap
-            for i in range(len(ll)):
+            if len(ll) < 2:
                 # only one shape can't overlap with itself
-                if len(ll) < 2:
-                    return True
-                # we need to test all the shapes and make sure they don't overlap!!
-                pass
+                return True
+            else:
+                # we need to check every combination of shapes and make sure each one doesn't overlap
+                for i in range(len(ll)-1):
+                    for j in range(i+1, len(ll), 1):
+                        ll_1, ll_2 = ll[i], ll[j]
+                        ul_1, ul_2 = ul[i], ul[j]
+                        lr_1, lr_2 = lr[i], lr[j]
+                        ur_1, ur_2 = ur[i], ur[j]
+                        # I think I could have done this with only 2 points on each piece, oh well.
+
+                        # if piece 1 is on the right or left of piece 2
+                        if (lr_2[0] < ll_1[0]) | (lr_1[0] < ll_2[0]):
+                            pass
+                        # if piece 1 is above or below piece 2
+                        elif (ur_1[1] < ll_2[1]) | (ul_2[1] < lr_1[1]):
+                            pass
+                        else:
+                            answer = False
 
         return answer
 
@@ -140,11 +172,15 @@ class CSP:
         """
         # if assignment is complete, then we return the assignment here
         if set(assignment) == set(self.x):
-            return assignment
+            self.solution.answer = assignment
+            return self.solution
 
         var = self.select_unassigned_variable(assignment=assignment)
 
         for value in self.order_domain_values(var=var, assignment=assignment):
+            # increment nodes visited in the solution object
+            self.solution.nodes_visited += 1
+
             # test whether or not the value is consistent with the assignment
             if self.verbose:
                 print(f'Testing whether or not {var, value} is consistent with the current assignment: {assignment}')
@@ -190,11 +226,10 @@ if __name__ == "__main__":
     d = {(3, 2): a_domain, (5, 2): b_domain, (2, 3): c_domain, (7, 1): e_domain}
 
     # define the constraints
-    # there would be an incredibly huge number of constraints for this problem... how could we represent them?
+    # there would be an incredibly huge number of constraints for this problem... let's just pass an empty list
     c = []
 
-    # assignment will have the position of the lower left corner of each piece
-    # for example: assignment = {(3, 2): (0, 0), (5, 2): (1, 1)}
+    sol = Solution(problem_type='Circuit Design')
 
-    m_csp = CSP(x=x, d=d, c=c, verbose=True, csp_problem='circuits')
+    m_csp = CSP(x=x, d=d, c=c, verbose=False, csp_problem='circuits', solution=sol)
     print(m_csp.backtracking_search())
