@@ -134,6 +134,7 @@ class CSP:
                         ur_1, ur_2 = ur[i], ur[j]
                         # I think I could have done this with only 2 points on each piece, oh well.
 
+                        # NOTE logic in this if-statement was adapted from stackoverflow.com: bit.ly/3p8pKgQ
                         # if piece 1 is on the right or left of piece 2
                         if (lr_2[0] < ll_1[0]) | (lr_1[0] < ll_2[0]):
                             pass
