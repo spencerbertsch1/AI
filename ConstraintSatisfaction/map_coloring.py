@@ -2,6 +2,7 @@
 # October 2021
 # Assignment 4
 # CS 276 @ Dartmouth College
+
 from general_csp import CSP, Solution
 
 # Countries (regions) are the variables in the CSP problem
