@@ -2,7 +2,7 @@
 # October 2021
 # Assignment 4
 # CS 276 @ Dartmouth College
-from general_csp import CSP
+from general_csp import CSP, Solution
 
 # Countries (regions) are the variables in the CSP problem
 # define the variables
@@ -18,9 +18,9 @@ d = {'WA': doms, 'NT': doms, 'Q': doms, 'NSW': doms, 'V': doms, 'SA': doms, 'T':
 c = [('SA', 'WA'), ('SA', 'NT'), ('SA', 'Q'), ('SA', 'NSW'), ('SA', 'WA'),
      ('SA', 'V'), ('WA', 'NT'), ('NT', 'Q'), ('Q', 'NSW'), ('NSW', 'V')]
 
+sol = Solution(problem_type='Map Coloring')
+
 if __name__ == "__main__":
-    print('Testing Constraint Satisfaction: Map Coloring')
-    m_csp = CSP(x=x, d=d, c=c, verbose=False, csp_problem='map_coloring')
-    print('MAP COLORING SOLUTION:')
+    m_csp = CSP(x=x, d=d, c=c, verbose=False, csp_problem='map_coloring', solution=sol)
     print(m_csp.backtracking_search())
 
