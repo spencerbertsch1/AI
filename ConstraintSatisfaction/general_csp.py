@@ -20,13 +20,14 @@ class Solution:
 
 class CSP:
 
-    def __init__(self, x, d, c, verbose: bool, csp_problem: str, solution):
+    def __init__(self, x, d, c, verbose: bool, csp_problem: str, solution, use_inference: bool):
         self.x = x
         self.d = d
         self.c = c
         self.verbose = verbose
         self.csp_problem = csp_problem
         self.solution = solution
+        self.use_inference = use_inference
 
     def __repr__(self):
         return '\n'.join([
@@ -34,6 +35,9 @@ class CSP:
             f'Domains: {self.d}',
             f'Constraints: {self.c}'
         ])
+
+    def mrv_heuristic(self):
+        pass
 
     def select_unassigned_variable(self, assignment):
         # maybe we should remove var from the unassigned variables here
@@ -95,7 +99,7 @@ class CSP:
             X = const[0]
             Y = const[1]
             if self.revise(X=X, Y=Y):
-                # get current domain
+                # get current domain here
                 d_i = self.d[X]
                 if len(d_i) == 0:
                     return False
@@ -192,15 +196,15 @@ class CSP:
 
         return answer
 
-    def inference(self, csp, var, value):
+    def inference(self, var, value):
         """
-        TODO
+
         :param csp:
         :param var:
         :param value:
         :return:
         """
-        pass
+        return self.AC3()
 
     def backtracking_search(self):
         """
@@ -241,16 +245,23 @@ class CSP:
 
                 # add value to assignment
                 assignment[var] = value
+                # TODO update the domains here
 
-                # inferences = self.inference(var=var, value=value)
-                a = self.AC3()
-                print(a)
-                # if inferences:
-                result = self.backtrack(assignment=assignment)
+                if self.use_inference:
+                    # use AC-3 with backtracking here
+                    inference: bool = self.inference(value=value, var=var)
+                    if inference:
+                        result = self.backtrack(assignment=assignment)
+                        if result is not False:
+                            return result
+                else:
+                    # vanilla backtracking with no inference
+                    result = self.backtrack(assignment=assignment)
 
-                if result is not False:
-                    return result
+                    if result is not False:
+                        return result
 
             del assignment[var]
+            # TODO update the domains here as well
 
         return False
