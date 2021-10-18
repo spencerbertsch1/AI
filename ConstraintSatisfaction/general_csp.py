@@ -42,26 +42,72 @@ class CSP:
         var = list(unassigned_vars)[0]
         return var
 
-    def revise(self, csp, X, Y):
+    def get_neighbors(self, X):
+        """
+        Helper function to return all the neighbors of a node X in the constraint graph
+        :param X:
+        :return:
+        """
+        neighbors = []
+        for c in self.c:
+            if X in c:
+                if c[0] != X:
+                    neighbors.append(c[0])
+                if c[1] != X:
+                    neighbors.append(c[1])
+        return neighbors
+
+    def revise(self, X, Y) -> bool:
         """
         Helper function for AC-3 function
 
-        TODO implement revise
         :param csp:
         :param X:
         :param Y:
         :return:
         """
-        pass
+        revised = True
+        d_i = self.d[X]
+        for x in d_i:
+            pass
+            # TODO add logic here!!
 
-    def AC3(self, csp):
+        return revised
+
+    def AC3(self):
         """
-        TODO implement AC-3
+        AC-3 implementation for backtracking algorithm
 
         :param csp:
         :return:
         """
-        pass
+
+        # create a queue of all the forward and backward arcs
+        backwards_arcs = []
+        for constraint in self.c:
+            backwards_constraint = tuple(reversed(constraint))
+            backwards_arcs.append(backwards_constraint)
+        forward_arcs = self.c.copy()
+        all_arcs_queue = forward_arcs + backwards_arcs
+
+        while len(all_arcs_queue) != 0:
+            const = all_arcs_queue.pop()
+            X = const[0]
+            Y = const[1]
+            if self.revise(X=X, Y=Y):
+                # get current domain
+                d_i = self.d[X]
+                if len(d_i) == 0:
+                    return False
+
+                all_neighbors: list = self.get_neighbors(X=X)
+                neighbors: list = [x for x in all_neighbors if x != Y]
+                for new_x in neighbors:
+                    new_edge = (new_x, X)
+                    # insert the new edge in the graph at the front of the queue to be checked
+                    all_arcs_queue.insert(0, new_edge)
+
+        return True
 
     def order_domain_values(self, var, assignment):
         """
@@ -134,7 +180,7 @@ class CSP:
                         ur_1, ur_2 = ur[i], ur[j]
                         # I think I could have done this with only 2 points on each piece, oh well.
 
-                        # NOTE logic in this if-statement was adapted from stackoverflow.com: bit.ly/3p8pKgQ
+                        # logic in this if-statement was adapted from stackoverflow.com: bit.ly/3p8pKgQ
                         # if piece 1 is on the right or left of piece 2
                         if (lr_2[0] < ll_1[0]) | (lr_1[0] < ll_2[0]):
                             pass
@@ -196,8 +242,9 @@ class CSP:
                 # add value to assignment
                 assignment[var] = value
 
-                # # TODO add inference code later...
-                # inferences = self.inference(csp=csp, var=var, value=value)
+                # inferences = self.inference(var=var, value=value)
+                a = self.AC3()
+                print(a)
                 # if inferences:
                 result = self.backtrack(assignment=assignment)
 
