@@ -20,7 +20,8 @@ class Solution:
 
 class CSP:
 
-    def __init__(self, x, d, c, verbose: bool, csp_problem: str, solution, use_inference: bool):
+    def __init__(self, x, d, c, verbose: bool, csp_problem: str, solution, use_inference: bool, use_mrv: bool = False,
+                 use_degree_heuristic: bool = False, use_lcv: bool = False):
         self.x = x
         self.d = d
         self.c = c
@@ -28,6 +29,10 @@ class CSP:
         self.csp_problem = csp_problem
         self.solution = solution
         self.use_inference = use_inference
+        self.use_mrv = use_mrv
+        self.use_degree_heuristic = use_degree_heuristic
+        self.use_lcv = use_lcv
+
 
     def __repr__(self):
         return '\n'.join([
@@ -40,11 +45,36 @@ class CSP:
         pass
 
     def select_unassigned_variable(self, assignment):
-        # maybe we should remove var from the unassigned variables here
-        # TODO this is where we can implement heuristic to improve performance !
-        unassigned_vars = set(self.x) - set(assignment.keys())
-        var = list(unassigned_vars)[0]
-        return var
+        """
+        This is where we can implement heuristics to improve performance !
+        :param assignment:
+        :return:
+        """
+        if self.use_mrv:
+            pass
+            # TODO implement mrv to get the unassigned variables
+        elif self.use_degree_heuristic:
+            pass
+            # TODO implement degree heuristic to get the unassigned variables
+        else:
+            # we if we're not using degree heuristic or MRV, then we just get the variables that arent in the assignment
+            unassigned_vars = set(self.x) - set(assignment.keys())
+
+            # TODO we should probably end up refactoring this code out into a function to call it 3 times in this method
+            # if we want to use the least-constraining-value heuristic to order the output
+            if self.use_lcv:
+                # Use the LCV heuristic to order the variables, and return the correct one
+                # let's first just try getting the variable that has the fewest neighbors
+                vars_dict = {}
+                for var in unassigned_vars:
+                    n = self.get_neighbors(X=var)
+                    vars_dict[var] = len(n)
+                # we can now get the variable with the min neighbors
+                var = min(vars_dict, key=vars_dict.get)
+                return var
+            else:
+                var = list(unassigned_vars)[0]
+                return var
 
     def get_neighbors(self, X):
         """
@@ -196,16 +226,6 @@ class CSP:
 
         return answer
 
-    def inference(self, var, value):
-        """
-
-        :param csp:
-        :param var:
-        :param value:
-        :return:
-        """
-        return self.AC3()
-
     def backtracking_search(self):
         """
         Wrapper function for backtracking
@@ -249,7 +269,8 @@ class CSP:
 
                 if self.use_inference:
                     # use AC-3 with backtracking here
-                    inference: bool = self.inference(value=value, var=var)
+                    inference: bool = self.AC3()
+                    # if AC3 returns false, we pass, but if it returns true, we run backtrack and get the result
                     if inference:
                         result = self.backtrack(assignment=assignment)
                         if result is not False:
