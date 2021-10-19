@@ -48,7 +48,7 @@ class CSP:
         :return: node (var)
         """
         # we only want to search through the usassigned variables
-        unassigned_vars = set(self.x) - set(assignment.keys())
+        unassigned_vars = [x for x in self.x if x not in assignment.keys()]
 
         # initialize the edge dictionary with all worst cases
         edge_dict = {}
@@ -69,13 +69,13 @@ class CSP:
 
     def degree_heuristic(self, assignment):
         # Use the degree heuristic to get the unassigned variables
-        unassigned_vars = set(self.x) - set(assignment.keys())
+        unassigned_vars = [x for x in self.x if x not in assignment.keys()]
         vars_dict = {}
         for var in unassigned_vars:
             n = self.get_neighbors(X=var)
             vars_dict[var] = len(n)
             # we can now get the variable with the max neighbors
-        var = max(vars_dict, key=vars_dict.get)
+        var = min(vars_dict, key=vars_dict.get)
         return var
 
     def order_domain_values(self, var, assignment):
@@ -144,7 +144,7 @@ class CSP:
 
         # If we're not using degree heuristic, LCV, or MRV, then we just use all variables not in the assignment
         else:
-            unassigned_vars = set(self.x) - set(assignment.keys())
+            unassigned_vars = [x for x in self.x if x not in assignment.keys()]
             var = list(unassigned_vars)[0]  # <-- order doesn't matter here so we just grab a value from the set
             return var
 
@@ -154,13 +154,18 @@ class CSP:
         :param X:
         :return:
         """
-        neighbors = []
-        for c in self.c:
-            if X in c:
-                if c[0] != X:
-                    neighbors.append(c[0])
-                if c[1] != X:
-                    neighbors.append(c[1])
+        # for the map-coloring problem we can use the constraints to get the neighbors
+        if self.csp_problem == 'map_coloring':
+            neighbors = []
+            for c in self.c:
+                if X in c:
+                    if c[0] != X:
+                        neighbors.append(c[0])
+                    if c[1] != X:
+                        neighbors.append(c[1])
+        else:
+            # we assume any other piece could be a neighbor in the circuits problem
+            neighbors = [x for x in self.x if x != X]
         return neighbors
 
     def revise(self, X, Y) -> bool:
@@ -239,8 +244,8 @@ class CSP:
         :param board:
         :return:
         """
-        for row in reversed(board):
-            print(row, '\n')
+        print('-------------- CIRCUIT BOARD LAYOUT --------------')
+        print('\n', board[0], '\n', board[1], '\n', board[2], '\n')
 
     def test_consistency(self, assignment) -> bool:
         """
@@ -300,6 +305,17 @@ class CSP:
 
         return answer
 
+    def print_circuit_board(self, assignment):
+        # {(2, 3): (0, 0), (3, 2): (2, 0), (7, 1): (2, 2), (5, 2): (5, 0)}
+        s = '.'*10
+        board = [list(s), list(s), list(s)]
+        self.pretty_print_board(board=board)
+        board[0][2] = 'A'
+        self.pretty_print_board(board=board)
+
+        # for piece, location in assignment.items():
+        #     pass
+
     def get_domains(self, var):
         """
         Updated function - returns the current (pruned) domains for an input variable
@@ -336,6 +352,9 @@ class CSP:
         # if assignment is complete, then we return the assignment here
         if set(assignment) == set(self.x):
             self.solution.answer = assignment
+            if self.csp_problem == 'circuits':
+                # print the final circuit board layout
+                self.print_circuit_board(assignment=assignment)
             return self.solution
 
         var = self.select_unassigned_variable(assignment=assignment)
