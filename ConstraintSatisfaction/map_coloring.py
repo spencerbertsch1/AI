@@ -22,5 +22,9 @@ c = [('SA', 'WA'), ('SA', 'NT'), ('SA', 'Q'), ('SA', 'NSW'), ('SA', 'WA'),
 sol = Solution(problem_type='Map Coloring')
 
 if __name__ == "__main__":
-    m_csp = CSP(x=x, d=d, c=c, verbose=False, csp_problem='map_coloring', solution=sol, use_inference=False)
+    m_csp = CSP(x=x, d=d, c=c, verbose=False, csp_problem='map_coloring', solution=sol,
+                use_inference=False,
+                use_lcv=False,
+                use_degree_heuristic=False,
+                use_mrv=True)
     print(m_csp.backtracking_search())

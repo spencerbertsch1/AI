@@ -25,6 +25,7 @@ class CSP:
         self.x = x
         self.d = d
         self.c = c
+        self.d_copy = self.d.copy()
         self.verbose = verbose
         self.csp_problem = csp_problem
         self.solution = solution
@@ -41,40 +42,81 @@ class CSP:
             f'Constraints: {self.c}'
         ])
 
-    def mrv_heuristic(self):
-        pass
+    def mrv_heuristic(self, assignment):
+        """
+        Returns the node with the minimum remaining value for connections in the constraint graph
+        :return: node (var)
+        """
+        # we only want to search through the usassigned variables
+        unassigned_vars = set(self.x) - set(assignment.keys())
+
+        # initialize the edge dictionary with all worst cases
+        edge_dict = {}
+        for var in unassigned_vars:
+            edge_dict[var] = len(self.d[var])
+
+        for var in unassigned_vars:
+            # here we have a variable with an unconstrained domain. we might be able to prune it here
+            for neighbor in self.get_neighbors(X=var):
+                # testing whether or not [neighbor] is constraining [var]'s domain values
+                if len(self.d[neighbor]) == 1:
+                    # we have found a constraint! Now we reduce the domain of [var] by the [var] of the neighbor
+                    edge_dict[var] = edge_dict[var] - 1
+
+        # now we just return the variable the has the fewest connections
+        var = max(edge_dict, key=edge_dict.get)
+        return var
+
+    def degree_heuristic(self, assignment):
+        # Use the degree heuristic to get the unassigned variables
+        unassigned_vars = set(self.x) - set(assignment.keys())
+        vars_dict = {}
+        for var in unassigned_vars:
+            n = self.get_neighbors(X=var)
+            vars_dict[var] = len(n)
+            # we can now get the variable with the max neighbors
+        var = max(vars_dict, key=vars_dict.get)
+        return var
+
+    def order_domain_values(self, var, assignment):
+        """
+        Order domain values method - similar to the get_successors method in DFS
+        :param csp:
+        :return:
+        """
+        if self.use_lcv:
+            # TODO order the domains
+            domains = self.d[var]
+            return domains
+        else:
+            # get all the possible values that can belong to that variable
+            domains = self.d[var]
+            return domains
 
     def select_unassigned_variable(self, assignment):
         """
-        This is where we can implement heuristics to improve performance !
-        :param assignment:
-        :return:
+        This is where we implement heuristics to improve performance!
+        1. MRV heuristic
+        2. Degree heuristic
+        3. If we're not using either, we just return an element of the unnassigned_variables set
+        :param assignment: current assignment
+        :return: an unassigned variable
         """
+        # Minimum Remaining Value heuristic returns the variable with the fewest remaining values in its domain
         if self.use_mrv:
-            pass
-            # TODO implement mrv to get the unassigned variables
-        elif self.use_degree_heuristic:
-            pass
-            # TODO implement degree heuristic to get the unassigned variables
-        else:
-            # we if we're not using degree heuristic or MRV, then we just get the variables that arent in the assignment
-            unassigned_vars = set(self.x) - set(assignment.keys())
+            var = self.mrv_heuristic(assignment=assignment)
+            return var
 
-            # TODO we should probably end up refactoring this code out into a function to call it 3 times in this method
-            # if we want to use the least-constraining-value heuristic to order the output
-            if self.use_lcv:
-                # Use the LCV heuristic to order the variables, and return the correct one
-                # let's first just try getting the variable that has the fewest neighbors
-                vars_dict = {}
-                for var in unassigned_vars:
-                    n = self.get_neighbors(X=var)
-                    vars_dict[var] = len(n)
-                # we can now get the variable with the min neighbors
-                var = min(vars_dict, key=vars_dict.get)
-                return var
-            else:
-                var = list(unassigned_vars)[0]
-                return var
+        # Degree heuristic returns the variable with the largest number of connections in the constrain graph
+        elif self.use_degree_heuristic:
+            var = self.degree_heuristic(assignment=assignment)
+            return var
+
+        # If we're not using degree heuristic, LCV, or MRV, then we just use all variables not in the assignment
+        else:
+            unassigned_vars = set(self.x) - set(assignment.keys())
+            var = list(unassigned_vars)[0]  # <-- order doesn't matter here so we just grab a value from the set
+            return var
 
     def get_neighbors(self, X):
         """
@@ -101,6 +143,7 @@ class CSP:
         :return:
         """
         revised = True
+        # TODO very similar to mrv_heuristic - implement same logic here!
         d_i = self.d[X]
         for x in d_i:
             pass
@@ -143,17 +186,6 @@ class CSP:
 
         return True
 
-    def order_domain_values(self, var, assignment):
-        """
-        Order domain values method - similar to the get_successors method in DFS
-        :param csp:
-        :return:
-        """
-        # get all the possible values that can belong to that variable
-        domains = self.d[var]
-        # TODO is this right?? Where do we use the assignment here?
-        return domains
-
     @ staticmethod
     def pretty_print_board(board):
         """
@@ -184,7 +216,6 @@ class CSP:
         else:
             # circuit problem
             answer = True
-            piece_names: dict = {0: 'a', 1: 'b', 2: 'c', 3: 'e'}
             ll, ul, lr, ur = [], [], [], []
             # first step, find all the corners of each piece!
             for piece, lower_left in assignment.items():
@@ -226,6 +257,27 @@ class CSP:
 
         return answer
 
+    def update_all_domains(self):
+        """
+        This seems like what the AC3 algorithm is supposed to do!
+        TODO look into this... should this be applied in backtracking? seems like AC-3's job
+        :return:
+        """
+        for var in self.x:
+            if len(self.d[var]) == 1:
+                # we can't prune the domain if we have already chosen a single value for it
+                pass
+            else:
+                # here we have a variable with an unconstrained domain. we might be able to prune it here
+                for neighbor in self.get_neighbors(X=var):
+                    # testing whether or not [neighbor] is constraining [var]'s domain values
+                    if len(self.d[neighbor]) == 1:
+                        # we have found a constraint! Now we reduce the domain of [var] by the [var] of the neighbor
+                        neighbor_var = self.d[neighbor][0]
+                        # and we update the instance variable to reflect the change
+                        self.d[var] = [x for x in self.d[var] if x != neighbor_var]
+
+
     def backtracking_search(self):
         """
         Wrapper function for backtracking
@@ -265,7 +317,8 @@ class CSP:
 
                 # add value to assignment
                 assignment[var] = value
-                # TODO update the domains here
+                # update the current domain of (var) here
+                self.d[var] = [value]
 
                 if self.use_inference:
                     # use AC-3 with backtracking here
@@ -283,6 +336,7 @@ class CSP:
                         return result
 
             del assignment[var]
-            # TODO update the domains here as well
+            # update the domains here as well
+            self.d[var] = self.d_copy[var]
 
         return False

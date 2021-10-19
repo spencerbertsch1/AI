@@ -27,5 +27,8 @@ sol = Solution(problem_type='Circuit Design')
 
 
 if __name__ == "__main__":
-    csp = CSP(x=x, d=d, c=c, verbose=False, csp_problem='circuits', solution=sol, use_inference=False)
+    csp = CSP(x=x, d=d, c=c, verbose=False, csp_problem='circuits', solution=sol, use_inference=False,
+              use_lcv=False,
+              use_degree_heuristic=False,
+              use_mrv=False)
     print(csp.backtracking_search())
