@@ -172,15 +172,27 @@ class CSP:
         :param Y:
         :return:
         """
-        revised = True
+        revised = False
         # get the updated domain of X
         d_x = self.get_domains(var=X)
         # get the updated domain of Y
         d_y = self.get_domains(var=Y)
 
         for x in d_x:
-            pass
-            # TODO add logic here!!
+            d_y_satisfied: bool = False
+            for y in d_y:
+                # if any of the values of y in dy allow the constraint to be satisfied:
+                new_assignment = {X: x, Y: y}  # <-- dictionary of CSP variables to CSP values
+                is_legal: bool = self.test_consistency(assignment=new_assignment)
+
+                # if the new value for Y is consistent with the value for X, then we set d_y_satisfied to True
+                if is_legal:
+                    d_y_satisfied = True
+
+            if d_y_satisfied is False:
+                # delete x from d_x (delete the value x from the domain d_x)
+                self.d[X] = [i for i in self.d[X] if i != x]
+                revised = True
 
         return revised
 
@@ -207,8 +219,8 @@ class CSP:
             Y = const[1]
             if self.revise(X=X, Y=Y):
                 # get current domain here
-                d_i = self.d[X]
-                if len(d_i) == 0:
+                d_x = self.get_domains(var=X)
+                if len(d_x) == 0:
                     return False
 
                 all_neighbors: list = self.get_neighbors(X=X)
