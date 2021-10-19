@@ -64,7 +64,7 @@ class CSP:
                     edge_dict[var] = edge_dict[var] - 1
 
         # now we just return the variable the has the fewest connections
-        var = max(edge_dict, key=edge_dict.get)
+        var = min(edge_dict, key=edge_dict.get)
         return var
 
     def degree_heuristic(self, assignment):
@@ -81,13 +81,43 @@ class CSP:
     def order_domain_values(self, var, assignment):
         """
         Order domain values method - similar to the get_successors method in DFS
+        Here we can use the Least Common Value heuristic to optimize backtracking search and resude the number of
+        nodes that the algorithm needs to search through
+
         :param csp:
         :return:
         """
         if self.use_lcv:
-            # TODO order the domains
+            # We want to choose the value in the domain that rules out the fewest choices for neighbors
+
             domains = self.d[var]
-            return domains
+            neighbors = self.get_neighbors(X=var)
+
+            # initialize neighbor_choices - later we will pick the variable that maximizes neighbor choices
+            neighbor_choices = {}
+            for value in domains:
+                neighbor_choices[value] = 0
+
+            for value in domains:
+                for neighbor in neighbors:
+                    # find out how many choices there are for the neighbor if we choose this variable from the domain
+                    original_domain = self.d[var].copy()
+                    self.d[var] = [value]
+
+                    # get the number of new domains when the current variable is set to [var]
+                    num_new_domains = len(self.get_domains(var=neighbor))
+                    neighbor_choices[value] = neighbor_choices[value] + num_new_domains
+
+                    # after the test, we reset the instance variable back to it's correct domain
+                    self.d[var] = original_domain
+
+            # we now have a dict with the number of total neighbor choices for each variable
+            # next step is to sort the dictionary ascending, then convert the keys to a list which we return
+            sorted_dict: dict = {k: v for k, v in sorted(neighbor_choices.items(), key=lambda item: item[1])}
+            sorted_domains: list = list(sorted_dict.keys())
+            sorted_domains.reverse()
+
+            return sorted_domains
         else:
             # get all the possible values that can belong to that variable
             domains = self.d[var]
@@ -143,9 +173,12 @@ class CSP:
         :return:
         """
         revised = True
-        # TODO very similar to mrv_heuristic - implement same logic here!
-        d_i = self.d[X]
-        for x in d_i:
+        # get the updated domain of X
+        d_x = self.get_domains(var=X)
+        # get the updated domain of Y
+        d_y = self.get_domains(var=Y)
+
+        for x in d_x:
             pass
             # TODO add logic here!!
 
@@ -164,6 +197,7 @@ class CSP:
         for constraint in self.c:
             backwards_constraint = tuple(reversed(constraint))
             backwards_arcs.append(backwards_constraint)
+        # maybe just use forward arcs... vvv
         forward_arcs = self.c.copy()
         all_arcs_queue = forward_arcs + backwards_arcs
 
@@ -228,9 +262,6 @@ class CSP:
                 ul.append(upper_left)
                 lr.append(lower_right)
                 ur.append(upper_right)
-                if self.verbose:
-                    print(f'PIECE: {piece}, Lower left position: {lower_left} \n upper_left: {upper_left} '
-                          f'\n lower_right: {lower_right} \n upper_right: {upper_right}')
 
             if len(ll) < 2:
                 # only one shape can't overlap with itself
@@ -257,26 +288,23 @@ class CSP:
 
         return answer
 
-    def update_all_domains(self):
+    def get_domains(self, var):
         """
-        This seems like what the AC3 algorithm is supposed to do!
-        TODO look into this... should this be applied in backtracking? seems like AC-3's job
-        :return:
-        """
-        for var in self.x:
-            if len(self.d[var]) == 1:
-                # we can't prune the domain if we have already chosen a single value for it
-                pass
-            else:
-                # here we have a variable with an unconstrained domain. we might be able to prune it here
-                for neighbor in self.get_neighbors(X=var):
-                    # testing whether or not [neighbor] is constraining [var]'s domain values
-                    if len(self.d[neighbor]) == 1:
-                        # we have found a constraint! Now we reduce the domain of [var] by the [var] of the neighbor
-                        neighbor_var = self.d[neighbor][0]
-                        # and we update the instance variable to reflect the change
-                        self.d[var] = [x for x in self.d[var] if x != neighbor_var]
+        Updated function - returns the current (pruned) domains for an input variable
 
+        :return: the new, potentially pruned domain
+        """
+        domain_copy: list = self.d[var].copy()
+        for neighbor in self.get_neighbors(X=var):
+            # testing whether or not [neighbor] is constraining [var]'s domain values
+            if len(self.d[neighbor]) == 1:
+                # we have found a constraint! Now we reduce the domain of [var] by the [var] of the neighbor
+                neighbor_var = self.d[neighbor][0]
+                # and we update the instance variable to reflect the change
+                domain_copy = [x for x in domain_copy if x != neighbor_var]
+
+        # we return the new, potentially pruned domain
+        return domain_copy
 
     def backtracking_search(self):
         """
