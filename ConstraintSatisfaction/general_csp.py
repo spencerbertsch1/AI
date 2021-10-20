@@ -306,15 +306,28 @@ class CSP:
         return answer
 
     def print_circuit_board(self, assignment):
-        # {(2, 3): (0, 0), (3, 2): (2, 0), (7, 1): (2, 2), (5, 2): (5, 0)}
+        """
+        Method to print the circuit board after the optimal circuit design has been found
+        :param assignment:
+        :return:
+        """
+        # initialize empty board
         s = '.'*10
         board = [list(s), list(s), list(s)]
-        self.pretty_print_board(board=board)
-        board[0][2] = 'A'
+
+        # loop through pieces and fill in board
+        piece_lookup: dict = {(3, 2): 'a', (5, 2): 'b', (2, 3): 'c', (7, 1): 'e'}
+        for piece, location in assignment.items():
+            x_start = location[0]
+            y_start = location[1]
+
+            for i in range(piece[1]):
+                for j in range(piece[0]):
+                    # add this row of piece values
+                    board[y_start+i][x_start+j] = piece_lookup[piece]
+
         self.pretty_print_board(board=board)
 
-        # for piece, location in assignment.items():
-        #     pass
 
     def get_domains(self, var):
         """
