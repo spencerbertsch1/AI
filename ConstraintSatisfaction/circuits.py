@@ -6,14 +6,39 @@
 from general_csp import CSP, Solution
 
 # define the variables
-# length tuple ()
 x = [(3, 2), (5, 2), (2, 3), (7, 1)]
 
-# define the domains
+board_size: tuple = (10, 3)
+# first we need to generate the domains
+a_domain, b_domain, c_domain, e_domain = [], [], [], []
+for piece in range(len(x)):
+    for n in range(board_size[0]):
+        for m in range(board_size[1]):
+            # width of the piece
+            w = x[piece][0]
+            # height of the piece
+            h = x[piece][1]
+
+            if ((n + w) <= board_size[0]) & ((m + h) <= board_size[1]):
+                new_domain = (n, m)
+            else:
+                continue
+
+            if piece == 0:
+                a_domain.append(new_domain)
+            elif piece == 1:
+                b_domain.append(new_domain)
+            elif piece == 2:
+                c_domain.append(new_domain)
+            elif piece == 3:
+                e_domain.append(new_domain)
+
+
+# we could also define the domains manually
 a_domain = [(0, 0), (0, 1), (1, 0), (1, 1), (2, 0), (2, 1), (3, 0), (3, 1), (4, 0), (4, 1), (5, 0), (5, 1),
             (6, 0), (6, 1), (7, 0), (7, 1)]
 b_domain = [(0, 0), (0, 1), (1, 0), (1, 1), (2, 0), (2, 1), (3, 0), (3, 1), (4, 0), (4, 1), (5, 0), (5, 1)]
-c_domain = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0)]
+c_domain = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0), (8, 0)]
 e_domain = [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2), (2, 0), (2, 1), (2, 2), (3, 0), (3, 1), (3, 2)]
 
 # define domains for each variable in the CSP

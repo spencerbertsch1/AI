@@ -64,7 +64,7 @@ class CSP:
                     edge_dict[var] = edge_dict[var] - 1
 
         # now we just return the variable the has the fewest connections
-        var = min(edge_dict, key=edge_dict.get)
+        var = max(edge_dict, key=edge_dict.get)  # TODO <-- experiment with this function
         return var
 
     def degree_heuristic(self, assignment):

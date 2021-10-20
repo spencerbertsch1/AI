@@ -78,7 +78,7 @@ Answer: {'WA': 'blue', 'SA': 'green', 'NT': 'red', 'Q': 'blue',
 The above result was generated when inference and all heuristics were turned on. 
 
 <p align="center">
-    <img src="https://github.com/spencerbertsch1/AI/blob/main/ConstraintSatisfaction/docs/australia.png?raw=true" alt="sensorless_diagram" width="55%"/>
+    <img src="https://github.com/spencerbertsch1/AI/blob/main/ConstraintSatisfaction/docs/austraila.png?raw=true" alt="australia" width="55%"/>
 </p>
 
 This is one of the many viable solutions to this map coloring problem. Another solution, for example, could easily be found by exchanging all 
