@@ -50,21 +50,31 @@ class CSP:
         # we only want to search through the usassigned variables
         unassigned_vars = [x for x in self.x if x not in assignment.keys()]
 
+        if len(unassigned_vars) == 3:
+            print('something')
+
         # initialize the edge dictionary with all worst cases
         edge_dict = {}
         for var in unassigned_vars:
-            edge_dict[var] = len(self.d[var])
+            edge_dict[var] = self.d_copy[var]
 
         for var in unassigned_vars:
-            # here we have a variable with an unconstrained domain. we might be able to prune it here
+            # we have a variable with an unconstrained domain. we might be able to prune it here
             for neighbor in self.get_neighbors(X=var):
                 # testing whether or not [neighbor] is constraining [var]'s domain values
                 if len(self.d[neighbor]) == 1:
-                    # we have found a constraint! Now we reduce the domain of [var] by the [var] of the neighbor
-                    edge_dict[var] = edge_dict[var] - 1
+                    # we need to get the color of the neighbor and remove it from the domain of the variable
+                    neighbor_color: str = self.d[neighbor]
+                    # we have found a constraint! Now we remove the neighbor's domain from [var]'s domain
+                    edge_dict[var] = [x for x in edge_dict[var] if x != neighbor_color[0]]
+
+        # we want the number of feasible variables, so we get that here
+        edge_dict_lengths = {}
+        for var, domain in edge_dict.items():
+            edge_dict_lengths[var] = len(edge_dict[var])
 
         # now we just return the variable the has the fewest connections
-        var = max(edge_dict, key=edge_dict.get)  # TODO <-- experiment with this function
+        var = min(edge_dict, key=edge_dict.get)
         return var
 
     def degree_heuristic(self, assignment):
