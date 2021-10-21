@@ -70,7 +70,8 @@ class CSP:
         for var, domain in edge_dict.items():
             edge_dict_lengths[var] = len(edge_dict[var])
 
-        # now we just return the variable the has the fewest connections
+        # now we just return the variable the has the most connections
+        # vvv we can switch between 'max' and 'min' here to see differences in performance
         var = max(edge_dict_lengths, key=edge_dict_lengths.get)
         return var
 
@@ -82,13 +83,14 @@ class CSP:
             n = self.get_neighbors(X=var)
             vars_dict[var] = len(n)
             # we can now get the variable with the max neighbors
-        var = min(vars_dict, key=vars_dict.get)
+        # vvv we can switch between 'max' and 'min' here to see differences in performance
+        var = max(vars_dict, key=vars_dict.get)
         return var
 
     def order_domain_values(self, var, assignment):
         """
         Order domain values method - similar to the get_successors method in DFS
-        Here we can use the Least Common Value heuristic to optimize backtracking search and resude the number of
+        Here we can use the Least Common Value heuristic to optimize backtracking search and reduce the number of
         nodes that the algorithm needs to search through
 
         :param csp:
@@ -96,7 +98,6 @@ class CSP:
         """
         if self.use_lcv:
             # We want to choose the value in the domain that rules out the fewest choices for neighbors
-
             domains = self.d[var]
             neighbors = self.get_neighbors(X=var)
 
@@ -175,26 +176,26 @@ class CSP:
             neighbors = [x for x in self.x if x != X]
         return neighbors
 
-    def revise(self, X, Y) -> bool:
+    def revise(self, x_i, x_j) -> bool:
         """
         Helper function for AC-3 function
 
         :param csp:
-        :param X:
-        :param Y:
+        :param x_i:
+        :param x_j:
         :return:
         """
         revised = False
         # get the updated domain of X
-        d_x = self.get_domains(var=X)
+        d_x = self.get_domains(var=x_i)
         # get the updated domain of Y
-        d_y = self.get_domains(var=Y)
+        d_y = self.get_domains(var=x_j)
 
         for x in d_x:
             d_y_satisfied: bool = False
             for y in d_y:
                 # if any of the values of y in dy allow the constraint to be satisfied:
-                new_assignment = {X: x, Y: y}  # <-- dictionary of CSP variables to CSP values
+                new_assignment = {x_i: x, x_j: y}  # <-- dictionary of CSP variables to CSP values
                 is_legal: bool = self.test_consistency(assignment=new_assignment)
 
                 # if the new value for Y is consistent with the value for X, then we set d_y_satisfied to True
@@ -203,7 +204,7 @@ class CSP:
 
             if d_y_satisfied is False:
                 # delete x from d_x (delete the value x from the domain d_x)
-                self.d[X] = [i for i in self.d[X] if i != x]
+                self.d[x_i] = [i for i in self.d[x_i] if i != x]
                 revised = True
 
         return revised
@@ -227,18 +228,18 @@ class CSP:
 
         while len(all_arcs_queue) != 0:
             const = all_arcs_queue.pop()
-            X = const[0]
-            Y = const[1]
-            if self.revise(X=X, Y=Y):
+            x_i = const[0]
+            x_j = const[1]
+            if self.revise(x_i=x_i, x_j=x_j):
                 # get current domain here
-                d_x = self.get_domains(var=X)
+                d_x = self.get_domains(var=x_i)
                 if len(d_x) == 0:
                     return False
 
-                all_neighbors: list = self.get_neighbors(X=X)
-                neighbors: list = [x for x in all_neighbors if x != Y]
-                for new_x in neighbors:
-                    new_edge = (new_x, X)
+                all_neighbors: list = self.get_neighbors(X=x_i)
+                neighbors: list = [x for x in all_neighbors if x != x_j]
+                for x_k in neighbors:
+                    new_edge = (x_k, x_i)
                     # insert the new edge in the graph at the front of the queue to be checked
                     all_arcs_queue.insert(0, new_edge)
 

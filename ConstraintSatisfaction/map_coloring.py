@@ -24,7 +24,9 @@ sol = Solution(problem_type='Map Coloring')
 if __name__ == "__main__":
     m_csp = CSP(x=x, d=d, c=c, verbose=False, csp_problem='map_coloring', solution=sol,
                 use_inference=True,
-                use_lcv=False,
-                use_degree_heuristic=False,
-                use_mrv=False)
+                use_lcv=True,
+                use_degree_heuristic=True,
+                use_mrv=True)
     print(m_csp.backtracking_search())
+
+# 11, 10, 8, 14, 11, 8
