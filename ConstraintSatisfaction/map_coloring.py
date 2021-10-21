@@ -28,5 +28,3 @@ if __name__ == "__main__":
                 use_degree_heuristic=True,
                 use_mrv=True)
     print(m_csp.backtracking_search())
-
-# 11, 10, 8, 14, 11, 8

@@ -61,3 +61,4 @@ if __name__ == "__main__":
               use_degree_heuristic=False,
               use_mrv=False)
     print(csp.backtracking_search())
+
