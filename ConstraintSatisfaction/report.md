@@ -61,12 +61,12 @@ each problem. You can test each problem by running each of these files as execut
 
 After much tinkering the CSP solver now works as expected for each problem. 
 
-The optimal solution for the map-coloring problem was found after searching 8 nodes, and the optimal solution to the 
-circuits' problem was found after searching 26 nodes. The heuristics and inference generally improved or did not change the performance
-of the algorithms, and in some cases the heuristics caused the circuits' problem to visit more nodes than vanilla backtracking with no 
-heuristics at all. 
+The optimal solution for the map-coloring problem was found after searching 7 nodes, and the optimal solution to the 
+circuits' problem was found after searching 19 nodes. The heuristics and inference generally improved or did not change the performance
+of the algorithms. In the case of map-coloring, the optimal performance was achieved when all of the heuristics and inference were activated
+at the same time. 
 
-**Optimal solution for the map-coloring problem:**
+### Optimal solution for the map-coloring problem:
 
 ```
 Constraint Satisfaction Problem: Map Coloring 
@@ -75,35 +75,60 @@ Answer: {'WA': 'blue', 'SA': 'green', 'NT': 'red', 'Q': 'blue',
          'NSW': 'red', 'V': 'blue', 'T': 'blue'}
 ```
 
-The above result was generated when inference and all heuristics were turned on. 
+The above result was generated when inference and all heuristics were turned on. See the below table for an overview of the CSP performance 
+for the map-coloring problem. 
+
+|               | Backtracking Alone | W/ Inference | W/ LCV | W/ Degree Heuristic | W/ MRV | W/ All Turned On |
+|---------------|--------------------|--------------|--------|---------------------|--------|------------------|
+| Nodes Visited | 11                 | 10           | 8      | 11                  | 11     | 7                |
+
+*Table showing Map-Coloring performance with different combinations of inference and heuristics*
+
+As seen in the above table, the best performance for the map-coloring problem as achieved when all heuristics and inference 
+is turned on. 
 
 <p align="center">
     <img src="https://github.com/spencerbertsch1/AI/blob/main/ConstraintSatisfaction/docs/austraila.png?raw=true" alt="australia" width="55%"/>
 </p>
 
+*Graphic showing a feasible map-coloring solution found using the generic CSP solver*
+
 This is one of the many viable solutions to this map coloring problem. Another solution, for example, could easily be found by exchanging all 
 green variables with red variables and vice versa. The initialization of the problem - the ordering of the variables and the constraints that 
 we pass into the solver - dictate the solution found and returned by the backtracking search. 
 
-**Optimal solution for the circuits problem:**
+### Optimal solution for the circuits problem:
+
+The circuits problem was also solved by the generic CSP solver, yielding different feasible solutions as different combinations of heuristics and 
+inference are activated and deactivated. 
 
 ```
+-------------- CIRCUIT BOARD LAYOUT --------------
+ ['c', 'c', '.', 'e', 'e', 'e', 'e', 'e', 'e', 'e'] 
+ ['c', 'c', 'b', 'b', 'b', 'b', 'b', 'a', 'a', 'a'] 
+ ['c', 'c', 'b', 'b', 'b', 'b', 'b', 'a', 'a', 'a'] 
+
 Constraint Satisfaction Problem: Circuit Design 
-Nodes Visited: 18 
+Nodes Visited: 19 
 Answer: {(3, 2): (7, 1), (5, 2): (2, 1), (2, 3): (0, 0), (7, 1): (3, 0)}
 ```
 
-From this answer we can see the below solution was found after visiting only 26 nodes in the constraint graph. Although some heuristics improved
-the performance in the map-coloring problem by reducing the number of nodes visited, the number of nodes visited in the circuits problem for vanilla backtracking, 
-backtracking with inference (AC-3) and backtracking with the degree heuristic all produced an optimal solution in which 26 nodes were visited during the search. 
+Note that the solution to this problem, like the map coloring problem, is not unique. The below diagram and the console log show different solutions produced
+by the CSP solver using different heuristics. Each solution is acceptable, but using different heuristics for each problem simply improves performance of the algorithm
+by reducing the number of nodes that need to be visited during each search.
 
 <p align="center">
     <img src="https://github.com/spencerbertsch1/AI/blob/main/ConstraintSatisfaction/docs/circuit_diagram.png?raw=true" alt="sensorless_diagram" width="55%"/>
 </p>
 
-Note that the solution to this problem, like the map coloring problem, is not unique. The above diagram and the console log show different solutions produced 
-by the CSP solver using different heuristics. Each solution is acceptable, but using different heuristics for each problem simply improves performance of the algorithm
-by reducing the number of nodes that need to be visited during each search. 
+See below for another board design generated by the CSP solver when different heuristic are activated. 
+
+```
+-------------- CIRCUIT BOARD LAYOUT --------------
+ ['a', 'a', 'a', 'b', 'b', 'b', 'b', 'b', 'c', 'c'] 
+ ['a', 'a', 'a', 'b', 'b', 'b', 'b', 'b', 'c', 'c'] 
+ ['e', 'e', 'e', 'e', 'e', 'e', 'e', '.', 'c', 'c'] 
+```
 
 
 # Responses to Discussion Questions
@@ -111,13 +136,14 @@ by reducing the number of nodes that need to be visited during each search.
 1. Describe the results from the test of your solver with and without heuristic, and with and without inference on the map coloring problem.
 
 The map-coloring problem's performance is improved slightly when inference it turned on, and the performance is improved even further when heuristics are turned on as well. 
-The optimal solution (in which only 8 nodes are visited before a solution is found) can be achieved when inference and all the heuristics are activated. See the below table for a 
+The optimal solution (in which only 7 nodes are visited before a solution is found) can be achieved when inference and all the heuristics are activated. See the below table for a 
 look at how the heuristics and inference impact the performance of backtracking on the map-coloring problem. 
 
-|               | Backtracking Alone | W/ Inference | W/ LCV | W/ Degree Heuristic | W/ MRV |
-|---------------|--------------------|--------------|--------|---------------------|--------|
-| Nodes Visited | 11                 | 10           | 8      | 11                  | 11     |
+|               | Backtracking Alone | W/ Inference | W/ LCV | W/ Degree Heuristic | W/ MRV | W/ All Turned On |
+|---------------|--------------------|--------------|--------|---------------------|--------|------------------|
+| Nodes Visited | 11                 | 10           | 8      | 11                  | 11     | 7                |
 
+*Table showing Map-Coloring performance with different combinations of inference and heuristics*
 
 2. Describe the domain of a variable corresponding to a component of width w and height h, on a circuit board of width n and height m.  Make sure the component fits completely on the board.
 
