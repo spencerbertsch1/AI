@@ -179,41 +179,57 @@ OR a left corner of (a) is right of a right corner of (b) OR a right corner of (
 
 A total list of legal positions for pieces (a) and (b) on a 10x3 board can be seen below: 
 
-**Position 1 for piece (a)**  
+**Positions when piece (a) is on the left and (b) is on the right**  
 {a: (0,0), b: (3,0)}  
 {a: (0,0), b: (3,1)}  
 {a: (0,0), b: (4,0)}  
 {a: (0,0), b: (4,1)}  
 {a: (0,0), b: (5,0)}  
-{a: (0,0), b: (5,1)}
-
-**Position 2 for piece (a)**  
+{a: (0,0), b: (5,1)}  
 {a: (0,1), b: (3,0)}  
 {a: (0,1), b: (3,1)}  
 {a: (0,1), b: (4,0)}  
 {a: (0,1), b: (4,1)}  
 {a: (0,1), b: (5,0)}  
 {a: (0,1), b: (5,1)}  
-
-**Position 3 for piece (a)**  
 {a: (1,0), b: (4,0)}  
 {a: (1,0), b: (4,1)}  
 {a: (1,0), b: (5,0)}  
-{a: (1,0), b: (5,1)}
-
-**Position 4 for piece (a)**  
+{a: (1,0), b: (5,1)}  
 {a: (1,1), b: (4,0)}  
 {a: (1,1), b: (4,1)}  
 {a: (1,1), b: (5,0)}  
-{a: (1,1), b: (5,1)}
-
-**Position 5 for piece (a)**  
+{a: (1,1), b: (5,1)}  
 {a: (2,0), b: (5,0)}  
-{a: (2,0), b: (5,1)}
-
-**Position 6 for piece (a)**  
+{a: (2,0), b: (5,1)}  
 {a: (2,1), b: (5,0)}  
 {a: (2,1), b: (5,1)}
+
+**Positions when piece (b) is on the left and (a) is on the right**
+{a: (7,0), b: (0,0)}  
+{a: (7,0), b: (0,1)}  
+{a: (7,0), b: (1,0)}  
+{a: (7,0), b: (1,1)}  
+{a: (7,0), b: (2,0)}  
+{a: (7,0), b: (2,1)}  
+{a: (7,1), b: (0,0)}  
+{a: (7,1), b: (0,1)}  
+{a: (7,1), b: (1,0)}  
+{a: (7,1), b: (1,1)}  
+{a: (7,1), b: (2,0)}  
+{a: (7,1), b: (2,1)}  
+{a: (6,0), b: (0,0)}  
+{a: (6,0), b: (0,1)}  
+{a: (6,0), b: (1,0)}  
+{a: (6,0), b: (1,1)}  
+{a: (6,1), b: (0,0)}  
+{a: (6,1), b: (0,1)}  
+{a: (6,1), b: (1,0)}  
+{a: (6,1), b: (1,1)}  
+{a: (5,0), b: (0,0)}  
+{a: (5,0), b: (0,1)}  
+{a: (5,1), b: (0,0)}  
+{a: (5,1), b: (0,1)}
 
 4. Describe how your code converts constraints, etc, to integer values for use by the generic CSP solver.
 
