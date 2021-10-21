@@ -110,8 +110,14 @@ by reducing the number of nodes that need to be visited during each search.
 
 1. Describe the results from the test of your solver with and without heuristic, and with and without inference on the map coloring problem.
 
-TODO
-Inference helps. Heuristics help even more. Optimal solution can be obtained by using both together. 
+The map-coloring problem's performance is improved slightly when inference it turned on, and the performance is improved even further when heuristics are turned on as well. 
+The optimal solution (in which only 8 nodes are visited before a solution is found) can be achieved when inference and all the heuristics are activated. See the below table for a 
+look at how the heuristics and inference impact the performance of backtracking on the map-coloring problem. 
+
+|               | Backtracking Alone | W/ Inference | W/ LCV | W/ Degree Heuristic | W/ MRV |
+|---------------|--------------------|--------------|--------|---------------------|--------|
+| Nodes Visited | 11                 | 10           | 8      | 11                  | 11     |
+
 
 2. Describe the domain of a variable corresponding to a component of width w and height h, on a circuit board of width n and height m.  Make sure the component fits completely on the board.
 
@@ -126,3 +132,17 @@ adding tuples (1,0), (2,0) until we get to (n-w, 0). We could then move up and c
 from origin upwards, left to right, the last tuple coordinate added would be ((n-w), (m-h)).
 
 3. Consider components a and b above, on a 10x3 board.  In your write-up, write the constraint that enforces the fact that the two components may not overlap.  Write out legal pairs of locations explicitly.
+
+
+
+4. Describe how your code converts constraints, etc, to integer values for use by the generic CSP solver.
+
+This is an interesting question; the generic CSP solver uses constraints in different ways based on the type of problem being solved. The 
+constraints in the map-coloring problem are hard coded as a list of tuples, each tuple representing two variables (countries) that cannot be adjacent.
+The constraints for the circuit design problem on the other hand are found dynamically as the logic in the *test_consistency* method yields legal and illegal
+positions for pieces on the board. The conversion to integer values occurs in the *test_consistency* function in which each string value in the input to the 
+problem is considered using logic that often converts the constraints, domains, and variables to integers, then returns a bool value. The majority of the generic 
+CSP solver uses the exact same methods for each type of CSP problem, treating the inputs from either problem the same way. As mentioned, the *test_consistency* 
+method is the main place where the generic CSP solver differs; one part of the function is designed for testing legality of the assignment for 
+map-coloring, and the other part is designed to test legality for the layout of the circuit board. 
+

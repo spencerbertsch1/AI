@@ -23,8 +23,8 @@ sol = Solution(problem_type='Map Coloring')
 
 if __name__ == "__main__":
     m_csp = CSP(x=x, d=d, c=c, verbose=False, csp_problem='map_coloring', solution=sol,
-                use_inference=False,
+                use_inference=True,
                 use_lcv=False,
                 use_degree_heuristic=False,
-                use_mrv=True)
+                use_mrv=False)
     print(m_csp.backtracking_search())

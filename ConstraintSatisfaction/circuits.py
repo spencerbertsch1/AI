@@ -19,11 +19,13 @@ for piece in range(len(x)):
             # height of the piece
             h = x[piece][1]
 
+            # if we fell off the board:
             if ((n + w) <= board_size[0]) & ((m + h) <= board_size[1]):
                 new_domain = (n, m)
             else:
                 continue
 
+            # if we are still on the board, we add the location to the domain
             if piece == 0:
                 a_domain.append(new_domain)
             elif piece == 1:
@@ -35,6 +37,7 @@ for piece in range(len(x)):
 
 
 # we could also define the domains manually
+# I left this commented because generating domains programmatically is better
 # a_domain = [(0, 0), (0, 1), (1, 0), (1, 1), (2, 0), (2, 1), (3, 0), (3, 1), (4, 0), (4, 1), (5, 0), (5, 1),
 #             (6, 0), (6, 1), (7, 0), (7, 1)]
 # b_domain = [(0, 0), (0, 1), (1, 0), (1, 1), (2, 0), (2, 1), (3, 0), (3, 1), (4, 0), (4, 1), (5, 0), (5, 1)]
@@ -56,5 +59,5 @@ if __name__ == "__main__":
               use_inference=False,
               use_lcv=False,
               use_degree_heuristic=False,
-              use_mrv=False)
+              use_mrv=True)
     print(csp.backtracking_search())
