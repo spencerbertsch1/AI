@@ -2,6 +2,9 @@ from Sudoku import Sudoku
 import sys
 
 if __name__ == "__main__":
+    """
+    Script to take a .sud file and generate a .cnf file that the SAT class can solve 
+    """
     test_sudoku = Sudoku()
 
     test_sudoku.load(sys.argv[1])
