@@ -3,22 +3,21 @@
 # Assignment 5
 # CS 276 @ Dartmouth College
 
+# native imports
 from pathlib import Path
 import random
 from random import randrange
 
 
-from Sudoku import Sudoku
+class SAT:
 
-
-class SAT(Sudoku):
-
-    def __init__(self, path_to_puzzle: str, path_to_sol: str, threshold: float, iterations: int, verbose: bool):
-        super().__init__()
+    def __init__(self, path_to_puzzle: str, path_to_sol: str, threshold: float, max_flips: int, max_tries: int,
+                 verbose: bool):
         self.path_to_puzzle = path_to_puzzle
         self.path_to_sol = path_to_sol
         self.threshold = threshold
-        self.iterations = iterations
+        self.max_flips = max_flips
+        self.max_tries = max_tries
         self.verbose = verbose
         self.puzzle = self.import_cnf()
 
@@ -43,7 +42,7 @@ class SAT(Sudoku):
         return cnf_list
 
 
-    def write_solution(self, sol_filename: str):
+    def write_solution(self):
         pass
         # TODO method to write the solved puzzle to the specified output location
 
@@ -191,7 +190,7 @@ if __name__ == "__main__":
 
     # instantiate the SAT object
     sat = SAT(path_to_puzzle=str(ABSPATH_TO_CNF), path_to_sol=str(ABSPATH_TO_SOL),
-              threshold=0.3, iterations=100_000, verbose=False)
+              threshold=0.3, max_tries=100_000, max_flips=10_000, verbose=False)
 
     new_board = sat.randomly_fill_board(puzzle=sat.puzzle)
     num_violations = sat.is_legal(board_state=new_board)

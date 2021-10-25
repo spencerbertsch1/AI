@@ -1,3 +1,8 @@
+# Spencer Bertsch
+# October 2021
+# Assignment 5
+# CS 276 @ Dartmouth College
+
 from Sudoku import Sudoku
 import sys
 
