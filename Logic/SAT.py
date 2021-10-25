@@ -96,14 +96,14 @@ class SAT:
                         value = int(str(position)[2])
                         values_in_row.append(value)
 
-            # now we can just find the difference between 9 and the unique values in the row
+            # now we can just find the difference between 9 and the num_unique values in the row
             v = 9 - len(set(values_in_row))
             violations = violations + v
 
         # ----- STEP 2 ----- make sure the columns dont have any repeating values
         for col in range(9):
             col += 1
-            values_in_row = []
+            values_in_col = []
             for row in range(9):
                 row += 1
                 # get the value of the current position
@@ -111,16 +111,34 @@ class SAT:
                     if (int(str(position)[0]) == row) & (int(str(position)[1]) == col):
                         # get the value from the current position
                         value = int(str(position)[2])
-                        values_in_row.append(value)
+                        values_in_col.append(value)
 
-            # now we can just find the difference between 9 and the unique values in the row
-            v = 9 - len(set(values_in_row))
+            # now we can just find the difference between 9 and the num_unique values in the row
+            v = 9 - len(set(values_in_col))
             violations = violations + v
 
         # ----- STEP 3 ----- make sure the 9x9 squares don't have any repeating numbers
-        # TODO
+        # search each sub-block
+        i = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+        for block_i in i:
+            for block_j in i:
 
-        print('something')
+                # here we will store the values for each sub_block
+                values_in_sub_block = []
+
+                # we can now iterate through each sub-block and find any violations
+                for row in block_i:
+                    for col in block_j:
+                        for position in board_state:
+                            if (int(str(position)[0]) == row) & (int(str(position)[1]) == col):
+                                # get the value from the current position
+                                value = int(str(position)[2])
+                                values_in_sub_block.append(value)
+
+                # now we can just find the difference between 9 and the num_unique values in the row
+                v = 9 - len(set(values_in_sub_block))
+                violations = violations + v
+
         return violations
 
     def randomly_fill_board(self, puzzle):
@@ -180,7 +198,7 @@ if __name__ == "__main__":
     PATH_TO_THIS_FILE: Path = Path(__file__).resolve()
     ABSPATH_TO_CNF_DIR: Path = PATH_TO_THIS_FILE.parent / 'puzzles'
     # for testing, always initialize the pseudorandom number generator to output the same sequence of values:
-    random.seed(2)
+    random.seed(3)
 
     # define the name of the solution file that we will write once the solver is finished
     sol_filename = puzzle_name + ".sol"
@@ -194,3 +212,4 @@ if __name__ == "__main__":
 
     new_board = sat.randomly_fill_board(puzzle=sat.puzzle)
     num_violations = sat.is_legal(board_state=new_board)
+    print(num_violations)
