@@ -155,6 +155,9 @@ class SAT:
                 v = 9 - len(set(values_in_sub_block))
                 violations = violations + v
 
+        if violations < 90:
+            print('something')
+
         return violations
 
     def randomly_fill_board(self, puzzle):
@@ -195,10 +198,60 @@ class SAT:
 
         return board_state
 
-    def flip_single_variable(self, board):
-        return board
+    @ staticmethod
+    def update_board_value(b1: list, old_value: int, new_value: int) -> list:
+        """
+        Helper function to update a single value on the board given a board (list of ints), an old_value
+        (int representing row, col, old_val), and a new_value (int representing row, col, new_val)
 
-    def walksat(self):
+        :param board:
+        :param old_value:
+        :param new_value:
+        :return:
+        """
+        b1.remove(old_value)
+        b1.append(new_value)
+        return b1
+
+    def get_val_from_position(self, b, search_index: int):
+        """
+        Takes a board search_index (an int with 2 digits representing row and col) and returns the value at that
+        position (an int with 3 digits representing row, col, value)
+
+        :param search_index: int with 2 digits representing position
+        :return: int with 3 digits representing position and value
+        """
+        current_val = 0
+        for position in b:
+            if (int(str(position)[0]) == (int(str(search_index)[0]))) & \
+                    (int(str(position)[1]) == (int(str(search_index)[1]))):
+                current_val = (int(str(search_index)[0] + str(search_index)[1] + str(position)[2]))
+                break
+
+        return current_val
+
+    def flip_single_variable(self, board: list, val_to_flip: int) -> (list, int):
+
+        # TODO maybe we need to pass in a variable so this isn't quite as random? Not sure...
+        b1 = board.copy()
+        v1 = val_to_flip
+
+        # we don't want to accidentally flip the value to the same value, so we can add a check for that
+        current_val = self.get_val_from_position(b=b1, search_index=val_to_flip)
+        current_val = int(str(current_val)[2])
+
+        potential_values = [x+1 for x in range(9)]
+        potential_values.remove(current_val)
+        new_val = random.choice(potential_values)
+
+        # now that we have a new value, we can update and return our board
+        old_value = int(str(val_to_flip) + str(current_val))
+        new_value = int(str(val_to_flip) + str(new_val))
+        updated_board = self.update_board_value(b1=b1, old_value=old_value, new_value=new_value)
+
+        return updated_board, new_value
+
+    def gsat(self):
         # define the parameters we will use for search
         max_tries = self.max_tries
         max_flips = self.max_flips
@@ -222,13 +275,59 @@ class SAT:
                 p: float = random.uniform(0, 1)
 
                 if p > threshold:
+                    # define the value that's going to get flipped
+                    v1, v2 = (randrange(9) + 1), (randrange(9) + 1)
+                    val_to_flip = int(str(v1) + str(v2))
+
                     # what does "flip it" mean? Just assign it a new value between 1 and 9?
-                    board = self.flip_single_variable(board=board)
+                    board, new_value = self.flip_single_variable(board=board, val_to_flip=val_to_flip)
+                    continue
 
-                    # TODO what does it mean to be flipped??
+                else:
+                    # for each variable, see how the object changes if that variable gets flipped
+                    board_copy = board.copy()
+                    objective_val_dict = {}
+                    initial_objective: int = self.is_legal(board_state=board)
+                    for row in range(9):
+                        row += 1
+                        for col in range(9):
+                            col += 1
 
+                            # here we flip a variable and get the new objective score
+                            val_to_flip: int = int(str(row) + str(col))
+
+                            # get the new board with a new value
+                            new_board, new_value = self.flip_single_variable(board=board, val_to_flip=val_to_flip)
+
+                            # score the new board with our objective function
+                            new_objective: int = self.is_legal(board_state=new_board)
+
+                            # find the difference between our initial objective and the new one & add it to the dict
+                            objective_diff: int = new_objective - initial_objective
+                            objective_val_dict[new_value] = objective_diff
+
+                            # we need to remember to reset the board after each change we make to it
+                            board = board_copy  # <-- we may not need this if we are just creating new boards every time
+
+                    # now we find the change that maximized the objective (or minimized the cost function)
+                    # instead of picking the first min value (argmin) we choose a random min value
+                    min_move_val = min(objective_val_dict.items(), key=lambda x: x[1])[1]
+                    best_moves = []
+                    # Iterate over all the values in dictionary to find moves with max value
+                    for key, value in objective_val_dict.items():
+                        if value == min_move_val:
+                            best_moves.append(key)
+
+                    # now we can make the move and continue with our search
+                    new_value = random.choice(best_moves)
+                    old_value = self.get_val_from_position(b=board, search_index=int(str(new_value)[0] + str(new_value)[1]))
+                    board = self.update_board_value(b1=board, old_value=old_value, new_value=new_value)
 
         return f'Could not find a solution after {max_tries} tries and {max_flips} flips.'
+
+    def walksat(self):
+        pass
+        # TODO
 
 # some test code - this code can be safely ignored or removed
 if __name__ == "__main__":
@@ -256,4 +355,4 @@ if __name__ == "__main__":
 
     new_board = sat.randomly_fill_board(puzzle=sat.puzzle)
     num_violations = sat.is_legal(board_state=new_board)
-    print(num_violations)
+    sat.gsat()
