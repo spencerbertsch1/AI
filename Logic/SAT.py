@@ -9,10 +9,25 @@ import random
 from random import randrange
 
 
+class Solution:
+
+    def __init__(self):
+        self.tries = 0
+        self.flips = 0
+        self.board = None
+
+    def __repr__(self):
+        s = f'WALKSAT SOLUTION \n' \
+            f'Number of Tries: {self.tries} \n' \
+            f'Number of Flips: {self.flips} \n' \
+            f'Solved Board: {self.board} \n'
+        return s
+
+
 class SAT:
 
     def __init__(self, path_to_puzzle: str, path_to_sol: str, threshold: float, max_flips: int, max_tries: int,
-                 verbose: bool):
+                 verbose: bool, solution):
         self.path_to_puzzle = path_to_puzzle
         self.path_to_sol = path_to_sol
         self.threshold = threshold
@@ -20,6 +35,7 @@ class SAT:
         self.max_tries = max_tries
         self.verbose = verbose
         self.puzzle = self.import_cnf()
+        self.solution = solution
 
 
     def import_cnf(self):
@@ -179,15 +195,40 @@ class SAT:
 
         return board_state
 
-    def generate_truth_assignment(self) -> bool:
-
-        return True
-
+    def flip_single_variable(self, board):
+        return board
 
     def walksat(self):
-        # TODO
-        pass
+        # define the parameters we will use for search
+        max_tries = self.max_tries
+        max_flips = self.max_flips
+        threshold: float = self.threshold
 
+        # run the search 'max_tries' times
+        for i in range(max_tries):
+            board = self.randomly_fill_board(puzzle=self.puzzle)
+            self.solution.tries = self.solution.tries + 1
+
+            # perform at most 'max_flips' flips during the search
+            for j in range(max_flips):
+                self.solution.flips = self.solution.flips + 1
+
+                # if the board state has no violations, add it to the solution and return the solution
+                if self.is_legal(board_state=board) == 0:
+                    self.solution.board = board
+                    return self.solution
+
+                # generate a random number between 0 and 1
+                p: float = random.uniform(0, 1)
+
+                if p > threshold:
+                    # what does "flip it" mean? Just assign it a new value between 1 and 9?
+                    board = self.flip_single_variable(board=board)
+
+                    # TODO what does it mean to be flipped??
+
+
+        return f'Could not find a solution after {max_tries} tries and {max_flips} flips.'
 
 # some test code - this code can be safely ignored or removed
 if __name__ == "__main__":
@@ -206,9 +247,12 @@ if __name__ == "__main__":
     ABSPATH_TO_CNF: Path = ABSPATH_TO_CNF_DIR / cnf_name
     ABSPATH_TO_SOL: Path = ABSPATH_TO_CNF_DIR / sol_filename
 
+    # instantiate an empty solution object that will get updated during search
+    sol = Solution()
+
     # instantiate the SAT object
     sat = SAT(path_to_puzzle=str(ABSPATH_TO_CNF), path_to_sol=str(ABSPATH_TO_SOL),
-              threshold=0.3, max_tries=100_000, max_flips=10_000, verbose=False)
+              threshold=0.3, max_tries=100_000, max_flips=10_000, verbose=False, solution=sol)
 
     new_board = sat.randomly_fill_board(puzzle=sat.puzzle)
     num_violations = sat.is_legal(board_state=new_board)
