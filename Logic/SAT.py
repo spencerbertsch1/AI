@@ -68,8 +68,25 @@ class SAT(Sudoku):
 
         return current_positions
 
-    def is_legal(self, puzzle) -> bool:
-        board_state: list = self.get_board_state_from_cnf(puzzle=puzzle)
+    def is_legal(self, board_state: list) -> int:
+        """
+        The function find the number of illegal board states and returns that number. If the board is completely
+        legal, it returns a 0.
+
+        If the board is illegal by only 2 position, then a change is made the board is illegal by 3 positions
+        then we know that was a bad change. Our hope is that as we make changes, or "flips" as they're called
+        in the Walksat pseudocode, this function will return smaller and smaller numbers until we reach 0.
+
+        :param board_state:
+        :return:
+        """
+        assert(len(board_state) == 81), f'Please only call \'is_legal()\' on complete boards!'
+
+        # make sure the rows don't have any repeating values
+        # TODO
+
+        # make sure the columns dont have any repeating values
+        # TODO
 
         # make sure the 9x9 squares don't have any repeating numbers
         # TODO
@@ -114,9 +131,6 @@ class SAT(Sudoku):
                     board_state.append(new_position)
 
         return board_state
-
-
-
 
     def generate_truth_assignment(self) -> bool:
 
