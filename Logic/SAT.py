@@ -102,7 +102,21 @@ class SAT(Sudoku):
             violations = violations + v
 
         # ----- STEP 2 ----- make sure the columns dont have any repeating values
-        # TODO
+        for col in range(9):
+            col += 1
+            values_in_row = []
+            for row in range(9):
+                row += 1
+                # get the value of the current position
+                for position in board_state:
+                    if (int(str(position)[0]) == row) & (int(str(position)[1]) == col):
+                        # get the value from the current position
+                        value = int(str(position)[2])
+                        values_in_row.append(value)
+
+            # now we can just find the difference between 9 and the unique values in the row
+            v = 9 - len(set(values_in_row))
+            violations = violations + v
 
         # ----- STEP 3 ----- make sure the 9x9 squares don't have any repeating numbers
         # TODO
@@ -167,7 +181,7 @@ if __name__ == "__main__":
     PATH_TO_THIS_FILE: Path = Path(__file__).resolve()
     ABSPATH_TO_CNF_DIR: Path = PATH_TO_THIS_FILE.parent / 'puzzles'
     # for testing, always initialize the pseudorandom number generator to output the same sequence of values:
-    random.seed(1)
+    random.seed(2)
 
     # define the name of the solution file that we will write once the solver is finished
     sol_filename = puzzle_name + ".sol"
