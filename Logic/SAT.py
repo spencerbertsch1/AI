@@ -44,7 +44,12 @@ class SAT:
         for line in f:
             # split the cnf file into lists of strings
             values = line.split()
-            clause_dict: dict = {int(x): True for x in values}
+            if len(values) == 2:
+                # we set the negated clauses to False, False
+                clause_dict: dict = {int(x): False for x in values}
+            else:
+                # we set the other clauses to True, True, True, ...
+                clause_dict: dict = {int(x): True for x in values}
             clauses.append(clause_dict)
         f.close()
 
@@ -121,37 +126,43 @@ class SAT:
 
         return assignment
 
-    def get_assignment_score(self, assignment_to_score):
+    def get_satisfied_clauses(self, assignment_to_score):
         """
-        This method provides a score value for the assignment. A score of 0 means that all clauses were satisfied.
-        A score value of 15 means that 15 of the clauses were not satisfied. By that logic, an assignment that
-        returns a score value of 12 would be 'better' than an assignment that returns a score value of 15.
+        Returns the number of clauses satisfied by the input assignment.
+        A perfect assignment would return a value of 3240.
 
-        :return: int - score value
+        :return: int - satisfied_clauses
         """
-        score = 0
+        satisfied_clauses = 0
 
         # we can iterate through the clauses and see if we have any that aren't satisfied
         for clause in self.clauses:
 
-            if len(clause) == 2:
-                # this is a clause that restricts a value from being both 1 and 2
-                keys = [int(str(x)[-3:]) for x in clause.keys()]
+            # count number of satisfied clauses
+            if any(((clause[key]) == (assignment_to_score[key])) for key in clause.keys()):
+                # clause is satisfied!
+                satisfied_clauses += 1
 
-                if (assignment_to_score[keys[0]] is True) & (assignment_to_score[keys[1]] is True):
-                    # TODO how does this happen??
-                    score += 1
 
-            else:
-                # determine if this clause is satisfied:
-                satisfied = False
-                for cell, truth_value in clause.items():
-                    if truth_value == assignment_to_score[cell]:
-                        satisfied = True
 
-                # if the constraint was not satisfied, then we add one value to the violations counter
-                if not satisfied:
-                    score += 1
+            # if len(clause) == 2:
+            #     # this is a clause that restricts a value from being both 1 and 2
+            #     keys = [int(str(x)[-3:]) for x in clause.keys()]
+            #
+            #     if (assignment_to_score[keys[0]] is True) & (assignment_to_score[keys[1]] is True):
+            #         # TODO how does this happen??
+            #         score += 1
+            #
+            # else:
+            #     # determine if this clause is satisfied:
+            #     satisfied = False
+            #     for cell, truth_value in clause.items():
+            #         if truth_value == assignment_to_score[cell]:
+            #             satisfied = True
+            #
+            #     # if the constraint was not satisfied, then we add one value to the violations counter
+            #     if not satisfied:
+            #         score += 1
 
         # This might be a cleaner implementation of the above code - more pythonic
         # for clause in self.clauses:
@@ -160,7 +171,7 @@ class SAT:
         #     else:
         #         violations += 1
 
-        return score
+        return satisfied_clauses
 
     def gsat_rewrite(self):
 
@@ -170,14 +181,11 @@ class SAT:
             random.seed(i + 1)
             self.assignment = self.create_random_assignment()
 
-            # this info is used below
-            initial_score: int = self.get_assignment_score(assignment_to_score=self.assignment)
-
             for j in range(self.max_flips):
                 self.solution.flips += 1
 
                 # if the assignment is legal, we update the solution object and return it
-                if self.get_assignment_score(assignment_to_score=self.assignment) == 0:
+                if self.get_satisfied_clauses(assignment_to_score=self.assignment) == 3240:
                     self.solution.assignment = self.assignment
                     return self.solution
 
@@ -206,20 +214,18 @@ class SAT:
                             test_assignment[variable] = True
 
                         # get the new score with the flipped variable
-                        new_score: int = self.get_assignment_score(assignment_to_score=test_assignment)
-                        # find the change between the initial score and the new score after the bit was flipped
-                        score_diff = new_score - initial_score
+                        satisfied_clauses: int = self.get_satisfied_clauses(assignment_to_score=test_assignment)
 
                         if self.verbose:
                             # suppress print statements
                             if j % 10 == 1:
-                                print(f'REMAINING BOARD VIOLATIONS: {new_score}')
+                                print(f'Remaining Clauses: {3240 - satisfied_clauses}')
 
-                        # add the score difference to the score dictionary
-                        score_dict[variable] = score_diff
+                        # add the satisfied_clauses to the score dictionary
+                        score_dict[variable] = satisfied_clauses
 
                     # now that we have the score dict, we can take a min value and make that change to the assignment
-                    best_move = min(score_dict.items(), key=lambda x: x[1])[1]
+                    best_move = max(score_dict.items(), key=lambda x: x[1])[1]
                     best_moves = []
                     # Iterate over all the values in dictionary to find moves with min values
                     for key, value in score_dict.items():
