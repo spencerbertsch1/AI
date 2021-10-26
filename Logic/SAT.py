@@ -128,6 +128,24 @@ class SAT:
 
         return assignment
 
+    def get_problem_variables(self, initial_assignment):
+
+        problem_variables = []
+
+        # we can iterate through the clauses and see if we have any that aren't satisfied
+        for clause in self.clauses:
+
+            # count number of satisfied clauses
+            if any(((clause[key]) == (initial_assignment[key])) for key in clause.keys()):
+                # clause is satisfied!
+                pass
+            else:
+                for key in clause.keys():
+                    problem_variables.append(initial_assignment[key])
+
+        return problem_variables
+
+
     def get_satisfied_clauses(self, assignment_to_score):
         """
         Returns the number of clauses satisfied by the input assignment.
@@ -147,7 +165,7 @@ class SAT:
 
         return satisfied_clauses
 
-    def gsat_rewrite(self):
+    def gsat(self):
 
         for i in range(self.max_tries):
             self.solution.tries += 1
@@ -156,6 +174,7 @@ class SAT:
             self.assignment = self.create_random_assignment()
 
             for j in range(self.max_flips):
+                self.solution.flips += 1
 
                 # if the assignment is legal, we update the solution object and return it
                 if self.get_satisfied_clauses(assignment_to_score=self.assignment) == self.num_clauses:
@@ -209,22 +228,89 @@ class SAT:
                     chosen_var = random.choice(best_moves)
 
                     # flip the variable
-                    self.solution.flips += 1
                     if self.assignment[chosen_var] is True:
                         self.assignment[chosen_var] = False
                     else:
                         self.assignment[chosen_var] = True
 
     def walksat(self):
-        pass
-        # TODO
+
+        for i in range(self.max_tries):
+            self.solution.tries += 1
+            # randomly fill the assignment
+            random.seed(i + 1)
+            self.assignment = self.create_random_assignment()
+
+            for j in range(self.max_flips):
+                self.solution.flips += 1
+
+                # if the assignment is legal, we update the solution object and return it
+                if self.get_satisfied_clauses(assignment_to_score=self.assignment) == self.num_clauses:
+                    self.solution.assignment = self.assignment
+                    return self.solution
+
+                # generate a random number between 0 and 1
+                p: float = random.uniform(0, 1)
+
+                if p > self.threshold:
+                    # flip a random variable in the assignment
+
+                    # random_key = random.choice(list(self.assignment.keys()))
+                    problem_variables = self.get_problem_variables(initial_assignment=self.assignment)
+                    random_key = random.choice(problem_variables)
+
+                    if self.assignment[random_key] is True:
+                        self.assignment[random_key] = False
+                    else:
+                        self.assignment[random_key] = True
+
+                else:
+                    # we now want to create a score dict which will hold the score improvement for each flip
+                    score_dict = {}
+                    for variable, truth_val in self.assignment.items():
+                        # flip each truth value and see how that changes the score
+                        test_assignment = self.assignment.copy()
+
+                        # flip the variable
+                        if test_assignment[variable] is True:
+                            test_assignment[variable] = False
+                        else:
+                            test_assignment[variable] = True
+
+                        # get the new score with the flipped variable
+                        satisfied_clauses: int = self.get_satisfied_clauses(assignment_to_score=test_assignment)
+
+                        if self.verbose:
+                            # suppress print statements
+                            if j % 10 == 1:
+                                print(f'Remaining Clauses: {self.num_clauses - satisfied_clauses}')
+
+                        # add the satisfied_clauses to the score dictionary
+                        score_dict[variable] = satisfied_clauses
+
+                    # now that we have the score dict, we can take a min value and make that change to the assignment
+                    best_move = max(score_dict.items(), key=lambda x: x[1])[1]
+                    best_moves = []
+                    # Iterate over all the values in dictionary to find moves with min values
+                    for key, value in score_dict.items():
+                        if value == best_move:
+                            best_moves.append(key)
+
+                    # now we can flip the chosen variable in the assignment and continue with the search
+                    chosen_var = random.choice(best_moves)
+
+                    # flip the variable
+                    if self.assignment[chosen_var] is True:
+                        self.assignment[chosen_var] = False
+                    else:
+                        self.assignment[chosen_var] = True
 
 
 # some test code - this code can be safely ignored or removed
 if __name__ == "__main__":
 
     # define puzzle name
-    puzzle_name = 'rows'  # 'test_puzzle3'
+    puzzle_name = 'test_puzzle2'  # 'test_puzzle3'
     # define paths to files
     PATH_TO_THIS_FILE: Path = Path(__file__).resolve()
     ABSPATH_TO_CNF_DIR: Path = PATH_TO_THIS_FILE.parent / 'puzzles'
@@ -242,9 +328,9 @@ if __name__ == "__main__":
 
     # instantiate the SAT object
     sat = SAT(path_to_puzzle=str(ABSPATH_TO_CNF), path_to_sol=str(ABSPATH_TO_SOL),
-              threshold=0.9, max_tries=100_000, max_flips=10_000, verbose=True, solution=sol)
+              threshold=0.5, max_tries=100_000, max_flips=10_000, verbose=True, solution=sol)
 
     sat.create_random_assignment()
 
-    s = sat.gsat_rewrite()
+    s = sat.walksat()
     print(s)
