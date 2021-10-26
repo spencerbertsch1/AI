@@ -291,8 +291,9 @@ class SAT:
 
                         if self.verbose:
                             # suppress print statements
-                            if j % 10 == 1:
-                                print(f'Remaining Clauses: {self.num_clauses - satisfied_clauses}')
+                            if variable == 111:
+                                print(f'Iterations: {self.solution.flips}')
+                                print(f'Remaining Clauses: {self.num_clauses - satisfied_clauses} \n')
 
                         # add the satisfied_clauses to the score dictionary
                         score_dict[variable] = satisfied_clauses
@@ -325,7 +326,7 @@ if __name__ == "__main__":
     max_flips: int = 10_000
 
     # define the name of the puzzle you want to solve:
-    puzzle_name = 'rows'
+    puzzle_name = 'rows'  # <-- should work with 'rows_and_cols'
 
     # for testing, always initialize the pseudorandom number generator to output the same sequence of values:
     random.seed(2)
