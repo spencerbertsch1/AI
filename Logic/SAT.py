@@ -34,17 +34,16 @@ class SAT:
         self.max_flips = max_flips
         self.max_tries = max_tries
         self.verbose = verbose
-        self.puzzle = self.import_cnf()
+        # self.puzzle = self.import_cnf()
         self.solution = solution
 
 
-    def import_cnf(self):
+    def create_cnf_list(self):
         """
         Import the CNF file
         :return:
         """
         f = open(self.path_to_puzzle, "r")
-
         cnf_list = []
         for line in f:
             # split the cnf file into lists of strings
@@ -52,7 +51,6 @@ class SAT:
             if self.verbose:
                 print(f'Values: {values}')
             cnf_list.append(line)
-
         f.close()
 
         return cnf_list
@@ -61,6 +59,60 @@ class SAT:
     def write_solution(self):
         pass
         # TODO method to write the solved puzzle to the specified output location
+
+    def create_initial_assignment(self):
+        """
+        Returns the initial assignment dictionary read in from the CNF file. If any values are not added (0 in the
+        CNF file), then they are filled in randomly.
+
+        :return: dictionary mapping 729 variables to 81 boolean values representing the state of the board
+        """
+        # first we can start with an assignment where everything is false, then we can randomly fill it in
+        assignment = {}
+        for row in range(9):
+            row += 1
+            for col in range(9):
+                col += 1
+                for value in range(9):
+                    value += 1
+                    key = int(str(row) + str(col) + str(value))
+                    assignment[key] = False
+
+        # We can now update the truth values for the starting points in our board
+        cnf_list = self.create_cnf_list()
+        cnf_list.reverse()
+        current_positions = []
+        for position in cnf_list:
+            if len(position) < 5:
+                current_positions.append(int(position))
+            else:
+                break
+
+        # update the truth values that the board starts with
+        for position, value in assignment.items():
+            if position in current_positions:
+                assignment[position] = True
+
+        # TODO this could become a more generic method for randomizing the assignment - could be useful later on
+        counter = 0
+        assignment_values = []
+        assignment_positions = []
+        for position, value in assignment.items():
+            counter += 1
+            assignment_positions.append(position)
+            assignment_values.append(value)
+
+            if counter == 9:
+                if not any(assignment_values):
+                    position_to_update: int = random.choice(assignment_positions)
+                    assignment[position_to_update] = True
+                # reset after every 9 values in the dict
+                counter = 0
+                assignment_values = []
+                assignment_positions = []
+
+        return assignment
+
 
     @ staticmethod
     def get_board_state_from_cnf(puzzle):
@@ -155,9 +207,6 @@ class SAT:
                 v = 9 - len(set(values_in_sub_block))
                 violations = violations + v
 
-        if violations < 90:
-            print('something')
-
         return violations
 
     def randomly_fill_board(self, puzzle):
@@ -174,9 +223,6 @@ class SAT:
             row += 1
             for col in range(9):
                 col += 1
-                if self.verbose:
-                    print(f'ROW: {row}, COL: {col}')
-
                 # if the board doesn't already have an assignment for [row, col], add a random one
                 position_exists = False
                 for position in board_state:
@@ -184,6 +230,7 @@ class SAT:
                     if (int(str(position)[0]) == row) & (int(str(position)[1]) == col):
                         position_exists = True
 
+                # TODO fix initialization!!!
                 # now we have all the positions in the row, let's filter those to make sure we're in the right col
                 if position_exists:
                     pass
@@ -261,6 +308,7 @@ class SAT:
         for i in range(max_tries):
             board = self.randomly_fill_board(puzzle=self.puzzle)
             self.solution.tries = self.solution.tries + 1
+            print(f'on try {i}!')
 
             # perform at most 'max_flips' flips during the search
             for j in range(max_flips):
@@ -302,6 +350,11 @@ class SAT:
                             # score the new board with our objective function
                             new_objective: int = self.is_legal(board_state=new_board)
 
+                            if self.verbose:
+                                # suppress print statements
+                                if j % 5 == 1:
+                                    print(f'REMAINING BOARD VIOLATIONS: {new_objective}')
+
                             # find the difference between our initial objective and the new one & add it to the dict
                             objective_diff: int = new_objective - initial_objective
                             objective_val_dict[new_value] = objective_diff
@@ -329,6 +382,7 @@ class SAT:
         pass
         # TODO
 
+
 # some test code - this code can be safely ignored or removed
 if __name__ == "__main__":
 
@@ -338,7 +392,7 @@ if __name__ == "__main__":
     PATH_TO_THIS_FILE: Path = Path(__file__).resolve()
     ABSPATH_TO_CNF_DIR: Path = PATH_TO_THIS_FILE.parent / 'puzzles'
     # for testing, always initialize the pseudorandom number generator to output the same sequence of values:
-    random.seed(3)
+    random.seed(1)
 
     # define the name of the solution file that we will write once the solver is finished
     sol_filename = puzzle_name + ".sol"
@@ -351,8 +405,6 @@ if __name__ == "__main__":
 
     # instantiate the SAT object
     sat = SAT(path_to_puzzle=str(ABSPATH_TO_CNF), path_to_sol=str(ABSPATH_TO_SOL),
-              threshold=0.3, max_tries=100_000, max_flips=10_000, verbose=False, solution=sol)
+              threshold=0.3, max_tries=100_000, max_flips=1000, verbose=True, solution=sol)
 
-    new_board = sat.randomly_fill_board(puzzle=sat.puzzle)
-    num_violations = sat.is_legal(board_state=new_board)
-    sat.gsat()
+    sat.create_initial_assignment()
