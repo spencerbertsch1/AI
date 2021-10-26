@@ -12,10 +12,10 @@ if __name__ == "__main__":
     """
     test_sudoku = Sudoku()
 
-    test_sudoku.load(sys.argv[1])
+    test_sudoku.load('puzzles/test_puzzle.sud')
     print(test_sudoku)
 
-    puzzle_name = sys.argv[1][:-4]
+    puzzle_name = 'test_puzzle'
     cnf_filename = puzzle_name + ".cnf"
 
     test_sudoku.generate_cnf(cnf_filename)
