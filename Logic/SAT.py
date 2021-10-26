@@ -17,7 +17,7 @@ class Solution:
         self.assignment = None
 
     def __repr__(self):
-        s = f'WALKSAT SOLUTION \n' \
+        s = f'GSAT SOLUTION \n' \
             f'Number of Tries: {self.tries} \n' \
             f'Number of Flips: {self.flips} \n' \
             f'Solved Board: {self.assignment} \n'
@@ -34,6 +34,7 @@ class SAT:
         self.max_flips = max_flips
         self.max_tries = max_tries
         self.verbose = verbose
+        self.num_clauses = 0
         self.clauses = self.create_clause_dicts()
         self.assignment = self.create_random_assignment()
         self.solution = solution
@@ -42,11 +43,12 @@ class SAT:
         f = open(self.path_to_puzzle, "r")
         clauses = []
         for line in f:
+            self.num_clauses += 1
             # split the cnf file into lists of strings
             values = line.split()
             if len(values) == 2:
                 # we set the negated clauses to False, False
-                clause_dict: dict = {int(x): False for x in values}
+                clause_dict: dict = {int(str(x)[-3:]): False for x in values}
             else:
                 # we set the other clauses to True, True, True, ...
                 clause_dict: dict = {int(x): True for x in values}
@@ -143,34 +145,6 @@ class SAT:
                 # clause is satisfied!
                 satisfied_clauses += 1
 
-
-
-            # if len(clause) == 2:
-            #     # this is a clause that restricts a value from being both 1 and 2
-            #     keys = [int(str(x)[-3:]) for x in clause.keys()]
-            #
-            #     if (assignment_to_score[keys[0]] is True) & (assignment_to_score[keys[1]] is True):
-            #         # TODO how does this happen??
-            #         score += 1
-            #
-            # else:
-            #     # determine if this clause is satisfied:
-            #     satisfied = False
-            #     for cell, truth_value in clause.items():
-            #         if truth_value == assignment_to_score[cell]:
-            #             satisfied = True
-            #
-            #     # if the constraint was not satisfied, then we add one value to the violations counter
-            #     if not satisfied:
-            #         score += 1
-
-        # This might be a cleaner implementation of the above code - more pythonic
-        # for clause in self.clauses:
-        #     if (any((clause[x]) == (assignment[x])) for x, y in clause.items()):
-        #         pass
-        #     else:
-        #         violations += 1
-
         return satisfied_clauses
 
     def gsat_rewrite(self):
@@ -182,10 +156,9 @@ class SAT:
             self.assignment = self.create_random_assignment()
 
             for j in range(self.max_flips):
-                self.solution.flips += 1
 
                 # if the assignment is legal, we update the solution object and return it
-                if self.get_satisfied_clauses(assignment_to_score=self.assignment) == 3240:
+                if self.get_satisfied_clauses(assignment_to_score=self.assignment) == self.num_clauses:
                     self.solution.assignment = self.assignment
                     return self.solution
 
@@ -219,7 +192,7 @@ class SAT:
                         if self.verbose:
                             # suppress print statements
                             if j % 10 == 1:
-                                print(f'Remaining Clauses: {3240 - satisfied_clauses}')
+                                print(f'Remaining Clauses: {self.num_clauses - satisfied_clauses}')
 
                         # add the satisfied_clauses to the score dictionary
                         score_dict[variable] = satisfied_clauses
@@ -236,6 +209,7 @@ class SAT:
                     chosen_var = random.choice(best_moves)
 
                     # flip the variable
+                    self.solution.flips += 1
                     if self.assignment[chosen_var] is True:
                         self.assignment[chosen_var] = False
                     else:
@@ -250,7 +224,7 @@ class SAT:
 if __name__ == "__main__":
 
     # define puzzle name
-    puzzle_name = 'puzzle2'
+    puzzle_name = 'rows'  # 'test_puzzle3'
     # define paths to files
     PATH_TO_THIS_FILE: Path = Path(__file__).resolve()
     ABSPATH_TO_CNF_DIR: Path = PATH_TO_THIS_FILE.parent / 'puzzles'
@@ -268,9 +242,9 @@ if __name__ == "__main__":
 
     # instantiate the SAT object
     sat = SAT(path_to_puzzle=str(ABSPATH_TO_CNF), path_to_sol=str(ABSPATH_TO_SOL),
-              threshold=0.99, max_tries=100_000, max_flips=10_000, verbose=True, solution=sol)
+              threshold=0.9, max_tries=100_000, max_flips=10_000, verbose=True, solution=sol)
 
     sat.create_random_assignment()
 
-    sat.gsat_rewrite()
-
+    s = sat.gsat_rewrite()
+    print(s)
