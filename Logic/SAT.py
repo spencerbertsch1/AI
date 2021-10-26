@@ -11,13 +11,14 @@ from random import randrange
 
 class Solution:
 
-    def __init__(self):
+    def __init__(self, algorithm: str):
         self.tries = 0
         self.flips = 0
         self.assignment = None
+        self.algorithm = algorithm
 
     def __repr__(self):
-        s = f'GSAT SOLUTION \n' \
+        s = f'{self.algorithm} SOLUTION \n' \
             f'Number of Tries: {self.tries} \n' \
             f'Number of Flips: {self.flips} \n' \
             f'Solved Board: {self.assignment} \n'
@@ -27,7 +28,7 @@ class Solution:
 class SAT:
 
     def __init__(self, path_to_puzzle: str, path_to_sol: str, threshold: float, max_flips: int, max_tries: int,
-                 verbose: bool, solution):
+                 verbose: bool, solution, random_initialization: bool):
         self.path_to_puzzle = path_to_puzzle
         self.path_to_sol = path_to_sol
         self.threshold = threshold
@@ -35,9 +36,11 @@ class SAT:
         self.max_tries = max_tries
         self.verbose = verbose
         self.num_clauses = 0
+        self.random_initialization = random_initialization
         self.clauses = self.create_clause_dicts()
-        self.assignment = self.create_random_assignment()
+        self.assignment = self.create_initial_assignment(initialize_randomly=self.random_initialization)
         self.solution = solution
+
 
     def create_clause_dicts(self):
         f = open(self.path_to_puzzle, "r")
@@ -75,7 +78,7 @@ class SAT:
         pass
         # TODO method to write the solved puzzle to the specified output location
 
-    def create_random_assignment(self):
+    def create_initial_assignment(self, initialize_randomly: bool):
         """
         Returns the initial assignment dictionary read in from the CNF file. If any values are not added (0 in the
         CNF file), then they are filled in randomly.
@@ -91,7 +94,10 @@ class SAT:
                 for value in range(9):
                     value += 1
                     key = int(str(row) + str(col) + str(value))
-                    assignment[key] = False
+                    if initialize_randomly:
+                        assignment[key] = random.choice([False, True])
+                    else:
+                        assignment[key] = False
 
         # We can now update the truth values for the starting points in our board
         cnf_list = self.create_cnf_list()
@@ -102,13 +108,17 @@ class SAT:
                 current_positions.append(int(position))
             else:
                 break
-
         # update the truth values that the board starts with
         for position, value in assignment.items():
             if position in current_positions:
                 assignment[position] = True
 
-        # TODO this could become a more generic method for randomizing the assignment - could be useful later on
+        # if we are initializing a truly random board, then we can return the assignment here
+        if initialize_randomly:
+            return assignment
+
+        # Otherwise we can ensure that only one square on the board is occupied at any one time. This accelerates
+        # the solving of easier puzzles
         counter = 0
         assignment_values = []
         assignment_positions = []
@@ -141,10 +151,9 @@ class SAT:
                 pass
             else:
                 for key in clause.keys():
-                    problem_variables.append(initial_assignment[key])
+                    problem_variables.append(key)
 
         return problem_variables
-
 
     def get_satisfied_clauses(self, assignment_to_score):
         """
@@ -170,8 +179,8 @@ class SAT:
         for i in range(self.max_tries):
             self.solution.tries += 1
             # randomly fill the assignment
-            random.seed(i + 1)
-            self.assignment = self.create_random_assignment()
+            random.seed(i+1)
+            self.assignment = self.create_initial_assignment(initialize_randomly=self.random_initialization)
 
             for j in range(self.max_flips):
                 self.solution.flips += 1
@@ -239,7 +248,7 @@ class SAT:
             self.solution.tries += 1
             # randomly fill the assignment
             random.seed(i + 1)
-            self.assignment = self.create_random_assignment()
+            self.assignment = self.create_initial_assignment(initialize_randomly=self.random_initialization)
 
             for j in range(self.max_flips):
                 self.solution.flips += 1
@@ -309,14 +318,20 @@ class SAT:
 # some test code - this code can be safely ignored or removed
 if __name__ == "__main__":
 
-    # define puzzle name
-    puzzle_name = 'test_puzzle2'  # 'test_puzzle3'
+    # Choose parameters to test the solver:
+    algorithm = 'walksat'  # <-- 'gsat' or 'walksat'
+    threshold: float = 0.3
+    max_tries: int = 100_000
+    max_flips: int = 10_000
+
+    # define the name of the puzzle you want to solve:
+    puzzle_name = 'rows'
+
+    # for testing, always initialize the pseudorandom number generator to output the same sequence of values:
+    random.seed(2)
     # define paths to files
     PATH_TO_THIS_FILE: Path = Path(__file__).resolve()
     ABSPATH_TO_CNF_DIR: Path = PATH_TO_THIS_FILE.parent / 'puzzles'
-    # for testing, always initialize the pseudorandom number generator to output the same sequence of values:
-    random.seed(1)
-
     # define the name of the solution file that we will write once the solver is finished
     sol_filename = puzzle_name + ".sol"
     cnf_name = puzzle_name + ".cnf"
@@ -324,13 +339,19 @@ if __name__ == "__main__":
     ABSPATH_TO_SOL: Path = ABSPATH_TO_CNF_DIR / sol_filename
 
     # instantiate an empty solution object that will get updated during search
-    sol = Solution()
+    sol = Solution(algorithm=algorithm)
 
     # instantiate the SAT object
     sat = SAT(path_to_puzzle=str(ABSPATH_TO_CNF), path_to_sol=str(ABSPATH_TO_SOL),
-              threshold=0.5, max_tries=100_000, max_flips=10_000, verbose=True, solution=sol)
+              threshold=threshold, max_tries=max_tries, max_flips=max_flips, verbose=True, solution=sol,
+              random_initialization=True)
 
-    sat.create_random_assignment()
-
-    s = sat.walksat()
-    print(s)
+    # run the solver on the chosen puzzle and return the result
+    if algorithm == 'walksat':
+        s = sat.walksat()
+        print(s)
+    elif algorithm == 'gsat':
+        s = sat.gsat()
+        print(s)
+    else:
+        raise Exception(f'The \'algorithm\' parameter should be either \'walksat\' or \'gsat\', not {algorithm}.')
