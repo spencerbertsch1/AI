@@ -34,9 +34,21 @@ class SAT:
         self.max_flips = max_flips
         self.max_tries = max_tries
         self.verbose = verbose
-        # self.puzzle = self.import_cnf()
+        self.clauses = self.create_clause_dicts()
+        self.assignment = self.create_initial_assignment()
         self.solution = solution
 
+    def create_clause_dicts(self):
+        f = open(self.path_to_puzzle, "r")
+        clauses = []
+        for line in f:
+            # split the cnf file into lists of strings
+            values = line.split()
+            clause_dict: dict = {int(x): True for x in values}
+            clauses.append(clause_dict)
+        f.close()
+
+        return clauses
 
     def create_cnf_list(self):
         """
@@ -113,192 +125,39 @@ class SAT:
 
         return assignment
 
-
-    @ staticmethod
-    def get_board_state_from_cnf(puzzle):
+    def is_assignment_legal(self):
         """
-        Helper function that returns a list of 3 digit integers representing the current board state from
-        a starting CNF file.
 
-        The list might be [115, 127], indicating a 5 in the [1,1] position, and a 7 in the [1,2] position
-        :param puzzle:
         :return:
         """
-        puzzle.reverse()
-        # get the current state of the board (what numbers have already been assigned)
-        current_positions = []
-        for position in puzzle:
-            if len(position) < 5:
-                current_positions.append(int(position))
-            else:
-                break
+        violations = 0
 
-        return current_positions
+        # we can iterate through the clauses and see if we have any that aren't satisfied
+        for clause in self.clauses:
 
-    def is_legal(self, board_state: list) -> int:
-        """
-        The function find the number of illegal board states and returns that number. If the board is completely
-        legal, it returns a 0.
+            # determine if this clause is satisfied:
+            satisfied = False
+            for cell, truth_value in clause.items():
+                if truth_value == self.assignment[cell]:
+                    satisfied = True
 
-        If the board is illegal by only 2 positions, then a change is made the board is illegal by 4 positions
-        then we know that was a bad change. Our hope is that as we make changes, or "flips" as they're called
-        in the Walksat pseudocode, this function will return smaller and smaller numbers until we reach 0.
+            # if the constraint was not satisfied, then we add one value to the violations counter
+            if not satisfied:
+                violations += 1
 
-        :param board_state:
-        :return:
-        """
-        assert(len(board_state) == 81), f'Please only call \'is_legal()\' on complete boards!'
-
-        violations: int = 0
-
-        # ----- STEP 1 ----- make sure the rows don't have any repeating values
-        for row in range(9):
-            row += 1
-            values_in_row = []
-            for col in range(9):
-                col += 1
-                # get the value of the current position
-                for position in board_state:
-                    if (int(str(position)[0]) == row) & (int(str(position)[1]) == col):
-                        # get the value from the current position
-                        value = int(str(position)[2])
-                        values_in_row.append(value)
-
-            # now we can just find the difference between 9 and the num_unique values in the row
-            v = 9 - len(set(values_in_row))
-            violations = violations + v
-
-        # ----- STEP 2 ----- make sure the columns dont have any repeating values
-        for col in range(9):
-            col += 1
-            values_in_col = []
-            for row in range(9):
-                row += 1
-                # get the value of the current position
-                for position in board_state:
-                    if (int(str(position)[0]) == row) & (int(str(position)[1]) == col):
-                        # get the value from the current position
-                        value = int(str(position)[2])
-                        values_in_col.append(value)
-
-            # now we can just find the difference between 9 and the num_unique values in the row
-            v = 9 - len(set(values_in_col))
-            violations = violations + v
-
-        # ----- STEP 3 ----- make sure the 9x9 squares don't have any repeating numbers
-        # search each sub-block
-        i = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-        for block_i in i:
-            for block_j in i:
-
-                # here we will store the values for each sub_block
-                values_in_sub_block = []
-
-                # we can now iterate through each sub-block and find any violations
-                for row in block_i:
-                    for col in block_j:
-                        for position in board_state:
-                            if (int(str(position)[0]) == row) & (int(str(position)[1]) == col):
-                                # get the value from the current position
-                                value = int(str(position)[2])
-                                values_in_sub_block.append(value)
-
-                # now we can just find the difference between 9 and the num_unique values in the row
-                v = 9 - len(set(values_in_sub_block))
-                violations = violations + v
+        # This might be a cleaner implementation of the above code - more pythonic
+        # for clause in self.clauses:
+        #     if (any((clause[x]) == (self.assignment[x])) for x, y in clause.items()):
+        #         pass
+        #     else:
+        #         violations += 1
 
         return violations
 
-    def randomly_fill_board(self, puzzle):
-        """
-        Take an incomplete board and fill the missing spaces with random values between 1 and 9
-
-        :param puzzle: unfinished puzzle (list of ints of length < 81)
-        :return: filled puzzle (list of ints of length 81)
-        """
-        # generate the initial board state from the cnf file
-        board_state: list = self.get_board_state_from_cnf(puzzle=puzzle)
-
-        for row in range(9):
-            row += 1
-            for col in range(9):
-                col += 1
-                # if the board doesn't already have an assignment for [row, col], add a random one
-                position_exists = False
-                for position in board_state:
-                    # check through the current row/col and see if we have any positions in that row/col
-                    if (int(str(position)[0]) == row) & (int(str(position)[1]) == col):
-                        position_exists = True
-
-                # TODO fix initialization!!!
-                # now we have all the positions in the row, let's filter those to make sure we're in the right col
-                if position_exists:
-                    pass
-                else:
-                    # if we don't have the position filled yet, we will it with a random int between 1 and 9
-                    random_entry: int = randrange(9)
-                    random_entry += 1
-                    new_position = int(str(row) + str(col) + str(random_entry))
-
-                    # add the random entry to the board state
-                    board_state.append(new_position)
-
-        return board_state
-
-    @ staticmethod
-    def update_board_value(b1: list, old_value: int, new_value: int) -> list:
-        """
-        Helper function to update a single value on the board given a board (list of ints), an old_value
-        (int representing row, col, old_val), and a new_value (int representing row, col, new_val)
-
-        :param board:
-        :param old_value:
-        :param new_value:
-        :return:
-        """
-        b1.remove(old_value)
-        b1.append(new_value)
-        return b1
-
-    def get_val_from_position(self, b, search_index: int):
-        """
-        Takes a board search_index (an int with 2 digits representing row and col) and returns the value at that
-        position (an int with 3 digits representing row, col, value)
-
-        :param search_index: int with 2 digits representing position
-        :return: int with 3 digits representing position and value
-        """
-        current_val = 0
-        for position in b:
-            if (int(str(position)[0]) == (int(str(search_index)[0]))) & \
-                    (int(str(position)[1]) == (int(str(search_index)[1]))):
-                current_val = (int(str(search_index)[0] + str(search_index)[1] + str(position)[2]))
-                break
-
-        return current_val
-
-    def flip_single_variable(self, board: list, val_to_flip: int) -> (list, int):
-
-        # TODO maybe we need to pass in a variable so this isn't quite as random? Not sure...
-        b1 = board.copy()
-        v1 = val_to_flip
-
-        # we don't want to accidentally flip the value to the same value, so we can add a check for that
-        current_val = self.get_val_from_position(b=b1, search_index=val_to_flip)
-        current_val = int(str(current_val)[2])
-
-        potential_values = [x+1 for x in range(9)]
-        potential_values.remove(current_val)
-        new_val = random.choice(potential_values)
-
-        # now that we have a new value, we can update and return our board
-        old_value = int(str(val_to_flip) + str(current_val))
-        new_value = int(str(val_to_flip) + str(new_val))
-        updated_board = self.update_board_value(b1=b1, old_value=old_value, new_value=new_value)
-
-        return updated_board, new_value
-
     def gsat(self):
+
+        # TODO rework this guy so that it works with the CNF implementation
+
         # define the parameters we will use for search
         max_tries = self.max_tries
         max_flips = self.max_flips
@@ -405,6 +264,10 @@ if __name__ == "__main__":
 
     # instantiate the SAT object
     sat = SAT(path_to_puzzle=str(ABSPATH_TO_CNF), path_to_sol=str(ABSPATH_TO_SOL),
-              threshold=0.3, max_tries=100_000, max_flips=1000, verbose=True, solution=sol)
+              threshold=0.3, max_tries=100_000, max_flips=1000, verbose=False, solution=sol)
 
     sat.create_initial_assignment()
+
+    sat.is_assignment_legal()
+
+    print('something')
