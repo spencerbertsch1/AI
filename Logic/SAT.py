@@ -14,13 +14,13 @@ class Solution:
     def __init__(self):
         self.tries = 0
         self.flips = 0
-        self.board = None
+        self.assignment = None
 
     def __repr__(self):
         s = f'WALKSAT SOLUTION \n' \
             f'Number of Tries: {self.tries} \n' \
             f'Number of Flips: {self.flips} \n' \
-            f'Solved Board: {self.board} \n'
+            f'Solved Board: {self.assignment} \n'
         return s
 
 
@@ -35,7 +35,7 @@ class SAT:
         self.max_tries = max_tries
         self.verbose = verbose
         self.clauses = self.create_clause_dicts()
-        self.assignment = self.create_initial_assignment()
+        self.assignment = self.create_random_assignment()
         self.solution = solution
 
     def create_clause_dicts(self):
@@ -58,10 +58,6 @@ class SAT:
         f = open(self.path_to_puzzle, "r")
         cnf_list = []
         for line in f:
-            # split the cnf file into lists of strings
-            values = line.split()
-            if self.verbose:
-                print(f'Values: {values}')
             cnf_list.append(line)
         f.close()
 
@@ -72,7 +68,7 @@ class SAT:
         pass
         # TODO method to write the solved puzzle to the specified output location
 
-    def create_initial_assignment(self):
+    def create_random_assignment(self):
         """
         Returns the initial assignment dictionary read in from the CNF file. If any values are not added (0 in the
         CNF file), then they are filled in randomly.
@@ -116,7 +112,7 @@ class SAT:
 
             if counter == 9:
                 if not any(assignment_values):
-                    position_to_update: int = random.choice(assignment_positions)
+                    position_to_update: int = random.choice(assignment_positions)  # <-- random choice used here
                     assignment[position_to_update] = True
                 # reset after every 9 values in the dict
                 counter = 0
@@ -125,117 +121,119 @@ class SAT:
 
         return assignment
 
-    def is_assignment_legal(self):
+    def get_assignment_score(self, assignment_to_score):
         """
+        This method provides a score value for the assignment. A score of 0 means that all clauses were satisfied.
+        A score value of 15 means that 15 of the clauses were not satisfied. By that logic, an assignment that
+        returns a score value of 12 would be 'better' than an assignment that returns a score value of 15.
 
-        :return:
+        :return: int - score value
         """
-        violations = 0
+        score = 0
 
         # we can iterate through the clauses and see if we have any that aren't satisfied
         for clause in self.clauses:
 
-            # determine if this clause is satisfied:
-            satisfied = False
-            for cell, truth_value in clause.items():
-                if truth_value == self.assignment[cell]:
-                    satisfied = True
+            if len(clause) == 2:
+                # this is a clause that restricts a value from being both 1 and 2
+                keys = [int(str(x)[-3:]) for x in clause.keys()]
 
-            # if the constraint was not satisfied, then we add one value to the violations counter
-            if not satisfied:
-                violations += 1
+                if (assignment_to_score[keys[0]] is True) & (assignment_to_score[keys[1]] is True):
+                    # TODO how does this happen??
+                    score += 1
+
+            else:
+                # determine if this clause is satisfied:
+                satisfied = False
+                for cell, truth_value in clause.items():
+                    if truth_value == assignment_to_score[cell]:
+                        satisfied = True
+
+                # if the constraint was not satisfied, then we add one value to the violations counter
+                if not satisfied:
+                    score += 1
 
         # This might be a cleaner implementation of the above code - more pythonic
         # for clause in self.clauses:
-        #     if (any((clause[x]) == (self.assignment[x])) for x, y in clause.items()):
+        #     if (any((clause[x]) == (assignment[x])) for x, y in clause.items()):
         #         pass
         #     else:
         #         violations += 1
 
-        return violations
+        return score
 
-    def gsat(self):
+    def gsat_rewrite(self):
 
-        # TODO rework this guy so that it works with the CNF implementation
+        for i in range(self.max_tries):
+            self.solution.tries += 1
+            # randomly fill the assignment
+            random.seed(i + 1)
+            self.assignment = self.create_random_assignment()
 
-        # define the parameters we will use for search
-        max_tries = self.max_tries
-        max_flips = self.max_flips
-        threshold: float = self.threshold
+            # this info is used below
+            initial_score: int = self.get_assignment_score(assignment_to_score=self.assignment)
 
-        # run the search 'max_tries' times
-        for i in range(max_tries):
-            board = self.randomly_fill_board(puzzle=self.puzzle)
-            self.solution.tries = self.solution.tries + 1
-            print(f'on try {i}!')
+            for j in range(self.max_flips):
+                self.solution.flips += 1
 
-            # perform at most 'max_flips' flips during the search
-            for j in range(max_flips):
-                self.solution.flips = self.solution.flips + 1
-
-                # if the board state has no violations, add it to the solution and return the solution
-                if self.is_legal(board_state=board) == 0:
-                    self.solution.board = board
+                # if the assignment is legal, we update the solution object and return it
+                if self.get_assignment_score(assignment_to_score=self.assignment) == 0:
+                    self.solution.assignment = self.assignment
                     return self.solution
 
                 # generate a random number between 0 and 1
                 p: float = random.uniform(0, 1)
 
-                if p > threshold:
-                    # define the value that's going to get flipped
-                    v1, v2 = (randrange(9) + 1), (randrange(9) + 1)
-                    val_to_flip = int(str(v1) + str(v2))
-
-                    # what does "flip it" mean? Just assign it a new value between 1 and 9?
-                    board, new_value = self.flip_single_variable(board=board, val_to_flip=val_to_flip)
-                    continue
+                if p > self.threshold:
+                    # flip a random variable in the assignment
+                    random_key = random.choice(list(self.assignment.keys()))
+                    if self.assignment[random_key] is True:
+                        self.assignment[random_key] = False
+                    else:
+                        self.assignment[random_key] = True
 
                 else:
-                    # for each variable, see how the object changes if that variable gets flipped
-                    board_copy = board.copy()
-                    objective_val_dict = {}
-                    initial_objective: int = self.is_legal(board_state=board)
-                    for row in range(9):
-                        row += 1
-                        for col in range(9):
-                            col += 1
+                    # we now want to create a score dict which will hold the score improvement for each flip
+                    score_dict = {}
+                    for variable, truth_val in self.assignment.items():
+                        # flip each truth value and see how that changes the score
+                        test_assignment = self.assignment.copy()
 
-                            # here we flip a variable and get the new objective score
-                            val_to_flip: int = int(str(row) + str(col))
+                        # flip the variable
+                        if test_assignment[variable] is True:
+                            test_assignment[variable] = False
+                        else:
+                            test_assignment[variable] = True
 
-                            # get the new board with a new value
-                            new_board, new_value = self.flip_single_variable(board=board, val_to_flip=val_to_flip)
+                        # get the new score with the flipped variable
+                        new_score: int = self.get_assignment_score(assignment_to_score=test_assignment)
+                        # find the change between the initial score and the new score after the bit was flipped
+                        score_diff = new_score - initial_score
 
-                            # score the new board with our objective function
-                            new_objective: int = self.is_legal(board_state=new_board)
+                        if self.verbose:
+                            # suppress print statements
+                            if j % 10 == 1:
+                                print(f'REMAINING BOARD VIOLATIONS: {new_score}')
 
-                            if self.verbose:
-                                # suppress print statements
-                                if j % 5 == 1:
-                                    print(f'REMAINING BOARD VIOLATIONS: {new_objective}')
+                        # add the score difference to the score dictionary
+                        score_dict[variable] = score_diff
 
-                            # find the difference between our initial objective and the new one & add it to the dict
-                            objective_diff: int = new_objective - initial_objective
-                            objective_val_dict[new_value] = objective_diff
-
-                            # we need to remember to reset the board after each change we make to it
-                            board = board_copy  # <-- we may not need this if we are just creating new boards every time
-
-                    # now we find the change that maximized the objective (or minimized the cost function)
-                    # instead of picking the first min value (argmin) we choose a random min value
-                    min_move_val = min(objective_val_dict.items(), key=lambda x: x[1])[1]
+                    # now that we have the score dict, we can take a min value and make that change to the assignment
+                    best_move = min(score_dict.items(), key=lambda x: x[1])[1]
                     best_moves = []
-                    # Iterate over all the values in dictionary to find moves with max value
-                    for key, value in objective_val_dict.items():
-                        if value == min_move_val:
+                    # Iterate over all the values in dictionary to find moves with min values
+                    for key, value in score_dict.items():
+                        if value == best_move:
                             best_moves.append(key)
 
-                    # now we can make the move and continue with our search
-                    new_value = random.choice(best_moves)
-                    old_value = self.get_val_from_position(b=board, search_index=int(str(new_value)[0] + str(new_value)[1]))
-                    board = self.update_board_value(b1=board, old_value=old_value, new_value=new_value)
+                    # now we can flip the chosen variable in the assignment and continue with the search
+                    chosen_var = random.choice(best_moves)
 
-        return f'Could not find a solution after {max_tries} tries and {max_flips} flips.'
+                    # flip the variable
+                    if self.assignment[chosen_var] is True:
+                        self.assignment[chosen_var] = False
+                    else:
+                        self.assignment[chosen_var] = True
 
     def walksat(self):
         pass
@@ -264,10 +262,9 @@ if __name__ == "__main__":
 
     # instantiate the SAT object
     sat = SAT(path_to_puzzle=str(ABSPATH_TO_CNF), path_to_sol=str(ABSPATH_TO_SOL),
-              threshold=0.3, max_tries=100_000, max_flips=1000, verbose=False, solution=sol)
+              threshold=0.99, max_tries=100_000, max_flips=10_000, verbose=True, solution=sol)
 
-    sat.create_initial_assignment()
+    sat.create_random_assignment()
 
-    sat.is_assignment_legal()
+    sat.gsat_rewrite()
 
-    print('something')
