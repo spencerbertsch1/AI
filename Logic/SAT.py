@@ -18,7 +18,7 @@ class Solution:
         self.algorithm = algorithm
 
     def __repr__(self):
-        s = f'{self.algorithm} SOLUTION \n' \
+        s = f'{self.algorithm} solution \n' \
             f'Number of Tries: {self.tries} \n' \
             f'Number of Flips: {self.flips} \n' \
             f'Solved Board: {self.assignment} \n'
@@ -139,8 +139,13 @@ class SAT:
         return assignment
 
     def get_problem_variables(self, initial_assignment):
-
+        """
+        WALKSAT
+        :param initial_assignment:
+        :return:
+        """
         problem_variables = []
+        problem_clauses = []
 
         # we can iterate through the clauses and see if we have any that aren't satisfied
         for clause in self.clauses:
@@ -150,8 +155,13 @@ class SAT:
                 # clause is satisfied!
                 pass
             else:
-                for key in clause.keys():
-                    problem_variables.append(key)
+                problem_clauses.append(clause)
+
+        random_clause = random.choice(problem_clauses)
+        for key in random_clause.keys():
+            problem_variables.append(key)
+
+        # print(f'WALKSAT is looping through {len(problem_variables)} problem variables.')
 
         return problem_variables
 
@@ -219,8 +229,9 @@ class SAT:
 
                         if self.verbose:
                             # suppress print statements
-                            if j % 10 == 1:
-                                print(f'Remaining Clauses: {self.num_clauses - satisfied_clauses}')
+                            if variable == 111:
+                                print(f'Iterations: {self.solution.flips}')
+                                print(f'Remaining Clauses: {self.num_clauses - satisfied_clauses} \n')
 
                         # add the satisfied_clauses to the score dictionary
                         score_dict[variable] = satisfied_clauses
@@ -261,11 +272,11 @@ class SAT:
                 # generate a random number between 0 and 1
                 p: float = random.uniform(0, 1)
 
-                if p > self.threshold:
-                    # flip a random variable in the assignment
+                # get the variables associated with ONLY unsatisfied clauses
+                problem_variables = self.get_problem_variables(initial_assignment=self.assignment)
 
-                    # random_key = random.choice(list(self.assignment.keys()))
-                    problem_variables = self.get_problem_variables(initial_assignment=self.assignment)
+                if p > self.threshold:
+                    # flip a problem variable in the assignment
                     random_key = random.choice(problem_variables)
 
                     if self.assignment[random_key] is True:
@@ -276,7 +287,7 @@ class SAT:
                 else:
                     # we now want to create a score dict which will hold the score improvement for each flip
                     score_dict = {}
-                    for variable, truth_val in self.assignment.items():
+                    for p, variable in enumerate(problem_variables):
                         # flip each truth value and see how that changes the score
                         test_assignment = self.assignment.copy()
 
@@ -291,7 +302,7 @@ class SAT:
 
                         if self.verbose:
                             # suppress print statements
-                            if variable == 111:
+                            if p == 1:
                                 print(f'Iterations: {self.solution.flips}')
                                 print(f'Remaining Clauses: {self.num_clauses - satisfied_clauses} \n')
 
@@ -316,17 +327,17 @@ class SAT:
                         self.assignment[chosen_var] = True
 
 
-# some test code - this code can be safely ignored or removed
+# some test code
 if __name__ == "__main__":
 
     # Choose parameters to test the solver:
     algorithm = 'walksat'  # <-- 'gsat' or 'walksat'
-    threshold: float = 0.3
+    threshold: float = 0.9  # <-- 0.9 for walksat, 0.9 for gsat
     max_tries: int = 100_000
-    max_flips: int = 10_000
+    max_flips: int = 100_000
 
     # define the name of the puzzle you want to solve:
-    puzzle_name = 'rows'  # <-- should work with 'rows_and_cols'
+    puzzle_name = 'rows_and_cols'  # <-- should work with 'rows_and_cols'
 
     # for testing, always initialize the pseudorandom number generator to output the same sequence of values:
     random.seed(2)
