@@ -8,6 +8,8 @@ from pathlib import Path
 import random
 from random import randrange
 
+from display import display_sudoku_solution
+
 
 class Solution:
 
@@ -73,10 +75,20 @@ class SAT:
 
         return cnf_list
 
-
     def write_solution(self):
-        pass
-        # TODO method to write the solved puzzle to the specified output location
+        # method to write the solved puzzle to the specified output location
+        print(f'Writing final solution in the following location: \n {self.path_to_sol}')
+
+        f = open(self.path_to_sol, "a")
+        for variable_key, truth_value in self.assignment.items():
+            if truth_value:
+                f.write(f'{variable_key}\n')
+            else:
+                f.write(f'-{variable_key}\n')
+
+        f.close()
+
+        print('something')
 
     def create_initial_assignment(self, initialize_randomly: bool):
         """
@@ -332,23 +344,24 @@ if __name__ == "__main__":
 
     # Choose parameters to test the solver:
     algorithm = 'walksat'  # <-- 'gsat' or 'walksat'
-    threshold: float = 0.9  # <-- 0.9 for walksat, 0.9 for gsat
+    threshold: float = 0.95  # <-- 0.9 for walksat, 0.9 for gsat
     max_tries: int = 100_000
     max_flips: int = 100_000
 
     # define the name of the puzzle you want to solve:
-    puzzle_name = 'rows_and_cols'  # <-- should work with 'rows_and_cols'
+    puzzle_name = 'rules'  # <-- should work with 'rows_and_cols'
 
     # for testing, always initialize the pseudorandom number generator to output the same sequence of values:
     random.seed(2)
     # define paths to files
     PATH_TO_THIS_FILE: Path = Path(__file__).resolve()
     ABSPATH_TO_CNF_DIR: Path = PATH_TO_THIS_FILE.parent / 'puzzles'
+    ABSPATH_TO_SOL_DIR: Path = PATH_TO_THIS_FILE.parent / 'solutions'
     # define the name of the solution file that we will write once the solver is finished
     sol_filename = puzzle_name + ".sol"
     cnf_name = puzzle_name + ".cnf"
     ABSPATH_TO_CNF: Path = ABSPATH_TO_CNF_DIR / cnf_name
-    ABSPATH_TO_SOL: Path = ABSPATH_TO_CNF_DIR / sol_filename
+    ABSPATH_TO_SOL: Path = ABSPATH_TO_SOL_DIR / sol_filename
 
     # instantiate an empty solution object that will get updated during search
     sol = Solution(algorithm=algorithm)
@@ -367,3 +380,7 @@ if __name__ == "__main__":
         print(s)
     else:
         raise Exception(f'The \'algorithm\' parameter should be either \'walksat\' or \'gsat\', not {algorithm}.')
+
+    # write and display the solution file
+    sat.write_solution()
+    display_sudoku_solution(str(ABSPATH_TO_SOL))
