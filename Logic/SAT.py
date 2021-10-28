@@ -75,6 +75,20 @@ class SAT:
 
         return cnf_list
 
+    def create_map(self):
+        """
+        We need to make the solver generalizable, so we can reference a map instead of the actual assignment.
+
+        :return:
+        """
+        map: dict = {}
+        new_assignment: dict = {}
+        i = 0
+        for assignment_cell, truth_value in self.assignment:
+            i += 1
+            map[i] = truth_value
+            new_assignment[assignment_cell] = i
+
     def write_solution(self):
         # method to write the solved puzzle to the specified output location
         print(f'Writing final solution in the following location: \n {self.path_to_sol}')
@@ -87,8 +101,6 @@ class SAT:
                 f.write(f'-{variable_key}\n')
 
         f.close()
-
-        print('something')
 
     def create_initial_assignment(self, initialize_randomly: bool):
         """
@@ -344,12 +356,12 @@ if __name__ == "__main__":
 
     # Choose parameters to test the solver:
     algorithm = 'walksat'  # <-- 'gsat' or 'walksat'
-    threshold: float = 0.95  # <-- 0.9 for walksat, 0.9 for gsat
+    threshold: float = 0.85  # <-- 0.85 for walksat puzzle1, 0.8 for walksat puzzle2, 0.9 for all others
     max_tries: int = 100_000
     max_flips: int = 100_000
 
     # define the name of the puzzle you want to solve:
-    puzzle_name = 'rules'  # <-- should work with 'rows_and_cols'
+    puzzle_name = 'puzzle1'  # <-- should work with 'rows_and_cols'
 
     # for testing, always initialize the pseudorandom number generator to output the same sequence of values:
     random.seed(2)
