@@ -3,7 +3,6 @@
 # Assignment 5
 # CS 276 @ Dartmouth College
 
-# native imports
 from pathlib import Path
 import random
 from random import randrange
@@ -351,7 +350,8 @@ class SAT:
                         self.assignment[chosen_var] = True
 
 
-# some test code
+# some test code. The SAT solver can be run either by running this file as an executable script - running the below
+# code - or by running the 'run_sat.py' file.
 if __name__ == "__main__":
 
     # Choose parameters to test the solver:
@@ -359,6 +359,7 @@ if __name__ == "__main__":
     threshold: float = 0.85  # <-- 0.85 for walksat puzzle1, 0.8 for walksat puzzle2, 0.9 for all others
     max_tries: int = 100_000
     max_flips: int = 100_000
+    write_solution: bool = False
 
     # define the name of the puzzle you want to solve:
     puzzle_name = 'puzzle1'  # <-- should work with 'rows_and_cols'
@@ -393,6 +394,7 @@ if __name__ == "__main__":
     else:
         raise Exception(f'The \'algorithm\' parameter should be either \'walksat\' or \'gsat\', not {algorithm}.')
 
-    # write and display the solution file
-    sat.write_solution()
-    display_sudoku_solution(str(ABSPATH_TO_SOL))
+    if write_solution:
+        # write and display the solution file
+        sat.write_solution()
+        display_sudoku_solution(str(ABSPATH_TO_SOL))
