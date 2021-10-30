@@ -29,7 +29,7 @@ class Solution:
 class SAT:
 
     def __init__(self, path_to_puzzle: str, path_to_sol: str, threshold: float, max_flips: int, max_tries: int,
-                 verbose: bool, solution, random_initialization: bool):
+                 verbose: bool, solution, random_initialization: bool, problem_type: str):
         self.path_to_puzzle = path_to_puzzle
         self.path_to_sol = path_to_sol
         self.threshold = threshold
@@ -37,6 +37,7 @@ class SAT:
         self.max_tries = max_tries
         self.verbose = verbose
         self.num_clauses = 0
+        self.problem_type = problem_type
         self.random_initialization = random_initialization
         self.clauses = self.create_clause_dicts()
         self.assignment = self.create_initial_assignment(initialize_randomly=self.random_initialization)
@@ -45,20 +46,47 @@ class SAT:
 
 
     def create_clause_dicts(self):
+        """
+        Generate the list of clause dicts that we will use to solve the problem
+        :return:
+        """
+        # ensure the problem type is either sudoku or map_coloring
+        assert self.problem_type in ('sudoku', 'map_coloring'), f'The \'problem_type\' parameter should be either ' \
+                                                                f'\'sudoku\' or \'map_coloring\', ' \
+                                                                f'not {self.problem_type}'
+
+        # read in the clauses from the .cnf file and create a dictionary from each line
         f = open(self.path_to_puzzle, "r")
         clauses = []
-        for line in f:
-            self.num_clauses += 1
-            # split the cnf file into lists of strings
-            values = line.split()
-            if len(values) == 2:
-                # we set the negated clauses to False, False
-                clause_dict: dict = {int(str(x)[-3:]): False for x in values}
-            else:
-                # we set the other clauses to True, True, True, ...
-                clause_dict: dict = {int(x): True for x in values}
-            clauses.append(clause_dict)
-        f.close()
+
+        if self.problem_type == 'map_coloring':
+            # generate the clauses for the map coloring problem
+            for line in f:
+                self.num_clauses += 1
+                # split the cnf file into lists of strings
+                values = line.split()
+                if len(values) == 2:
+                    # we set the negated clauses to False, False
+                    clause_dict: dict = {str(x)[-5:]: False for x in values}
+                else:
+                    # each country needs to be assigned a color
+                    clause_dict: dict = {str(x): True for x in values}
+                clauses.append(clause_dict)
+            f.close()
+        else:
+            # generate the clauses for the sudoku problem
+            for line in f:
+                self.num_clauses += 1
+                # split the cnf file into lists of strings
+                values = line.split()
+                if len(values) == 2:
+                    # we set the negated clauses to False, False
+                    clause_dict: dict = {int(str(x)[-3:]): False for x in values}
+                else:
+                    # we set the other clauses to True, True, True, ...
+                    clause_dict: dict = {int(x): True for x in values}
+                clauses.append(clause_dict)
+            f.close()
 
         return clauses
 
@@ -111,58 +139,67 @@ class SAT:
 
         :return: dictionary mapping 729 variables to 81 boolean values representing the state of the board
         """
-        # first we can start with an assignment where everything is false, then we can randomly fill it in
-        assignment = {}
-        for row in range(9):
-            row += 1
-            for col in range(9):
-                col += 1
-                for value in range(9):
-                    value += 1
-                    key = int(str(row) + str(col) + str(value))
-                    if initialize_randomly:
-                        assignment[key] = random.choice([False, True])
-                    else:
-                        assignment[key] = False
+        if self.problem_type == 'sudoku':
+            # first we can start with an assignment where everything is false, then we can randomly fill it in
+            assignment = {}
+            for row in range(9):
+                row += 1
+                for col in range(9):
+                    col += 1
+                    for value in range(9):
+                        value += 1
+                        key = int(str(row) + str(col) + str(value))
+                        if initialize_randomly:
+                            assignment[key] = random.choice([False, True])
+                        else:
+                            assignment[key] = False
 
-        # We can now update the truth values for the starting points in our board
-        cnf_list = self.create_cnf_list()
-        cnf_list.reverse()
-        current_positions = []
-        for position in cnf_list:
-            if len(position) < 5:
-                current_positions.append(int(position))
-            else:
-                break
-        # update the truth values that the board starts with
-        for position, value in assignment.items():
-            if position in current_positions:
-                assignment[position] = True
+            # We can now update the truth values for the starting points in our board
+            cnf_list = self.create_cnf_list()
+            cnf_list.reverse()
+            current_positions = []
+            for position in cnf_list:
+                if len(position) < 5:
+                    current_positions.append(int(position))
+                else:
+                    break
+            # update the truth values that the board starts with
+            for position, value in assignment.items():
+                if position in current_positions:
+                    assignment[position] = True
 
-        # if we are initializing a truly random board, then we can return the assignment here
-        if initialize_randomly:
+            # if we are initializing a truly random board, then we can return the assignment here
+            if initialize_randomly:
+                return assignment
+
+            # Otherwise we can ensure that only one square on the board is occupied at any one time. This accelerates
+            # the solving of easier puzzles
+            counter = 0
+            assignment_values = []
+            assignment_positions = []
+            for position, value in assignment.items():
+                counter += 1
+                assignment_positions.append(position)
+                assignment_values.append(value)
+
+                if counter == 9:
+                    if not any(assignment_values):
+                        position_to_update: int = random.choice(assignment_positions)  # <-- random choice used here
+                        assignment[position_to_update] = True
+                    # reset after every 9 values in the dict
+                    counter = 0
+                    assignment_values = []
+                    assignment_positions = []
+
             return assignment
+        else:
+            assignment = {}
+            c: list = ['NT__B', 'NT__G', 'NT__R', 'Q___B', 'Q___G', 'Q___R', 'V___B', 'V___G', 'V___R',
+                       'SA__B', 'SA__G', 'SA__R', 'NSW_B', 'NSW_G', 'NSW_R', 'WA__B', 'WA__G', 'WA__R']
+            for key in c:
+                assignment[key] = random.choice([False, True])
 
-        # Otherwise we can ensure that only one square on the board is occupied at any one time. This accelerates
-        # the solving of easier puzzles
-        counter = 0
-        assignment_values = []
-        assignment_positions = []
-        for position, value in assignment.items():
-            counter += 1
-            assignment_positions.append(position)
-            assignment_values.append(value)
-
-            if counter == 9:
-                if not any(assignment_values):
-                    position_to_update: int = random.choice(assignment_positions)  # <-- random choice used here
-                    assignment[position_to_update] = True
-                # reset after every 9 values in the dict
-                counter = 0
-                assignment_values = []
-                assignment_positions = []
-
-        return assignment
+            return assignment
 
     def get_problem_variables(self, input_assignment):
         """
@@ -385,7 +422,7 @@ if __name__ == "__main__":
     # instantiate the SAT object
     sat = SAT(path_to_puzzle=str(ABSPATH_TO_CNF), path_to_sol=str(ABSPATH_TO_SOL),
               threshold=threshold, max_tries=max_tries, max_flips=max_flips, verbose=True, solution=sol,
-              random_initialization=True)
+              random_initialization=True, problem_type='sudoku')
 
     # run the solver on the chosen puzzle and return the result
     if algorithm == 'walksat':
