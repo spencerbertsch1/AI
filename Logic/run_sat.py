@@ -10,7 +10,8 @@ from random import randrange
 from display import display_sudoku_solution
 from SAT import Solution, SAT
 
-def run_sat(write_solution: bool, algorithm: str, threshold: float, max_tries: int, max_flips: int, puzzle_name: str):
+def run_sat(write_solution: bool, algorithm: str, threshold: float, max_tries: int, max_flips: int, puzzle_name: str,
+            problem_type: str = 'sudoku'):
     """
     run_sat is a driver function that gives us an easy way to run the WalkSAT and GSAT
     algorithms on different puzzle CNF files.
@@ -21,6 +22,7 @@ def run_sat(write_solution: bool, algorithm: str, threshold: float, max_tries: i
     :param max_tries: int - number of total tries the algorithm uses for each run
     :param max_flips: int - the maximum number of flips used in each search before a new try is initiated
     :param puzzle_name: str - the name of the puzzle CNF file that you want to solve. 'puzzle1' for example
+    :param problem_type: str - either 'sudoku' or 'map_coloring', tells the solver what problem to solve
     :return:
     """
     # for testing, always initialize the pseudorandom number generator to output the same sequence of values:
@@ -41,7 +43,7 @@ def run_sat(write_solution: bool, algorithm: str, threshold: float, max_tries: i
     # instantiate the SAT object
     sat = SAT(path_to_puzzle=str(ABSPATH_TO_CNF), path_to_sol=str(ABSPATH_TO_SOL),
               threshold=threshold, max_tries=max_tries, max_flips=max_flips, verbose=True, solution=sol,
-              random_initialization=True)
+              random_initialization=True, problem_type=problem_type)
 
     # run the solver on the chosen puzzle and return the result
     if algorithm == 'walksat':
@@ -65,9 +67,10 @@ if __name__ == "__main__":
     threshold: float = 0.85  # <-- 0.85 for walksat puzzle1, 0.8 for walksat puzzle2, 0.9 for all others
     max_tries: int = 100_000
     max_flips: int = 100_000
-    puzzle_name: str = 'puzzle1'  # <-- try 'puzzle1' or 'puzzle2'
+    puzzle_name: str = 'puzzle1'  # <-- try 'puzzle1' or 'puzzle2'/ 'map_coloring' for map coloring problems
     write_solution: bool = False
+    problem_type: str = 'sudoku'  # <-- 'sudoku' or 'map_coloring'
 
     # run the solver on the chosen puzzle
     run_sat(algorithm=algorithm, threshold=threshold, max_tries=max_tries, max_flips=max_flips,
-            puzzle_name=puzzle_name, write_solution=write_solution)
+            puzzle_name=puzzle_name, write_solution=write_solution, problem_type=problem_type)
