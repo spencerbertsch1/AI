@@ -114,8 +114,8 @@ assignment_decode: dict = {
 ```
 
 This seemingly pedantic step is what allows the solver to become dynamic and applicable to any problem, not just the sudoku problems
-in conjunctive normal form. Using the new solver, we could also solve problems such as the map_coloring problem, or any other constraint satisfaction 
-problem with relatively few variables in the assignment, and relatively few clauses. 
+in conjunctive normal form. Using the new solver, I was able to also solve the map coloring problem. This solver could solve any constraint satisfaction 
+problem with relatively few variables in the assignment, and relatively few clauses given the .cnf file filled with the logical statements. 
 
 # Evaluation
 
