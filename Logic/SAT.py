@@ -89,12 +89,6 @@ class SAT:
             decode_assignment[i] = truth_value
             encode_assignment[assignment_cell] = i
 
-        # assignment
-        print(self.assignment[111])
-
-        # equivalent to
-        print(decode_assignment[encode_assignment[111]])
-
         return encode_assignment, decode_assignment
 
     def write_solution(self):
@@ -102,7 +96,7 @@ class SAT:
         print(f'Writing final solution in the following location: \n {self.path_to_sol}')
 
         f = open(self.path_to_sol, "a")
-        for variable_key, truth_value in self.assignment.items():
+        for variable_key, truth_value in zip(self.encode_assignment.keys(), self.decode_assignment.values()):
             if truth_value:
                 f.write(f'{variable_key}\n')
             else:
@@ -170,10 +164,10 @@ class SAT:
 
         return assignment
 
-    def get_problem_variables(self, initial_assignment):
+    def get_problem_variables(self, input_assignment):
         """
         WALKSAT
-        :param initial_assignment:
+        :param input_assignment:
         :return:
         """
         problem_variables = []
@@ -183,7 +177,7 @@ class SAT:
         for clause in self.clauses:
 
             # count number of satisfied clauses
-            if any(((clause[key]) == (initial_assignment[key])) for key in clause.keys()):
+            if any(((clause[key]) == (input_assignment[self.encode_assignment[key]])) for key in clause.keys()):
                 # clause is satisfied!
                 pass
             else:
@@ -192,8 +186,6 @@ class SAT:
         random_clause = random.choice(problem_clauses)
         for key in random_clause.keys():
             problem_variables.append(key)
-
-        # print(f'WALKSAT is looping through {len(problem_variables)} problem variables.')
 
         return problem_variables
 
@@ -210,7 +202,7 @@ class SAT:
         for clause in self.clauses:
 
             # count number of satisfied clauses
-            if any(((clause[key]) == (assignment_to_score[key])) for key in clause.keys()):
+            if any(((clause[key]) == (assignment_to_score[self.encode_assignment[key]])) for key in clause.keys()):
                 # clause is satisfied!
                 satisfied_clauses += 1
 
@@ -223,13 +215,14 @@ class SAT:
             # randomly fill the assignment
             random.seed(i+1)
             self.assignment = self.create_initial_assignment(initialize_randomly=self.random_initialization)
+            self.encode_assignment, self.decode_assignment = self.encode_decode_assignment()
 
             for j in range(self.max_flips):
                 self.solution.flips += 1
 
                 # if the assignment is legal, we update the solution object and return it
-                if self.get_satisfied_clauses(assignment_to_score=self.assignment) == self.num_clauses:
-                    self.solution.assignment = self.assignment
+                if self.get_satisfied_clauses(assignment_to_score=self.decode_assignment) == self.num_clauses:
+                    self.solution.assignment = self.decode_assignment
                     return self.solution
 
                 # generate a random number between 0 and 1
@@ -237,24 +230,24 @@ class SAT:
 
                 if p > self.threshold:
                     # flip a random variable in the assignment
-                    random_key = random.choice(list(self.assignment.keys()))
-                    if self.assignment[random_key] is True:
-                        self.assignment[random_key] = False
+                    random_key = random.choice(list(self.encode_assignment.keys()))
+                    if self.decode_assignment[self.encode_assignment[random_key]] is True:
+                        self.decode_assignment[self.encode_assignment[random_key]] = False
                     else:
-                        self.assignment[random_key] = True
+                        self.decode_assignment[self.encode_assignment[random_key]] = True
 
                 else:
                     # we now want to create a score dict which will hold the score improvement for each flip
                     score_dict = {}
-                    for variable, truth_val in self.assignment.items():
+                    for variable in self.encode_assignment.keys():
                         # flip each truth value and see how that changes the score
-                        test_assignment = self.assignment.copy()
+                        test_assignment = self.decode_assignment.copy()
 
                         # flip the variable
-                        if test_assignment[variable] is True:
-                            test_assignment[variable] = False
+                        if test_assignment[self.encode_assignment[variable]] is True:
+                            test_assignment[self.encode_assignment[variable]] = False
                         else:
-                            test_assignment[variable] = True
+                            test_assignment[self.encode_assignment[variable]] = True
 
                         # get the new score with the flipped variable
                         satisfied_clauses: int = self.get_satisfied_clauses(assignment_to_score=test_assignment)
@@ -280,10 +273,10 @@ class SAT:
                     chosen_var = random.choice(best_moves)
 
                     # flip the variable
-                    if self.assignment[chosen_var] is True:
-                        self.assignment[chosen_var] = False
+                    if self.decode_assignment[self.encode_assignment[chosen_var]] is True:
+                        self.decode_assignment[self.encode_assignment[chosen_var]] = False
                     else:
-                        self.assignment[chosen_var] = True
+                        self.decode_assignment[self.encode_assignment[chosen_var]] = True
 
     def walksat(self):
 
@@ -292,42 +285,43 @@ class SAT:
             # randomly fill the assignment
             random.seed(i + 1)
             self.assignment = self.create_initial_assignment(initialize_randomly=self.random_initialization)
+            self.encode_assignment, self.decode_assignment = self.encode_decode_assignment()
 
             for j in range(self.max_flips):
                 self.solution.flips += 1
 
                 # if the assignment is legal, we update the solution object and return it
-                if self.get_satisfied_clauses(assignment_to_score=self.assignment) == self.num_clauses:
-                    self.solution.assignment = self.assignment
+                if self.get_satisfied_clauses(assignment_to_score=self.decode_assignment) == self.num_clauses:
+                    self.solution.assignment = self.decode_assignment
                     return self.solution
 
                 # generate a random number between 0 and 1
                 p: float = random.uniform(0, 1)
 
                 # get the variables associated with ONLY unsatisfied clauses
-                problem_variables = self.get_problem_variables(initial_assignment=self.assignment)
+                problem_variables = self.get_problem_variables(input_assignment=self.decode_assignment)
 
                 if p > self.threshold:
                     # flip a problem variable in the assignment
                     random_key = random.choice(problem_variables)
 
-                    if self.assignment[random_key] is True:
-                        self.assignment[random_key] = False
+                    if self.decode_assignment[self.encode_assignment[random_key]] is True:
+                        self.decode_assignment[self.encode_assignment[random_key]] = False
                     else:
-                        self.assignment[random_key] = True
+                        self.decode_assignment[self.encode_assignment[random_key]] = True
 
                 else:
                     # we now want to create a score dict which will hold the score improvement for each flip
                     score_dict = {}
                     for p, variable in enumerate(problem_variables):
                         # flip each truth value and see how that changes the score
-                        test_assignment = self.assignment.copy()
+                        test_assignment = self.decode_assignment.copy()
 
                         # flip the variable
-                        if test_assignment[variable] is True:
-                            test_assignment[variable] = False
+                        if test_assignment[self.encode_assignment[variable]] is True:
+                            test_assignment[self.encode_assignment[variable]] = False
                         else:
-                            test_assignment[variable] = True
+                            test_assignment[self.encode_assignment[variable]] = True
 
                         # get the new score with the flipped variable
                         satisfied_clauses: int = self.get_satisfied_clauses(assignment_to_score=test_assignment)
@@ -353,10 +347,10 @@ class SAT:
                     chosen_var = random.choice(best_moves)
 
                     # flip the variable
-                    if self.assignment[chosen_var] is True:
-                        self.assignment[chosen_var] = False
+                    if self.decode_assignment[self.encode_assignment[chosen_var]] is True:
+                        self.decode_assignment[self.encode_assignment[chosen_var]] = False
                     else:
-                        self.assignment[chosen_var] = True
+                        self.decode_assignment[self.encode_assignment[chosen_var]] = True
 
 
 # some test code. The SAT solver can be run either by running this file as an executable script - running the below
@@ -371,7 +365,7 @@ if __name__ == "__main__":
     write_solution: bool = False
 
     # define the name of the puzzle you want to solve:
-    puzzle_name = 'puzzle1'  # <-- should work with 'rows_and_cols'
+    puzzle_name = 'all_cells'  # <-- should work with 'rows_and_cols'
 
     # for testing, always initialize the pseudorandom number generator to output the same sequence of values:
     random.seed(2)
@@ -392,9 +386,6 @@ if __name__ == "__main__":
     sat = SAT(path_to_puzzle=str(ABSPATH_TO_CNF), path_to_sol=str(ABSPATH_TO_SOL),
               threshold=threshold, max_tries=max_tries, max_flips=max_flips, verbose=True, solution=sol,
               random_initialization=True)
-
-    # TODO vvv remove later, just for testing
-    sat.encode_decode_assignment()
 
     # run the solver on the chosen puzzle and return the result
     if algorithm == 'walksat':
