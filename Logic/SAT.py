@@ -40,6 +40,7 @@ class SAT:
         self.random_initialization = random_initialization
         self.clauses = self.create_clause_dicts()
         self.assignment = self.create_initial_assignment(initialize_randomly=self.random_initialization)
+        self.encode_assignment, self.decode_assignment = self.encode_decode_assignment()
         self.solution = solution
 
 
@@ -74,19 +75,27 @@ class SAT:
 
         return cnf_list
 
-    def create_map(self):
+    def encode_decode_assignment(self):
         """
         We need to make the solver generalizable, so we can reference a map instead of the actual assignment.
 
         :return:
         """
-        map: dict = {}
-        new_assignment: dict = {}
+        encode_assignment: dict = {}
+        decode_assignment: dict = {}
         i = 0
-        for assignment_cell, truth_value in self.assignment:
+        for assignment_cell, truth_value in self.assignment.items():
             i += 1
-            map[i] = truth_value
-            new_assignment[assignment_cell] = i
+            decode_assignment[i] = truth_value
+            encode_assignment[assignment_cell] = i
+
+        # assignment
+        print(self.assignment[111])
+
+        # equivalent to
+        print(decode_assignment[encode_assignment[111]])
+
+        return encode_assignment, decode_assignment
 
     def write_solution(self):
         # method to write the solved puzzle to the specified output location
@@ -383,6 +392,9 @@ if __name__ == "__main__":
     sat = SAT(path_to_puzzle=str(ABSPATH_TO_CNF), path_to_sol=str(ABSPATH_TO_SOL),
               threshold=threshold, max_tries=max_tries, max_flips=max_flips, verbose=True, solution=sol,
               random_initialization=True)
+
+    # TODO vvv remove later, just for testing
+    sat.encode_decode_assignment()
 
     # run the solver on the chosen puzzle and return the result
     if algorithm == 'walksat':
