@@ -126,8 +126,8 @@ The implemented SAT solver works exactly as expected on all puzzles, including t
 |--------------------|----------|-----------|------|-------------------|-------------------|-------------------|-------------------|
 | GSAT Iterations    | 5        | 306       | 378  | Unsolved after 2k | Unsolved after 2k | Unsolved after 2k | Unsolved after 2k |
 | WalkSAT Iterations | 5        | 282       | 346  | 1,468             | 3,354             | 6,784             | 59,012            |
-*Table 1: Results of the GSAT and WalkSAT local search algorithms on different .cnf puzzle files.*
 
+*Table 1: Results of the GSAT and WalkSAT local search algorithms on different .cnf puzzle files.*
 
 I will say that unlike the solution that the professor posted on slack, I had to vary my *p* value through a large range of values before 
 I was able to get my WalkSAT to find solutions to puzzle1 and puzzle2. I ended up using *p*=0.85 for puzzle1 and *p*=0.8 for puzzle2. 
