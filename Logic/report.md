@@ -9,10 +9,6 @@ This report contains two sections:
 1. Description
 2. Evaluation
 
-### TODO Add encode/decode to the code after writing the report 
-
-### TODO Add CNF for map coloring (Not state1, Not state 2 if they are touching, etc.)
-
 # Description
 
 1. How do your implemented algorithms work?
@@ -26,7 +22,7 @@ of unsatisfied clauses reaches zero, then the search is finished, and we can ret
 
 In our case, we are working with boolean values that are always separated by an 'or' (∨) symbol. In this way, all we need to do is loop through
 our current assignment and compare each bool in each clause to the corresponding element of the assignment. If at least one of the assignment 
-values alligns with the clause, then that clause is satisfied and we can continue. If no values in the assignment align with any values in the clause, then 
+values aligns with the clause, then that clause is satisfied and we can continue. If no values in the assignment align with any values in the clause, then 
 that clause is unsatisfied. 
 
 For example, a clause might be: 
@@ -41,17 +37,50 @@ Additional information on the formulation of the sudoku problem as a satisfiabil
 from Ivor Spence [here](http://www.cs.qub.ac.uk/~I.Spence/SuDoku/SuDoku.html).
 
 ### GSAT
-GSAT is a search algorithm that is designed to solve satisfyability problems given a set of boolean logical expressions. In our case, the 
-boolean logic expressions are in the form of **.cnf** files which we iterate through. 
+GSAT is a search algorithm that is designed to solve satisfiability problems given a set of boolean logical expressions. In our case, the 
+boolean logic expressions are in the form of **.cnf** files which we iterate through, altering the assignment of a sudoku board until all 
+clauses are satisfied. The steps of the GSAT algorithm are as follows: 
 
-### WALKSAT
-TODO
+* The below description of the GSAT algorithm was adapted from the description on Gradescope, with some small additions that I thought
+  were helpful important.
+
+1. Generate a random assignment while preserving the initial state of the board, if one was provided. 
+2. Check to see if the current assignment satisfies all the clauses in the **.cnf** file. If it does, then stop the 
+search and return the solution assignment. 
+3. Generate a random value between 0 and 1. If the value is greater than a predetermined threshold (*p*), then choose one value in the
+assignment and flip its truth value from False to True, or True to False. After this, go back to Step 2. 
+4. If the random value is below (*p*), then iterate through all values in the assignment and find the number of clauses that would be
+satisfied if the assignment's truth value was flipped. 
+5. Out of all the variables that had the highest impact on the number of satisfied clauses when flipped, select a random variable 
+and flip its truth value. Go back to Step 2. 
+
+The GSAT algorithm takes quite a while to find solutions, even for small problems. I noticed that the GSAT algorithm performed poorly 
+when the *p* value was too low (below 0.5), and performed much better when the *p* value was high (above 0.95). I can attribute this to the fact
+that the GSAT algorithm explores randomly when the random value is above *p*, which towards the end of the search has a much higher probability of 
+creating additional unsatisfied clauses than satisfying additional clauses by chance. 
+
+### WalkSAT
+WalkSAT is very similar to the GSAT algorithm, except with a few key differences that significantly increase performance and reduce run time. 
+
+The main difference that accounts for the improvement over GSAT is that when WalkSAT searches randomly, it only flips variables that 
+we know are causing at lease one clause to be unsatisfied. This means that every time is randomly makes a flip, we know that 
+the resulting assignment should not be getting worse. The WalkSAT flip might cause as many problems as it solves, but it doesn't randomly flip
+variables in the way that GSAT does. 
+
+The runtime boost is due to the fact that WalkSAT only iterates through the 'problem' variables instead of all variables. By 'problem' variables, 
+I mean the variables associated with an unsatisfied clause. Even better, we are selecting one unsatisfied clause uniformly at random, then finding all of the 
+variables associated with that clause, then scoring them and flipping the optimal one. When the search gets close to a solution, then there are only a 
+few unsatisfied clauses and only a handful of problem variables which means that every iteration of the WalkSAT algorithm is extremely fast. By contrast, GSAT
+iterations occur at the same speed if there are 3,000 unsatisfied clauses or if there are 2 unsatisfied clauses. 
 
 ### What design decisions did you make? How you laid out the problems?
 
-All code is in the SAT.py file
+All GSAT and WalkSAT code is in the SAT.py file, and there is a driver function in the run_sat.py file that can be used to easily test either
+of the search algorithms on any of the puzzle files in the /puzzle directory. There is a README in this directory that shows how to run 
+the run_sat.py file to test each algorithm on different .cnf files. I also consolidated the puzzle files into a new directory called */puzzles*, and 
+I store all of the solutions in a directory called */solutions*.
 
-Driver script is run_sat.py which can be used to run the solver on any of the **.cnf** files. 
+* A few notes on implementation of GSAT and WalkSAT: 
 
 I initially coded the solver using a direct assignment:
 
@@ -85,9 +114,7 @@ assignment_decode: dict = {
 ```
 
 This seemingly pedantic step is what allows the solver to become dynamic and applicable to any problem, not just the sudoku problems
-in conjunctive normal form. 
-
-TODO 
+in conjunctive normal form.
 
 # Evaluation
 
@@ -102,11 +129,12 @@ The implemented SAT solver works exactly as expected on all puzzles, including t
 *Table 1: Results of the GSAT and WalkSAT local search algorithms on different .cnf puzzle files.*
 
 
-I will say that unlike the solution that the professor posted on slack, I had to vary my **p** value through a large range of values before 
-I was able to get my WalkSAT to find solutions to puzzle1 and puzzle2. I ended up using **p=0.85** for puzzle1 and **p=0.8** for puzzle2. 
-Using these **p** values along with a value of **p=0.9** for all other puzzles, I was able to achieve the results in *Table 1*. 
+I will say that unlike the solution that the professor posted on slack, I had to vary my *p* value through a large range of values before 
+I was able to get my WalkSAT to find solutions to puzzle1 and puzzle2. I ended up using *p*=0.85 for puzzle1 and *p*=0.8 for puzzle2. 
+Using these *p* values along with a value of *p*=0.9 for all other puzzles, I was able to achieve the results in *Table 1*. 
 
-Below we can see a solution to one of the sample problems: **puzzle2.cnf**
+Lastly, using a combination of the provided code and a small method that writes the resulting assignment after the puzzle is solved, 
+we get to see the solved puzzles! Below we can see a solution to one of the sample problems: puzzle2.cnf
 
 Puzzle 2 Solution: 
 ```
