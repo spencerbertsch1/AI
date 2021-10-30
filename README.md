@@ -20,3 +20,6 @@ Artificial Intelligence - Dartmouth Fall 2021
 * [Map Coloring CSP](https://github.com/spencerbertsch1/AI/blob/main/ConstraintSatisfaction/general_csp.py)
 * [Circuit Optimization CSP](https://github.com/spencerbertsch1/AI/blob/main/ConstraintSatisfaction/general_csp.py)
 
+[Logic](https://github.com/spencerbertsch1/AI/tree/main/Logic)
+* [GSAT Sudoku](https://github.com/spencerbertsch1/AI/blob/main/Logic/SAT.py)
+* [WalkSAT Sudoku](https://github.com/spencerbertsch1/AI/blob/main/Logic/SAT.py)
