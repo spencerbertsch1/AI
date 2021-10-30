@@ -154,8 +154,7 @@ Puzzle 2 Solution:
 
 ## Assignment Extensions
 
-In addition to solving the sudoku problem, I also implemented the Australia map coloring problem in CNF form and used WalkSAT to find a solution. 
-The solution that was provided by WalkSAT was the following: 
+In addition to solving the sudoku problem, I also implemented the Australia map coloring problem in CNF form and used WalkSAT to find a solution.
 
 I encoded the colors ('G', 'R', 'B') inside the CNF file so that each state can have one of the three colors, but not two colors. 
 
