@@ -20,19 +20,32 @@ Spencer Bertsch
 2. `cd` to the Logic directory by running the following command:
     1. `$ cd Logic`
 
-### To Run GSAT Search:
+### To Run GSAT Search for Map Coloring:
 3. Ensure that the 'algorithm' variable is set to 'gsat', as noted on line 64. 
    1. `algorithm: str = 'gsat'`
 
 4. Run the following command to run the run_sat.py file.
     1. `$ python3 run_sat.py`
 
-### To Run WalkSAT Search:
+### To Run WalkSAT Search for Map Coloring:
 3. Ensure that the 'algorithm' variable is set to 'walksat', as noted on line 64.
     1. `algorithm: str = 'walksat'`
 
 4. Run the following command to run the run_sat.py file.
     1. `$ python3 run_sat.py`
 
-Feel free to change the configuration in the run_sat.py to experiment with different *p* values or test the algorithms 
+### To Run WalkSAT Search for Map Coloring:
+5. Ensure that the 'algorithm' variable is set to 'walksat', as noted on line 64. Also ensure that the **puzzle_name** and **problem_type** variables are both set to 
+'map_coloring' on lines 69 and 71.
+   ```
+   algorithm: str = 'walksat'
+   ...
+   puzzle_name: str = 'map_coloring'
+   ...
+   problem_type: str = 'map_coloring'
+   ```
+6. Run the following command to run the run_sat.py file.
+   1. `$ python3 run_sat.py`
+
+Feel free to change the configuration in the run_sat.py to experiment with different *p* values or test the algorithms
 on different .cnf puzzle files. 
