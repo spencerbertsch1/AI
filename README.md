@@ -23,3 +23,4 @@ Artificial Intelligence - Dartmouth Fall 2021
 [Logic](https://github.com/spencerbertsch1/AI/tree/main/Logic)
 * [GSAT Sudoku](https://github.com/spencerbertsch1/AI/blob/main/Logic/SAT.py)
 * [WalkSAT Sudoku](https://github.com/spencerbertsch1/AI/blob/main/Logic/SAT.py)
+* [WalkSAT Map Coloring](https://github.com/spencerbertsch1/AI/blob/main/Logic/SAT.py)
