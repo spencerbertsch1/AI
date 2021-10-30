@@ -21,14 +21,14 @@ Spencer Bertsch
     1. `$ cd Logic`
 
 ### To Run GSAT Search:
-3. Ensure that the 'algorithm' is set to 'gsat', as noted on line 64. 
+3. Ensure that the 'algorithm' variable is set to 'gsat', as noted on line 64. 
    1. `algorithm: str = 'gsat'`
 
 4. Run the following command to run the run_sat.py file.
     1. `$ python3 run_sat.py`
 
 ### To Run WalkSAT Search:
-3. Ensure that the 'algorithm' variables is set to 'walksat', as noted on line 64.
+3. Ensure that the 'algorithm' variable is set to 'walksat', as noted on line 64.
     1. `algorithm: str = 'walksat'`
 
 4. Run the following command to run the run_sat.py file.
