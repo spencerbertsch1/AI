@@ -22,7 +22,7 @@ of unsatisfied clauses reaches zero, then the search is finished, and we can ret
 
 In our case, we are working with boolean values that are always separated by an 'or' (∨) symbol. In this way, all we need to do is loop through
 our current assignment and compare each bool in each clause to the corresponding element of the assignment. If at least one of the assignment 
-values aligns with the clause, then that clause is satisfied and we can continue. If no values in the assignment align with any values in the clause, then 
+values aligns with the clause, then that clause is satisfied, and we can continue. If no values in the assignment align with any values in the clause, then 
 that clause is unsatisfied. 
 
 For example, a clause might be: 
@@ -82,7 +82,7 @@ I store all of the solutions in a directory called */solutions*.
 
 * A few notes on implementation of GSAT and WalkSAT: 
 
-I initially coded the solver using a direct assignment:
+I initially coded the solver using a direct assignment as seen below. 
 
 ```
 assignment: dict = {
@@ -93,7 +93,7 @@ assignment: dict = {
 }
 ```
 
-But this forces the solver to only work for this specific Sudoku problem. In order to fix this problem, 
+However, this forces the solver to only work for this specific Sudoku problem. In order to fix this problem, 
 I implemented an *encode/decode* dictionary which is used as a map between the assignment values and the cells in the sudoku board. 
 This *encode/decode* mapper is what allowed me to also implement the map coloring problem using GSAT and WalkSAT. 
 
@@ -114,7 +114,8 @@ assignment_decode: dict = {
 ```
 
 This seemingly pedantic step is what allows the solver to become dynamic and applicable to any problem, not just the sudoku problems
-in conjunctive normal form.
+in conjunctive normal form. Using the new solver, we could also solve problems such as the map_coloring problem, or any other constraint satisfaction 
+problem with relatively few variables in the assignment, and relatively few clauses. 
 
 # Evaluation
 
@@ -150,3 +151,59 @@ Puzzle 2 Solution:
 1 6 7 | 2 8 9 | 4 3 5
 9 8 4 | 3 5 1 | 6 7 2
 ```
+
+## Assignment Extensions
+
+In addition to solving the sudoku problem, I also implemented the Australia map coloring problem in CNF form and used WalkSAT to find a solution. 
+The solution that was provided by WalkSAT was the following: 
+
+I encoded the colors ('G', 'R', 'B') inside the CNF file so that each state can have one of the three colors, but not two colors. 
+
+For example, in order to show that the state 'WA' can only be red, green, or blue, we add the following clause:
+
+```
+-SA__G -SA__R
+-SA__G -SA__B
+-SA__B -SA__R
+```
+
+Additional clauses are needed to ensure that adjacent states are not the same color. An example showing that 'WA' cannot be the same color as 'NT' can be 
+seen below. 
+
+```
+-WA__G -NT__G
+-WA__R -NT__R
+-WA__B -NT__B
+```
+
+Lastly we need to add the clauses that ensure each state is assigned a color. For this we need to create True clauses that represent each state
+and each of the three colors: Red, Green, and Blue. An example Clause can be seen below. 
+
+```
+NSW_B NSW_G NSW_R
+```
+
+After making a few slight modifications to the helper functions in the SAT class and running WalkSAT on the map coloring problem, I got a correct solution! Seen below. 
+
+```
+walksat solution 
+Number of Tries: 1 
+Number of Flips: 11 
+Solved Board: {1: False, 2: False, 3: True, 4: True, 5: False, 6: False, 7: True, 8: False, 9: False, 10: False, 11: True, 12: False, 13: False, 14: False, 15: True, 16: True, 17: False, 18: False} 
+```
+
+Note that there are 18 resulting binary values which corresponds to three colors multiplied by six states in the map. Six of the 
+values are set to True, showing that one color has been chosen for each of the states in the map. Also note that Tazmania was excluded from this
+problem since there are no constraints and it can be any color. 
+
+The solution corresponds to the following assignment: 
+
+```
+{'NT__R': True, 'Q___B': True,'V___B': True, 'SA__G': True, 'NSW_R': True, 'WA__B': True}
+```
+
+The graph that corresponds to this assignment can be seen below. 
+
+<p align="center">
+    <img src="https://github.com/spencerbertsch1/AI/blob/main/Logic/docs/map_coloring_sol.png?raw=true" alt="sensorless_diagram" width="50%"/>
+</p>
