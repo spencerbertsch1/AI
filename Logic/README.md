@@ -35,7 +35,7 @@ Spencer Bertsch
     1. `$ python3 run_sat.py`
 
 ### To Run WalkSAT Search for Map Coloring:
-5. Ensure that the 'algorithm' variable is set to 'walksat', as noted on line 64. Also ensure that the **puzzle_name** and **problem_type** variables are both set to 
+3. Ensure that the 'algorithm' variable is set to 'walksat', as noted on line 64. Also ensure that the **puzzle_name** and **problem_type** variables are both set to 
 'map_coloring' on lines 69 and 71.
    ```
    algorithm: str = 'walksat'
@@ -44,8 +44,5 @@ Spencer Bertsch
    ...
    problem_type: str = 'map_coloring'
    ```
-6. Run the following command to run the run_sat.py file.
+4. Run the following command to run the run_sat.py file.
    1. `$ python3 run_sat.py`
-
-Feel free to change the configuration in the run_sat.py to experiment with different *p* values or test the algorithms
-on different .cnf puzzle files. 
