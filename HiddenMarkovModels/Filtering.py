@@ -23,6 +23,7 @@ class HMM:
         self.path_length = path_length
         self.starting_state = starting_state
         self.robot_path = self.generate_path()
+        self.ground_truth_states = self.generate_robot_path()
         self.sensor_readings = self.make_sensor_readings()
         self.transition_model = self.generate_transition_model()
 
@@ -117,6 +118,9 @@ class HMM:
 
             current_state = deepcopy(state)
 
+        if self.verbose:
+            print(f'Robot Path: {path}')
+
         return path
 
     def make_sensor_readings(self):
@@ -200,10 +204,6 @@ class HMM:
                     # the robot is against the right wall
                     current_matrix[row][col] = current_matrix[row][col] + 0.25
 
-                if self.verbose:
-                    self.pretty_print_maze(matrix=current_matrix,
-                                           maze_name=f'Transition_Model - Robot Position: {(row, col)}')
-
                 transition_model.append(current_matrix)
 
         return transition_model
@@ -225,13 +225,38 @@ class HMM:
 
         return matrix
 
+    def generate_robot_path(self):
+        """
+        Generates a list of matrices in which the robot's position is updated for each move in the move list
+        Note that sometimes the robot runs into a wall and doesn't actually move - this still uses a turn
+        :return:
+        """
+        robot_path = []
+
+        for position in self.robot_path:
+            maze = [[0 for x in range(4)] for x in range(4)]
+            row = position[0]
+            col = position[1]
+            maze[row][col] = '*'
+            robot_path.append(maze)
+
+        return robot_path
 
     def filtering(self):
         """
         Implement the filtering algorithm
+
+        initialize probability matrix as matrix of 0.0625 probabilities
+            loop through readings:
+                p_v = generate prediction vector
+                u_v = generate update vector
+                probability_matrix = prediction_vector * update_vector
+            return probability_matrix
         :return:
         """
-        color_matrix = self.maze
+
+        color_matrix: list = self.maze
+        transition_model: list = self.transition_model
 
         sensor_readings = self.sensor_readings
         if self.verbose:
@@ -243,7 +268,7 @@ class HMM:
         if self.verbose:
             self.pretty_print_maze(matrix=current_state_list, maze_name='Initial Probability Matrix')
 
-        for sensor_reading in sensor_readings:
+        for i, sensor_reading in enumerate(sensor_readings):
             # initialize prediction vector
             prediction_vector = [[0 for x in range(4)] for x in range(4)]
             # if the color of the ground truth matches the current sensor reading, then set the probability to 0.88
@@ -263,80 +288,47 @@ class HMM:
             next = [[0 for x in range(4)] for x in range(4)]
             for row in range(4):
                 for col in range(4):
-                    # FIXME create the real transition matrix later
-                    transition_model = [[1 for x in range(4)] for x in range(4)]
 
-                    # define m
+                    # # define m
+                    # # I think this section is the problem area... How do we use the
+                    # counter = 0
+                    # current_transition_model: np.array = np.array(transition_model[counter])
+                    # print(current_transition_model)
+                    # current_location = current_state[row][col]
+                    # m = current_transition_model * current_state
+                    # counter += 1
+                    # m_total: float = float(np.sum(m))
+                    # next[row][col] = m_total
+
+
+                    # define update vector (my update vector - next - is always a matrix of only ones!!)
+                    counter = 0
                     m = [[0 for x in range(4)] for x in range(4)]
                     for sub_row in range(4):
                         for sub_col in range(4):
-                            m = transition_model[sub_row][sub_col] * current_state[sub_row][sub_col]  # <-- might be (+)
-                    next[row][col] = sum(m)
+                            current_transition_model: np.array = np.array(transition_model[counter])
+                            m[sub_row][sub_col] = current_transition_model * current_state[sub_row][sub_col]
+                            counter += 1
 
-            prediction_vector = prediction_vector + np.array(next)
-            if self.verbose:
-                self.pretty_print_maze(matrix=prediction_vector, maze_name='Newly Updated Prediction Vector')
+                    # we then add the sum to the next matrix
+                    m_total: float = float(np.sum(m))
+                    next[row][col] = m_total
+
+            next_array = np.array(next)
+            prediction_vector_array = np.array(prediction_vector)
+            prediction_vector = prediction_vector_array + next_array  # <-- (+) or (*)
 
             current_state = self.normalize_matrix(prediction_vector)
 
-            print(current_state)
+            if self.verbose:
+                self.pretty_print_maze(matrix=self.ground_truth_states[i], maze_name=f'Ground Truth: X{i}')
+                self.pretty_print_maze(matrix=current_state, maze_name='Current State')
+            print('\n\n')
 
-        """
-            1. define the prediction vector (this part is done) 
-            
-            2. next = [[0 for x in range(4)] for x in range(4)]
-               for row in range(4)
-                  for col in range(4)
-                      transition_model = [[[]], [[]], ...]
-            
-                      m = [[0 for x in range(4)] for x in range(4)]
-                      for sub_row in range(4):
-                          for sub_col in range(4):
-                              m = transition_model[row][col] * current_state[row][col] 
-                      next[row][col] = sum(m) 
-                      
-            3. position_vector = np.array(next)
-            
-            4. current_state = normalize(position_vector)
-            
-            5. print(current_state, ground_truth) 
-            
-            """
-
-        # u_v = generate update vector
-        # get the possible positions for next moves
-        # update probabilities for next moves
-        # 16 4x4 matrices
-
-        print('\n\n\n')
-
-            # probability_matrix = prediction_vector * update_vector
-
-        # takes an initial probability matrix of
-        # [0.0625, 0.0625, 0.0625, 0.0625]
-        # [0.0625, 0.0625, 0.0625, 0.0625]
-        # [0.0625, 0.0625, 0.0625, 0.0625]
-        # [0.0625, 0.0625, 0.0625, 0.0625]
-
-        # as it explores, it updates the probability matrix, then returns the resulting matrix
-
-        """
-        def filter(sensor_readings):
-            initialize probability matrix as matrix of 0.0625 probabilities 
-            
-            loop through readings:
-                p_v = generate prediction vector
-                
-                u_v = generate update vector
-                
-                probability_matrix = prediction_vector * update_vector
-                
-            return probability_matrix
-        """
-        return []
+        return current_state
 
 
 if __name__ == "__main__":
-    h = HMM(starting_state=(0, 0), path_length=20, verbose=True)
+    h = HMM(starting_state=(0, 0), path_length=25, verbose=True)
     h.pretty_print_maze(matrix=h.maze, maze_name='Maze')
     h.filtering()
