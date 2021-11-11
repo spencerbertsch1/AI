@@ -24,18 +24,16 @@ class HMM:
         self.starting_state = starting_state
         self.robot_path = self.generate_path()
         self.sensor_readings = self.make_sensor_readings()
+        # self.update_vector = self.generate_update_vector()
 
     @staticmethod
-    def pretty_print_maze(matrix: list, maze: bool):
+    def pretty_print_maze(matrix: list, maze_name: str):
         """
         Print the maze or the probability matrix in a nice format
         :param matrix: list of lists representing the maze or the probability matix
         :return: N/A
         """
-        if maze:
-            print(f'----- MAZE -----')
-        else:
-            print(f'----- Probability Matrix -----')
+        print(f'----- {maze_name} -----')
         for row in matrix:
             print(f'{row}')
 
@@ -154,27 +152,94 @@ class HMM:
 
         return sensor_readings
 
-    def filtering(self) -> list:
+    def generate_tranition_model(self, maze_size: int):
         """
-
+        Generate the update vector
+        :param: length of one side of the square maze
         :return:
         """
+        total_vector = []
+
+        for i in range(4):
+            for j in range(4):
+                pass
+
+    def filtering(self) -> list:
+        """
+        Implement the filtering algorithm
+        :return:
+        """
+        color_matrix = self.maze
+
         sensor_readings = self.sensor_readings
         if self.verbose:
             print(f'SENSOR READINGS: \n {sensor_readings}')
 
         # define the initial probability matrix with values of 0.0625 in each cell
-        initial_matrix = [[0.0625 for x in range(4)] for x in range(4)]
+        current_state_list = [[0.0625 for x in range(4)] for x in range(4)]
+        current_state = np.array(current_state_list)
         if self.verbose:
-            self.pretty_print_maze(matrix=initial_matrix, maze=False)
+            self.pretty_print_maze(matrix=current_state_list, maze_name='Initial Probability Matrix')
 
         for sensor_reading in sensor_readings:
-            # p_v = generate prediction vector
+            # initialize prediction vector
+            prediction_vector = [[0 for x in range(4)] for x in range(4)]
+            # if the color of the ground truth matches the current sensor reading, then set the probability to 0.88
+            for row in range(4):
+                for col in range(4):
+                    if color_matrix[row][col] == sensor_reading:
+                        prediction_vector[row][col] = 0.88
+            # if the color of the ground truth doesn't match the current sensor reading, set the probability to 0.04
+            for row in range(4):
+                for col in range(4):
+                    if prediction_vector[row][col] == 0:
+                        prediction_vector[row][col] = 0.04
+
+            if self.verbose:
+                self.pretty_print_maze(matrix=prediction_vector, maze_name='Prediction Vector')
+
+            for row in range(4):
+                for col in range(4):
+                    # FIXME create the real transition matrix later
+                    transition_model = [[1 for x in range(4)] for x in range(4)]
+
+                    m = transition_model[row][col] * current_state[row][col]
+
+            """
+            1. define the prediction vector (this part is done) 
+            
+            2. next = [[0 for x in range(4)] for x in range(4)]
+               for row in range(4)
+                  for col in range(4)
+                      transition_model = [[[]], [[]], ...]
+            
+                      m = [[0 for x in range(4)] for x in range(4)]
+                      for sub_row in range(4):
+                          for sub_col in range(4):
+                              m = transition_model[row][col] * current_state[row][col] 
+                      next[row][col] = sum(m) 
+                      
+            3. position_vector = np.array(next)
+            
+            4. current_state = normalize(position_vector)
+            
+            5. print(current_state, ground_truth) 
+            
+            """
+
 
             # u_v = generate update vector
+            # get the possible positions for next moves
+            # update probabilities for next moves
+            # 16 4x4 matrices
+
+            print('\n\n\n')
 
             # probability_matrix = prediction_vector * update_vector
             pass
+
+
+
 
         # takes an initial probability matrix of
         # [0.0625, 0.0625, 0.0625, 0.0625]
@@ -199,7 +264,8 @@ class HMM:
         """
         return []
 
+
 if __name__ == "__main__":
     h = HMM(starting_state=(0, 0), path_length=20, verbose=True)
-    h.pretty_print_maze(matrix=h.maze, maze=True)
+    h.pretty_print_maze(matrix=h.maze, maze_name='Maze')
     h.filtering()
