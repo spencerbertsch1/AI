@@ -44,7 +44,7 @@ class HMM:
             row = []
             for j in range(4):
                 color = random.choice(self.colors)
-                encoded_color = self.maze_map[color]  # <- use encoded color if strings are'nt a good implementation
+                encoded_color = self.maze_map[color]  # <- use encoded color if ints are more useful than strings
                 row.append(color)
             maze.append(row)
         return maze
@@ -146,7 +146,8 @@ class HMM:
                 choices.append(other_color)
 
             # here we simulate the sensor reading (88% chance of getting it right, and 12% chance of getting it wrong)
-            sensor_reading_array: str = np.random.choice(a=choices, size=1, p=[0.88, 0.04, 0.04, 0.04])
+            # sensor_reading_array: str = np.random.choice(a=choices, size=1, p=[0.88, 0.04, 0.04, 0.04])
+            sensor_reading_array: str = np.random.choice(a=choices, size=1, p=[1, 0, 0, 0])  # <-- TODO remove and use the above line, just for testing
             sensor_reading = sensor_reading_array[0]
             if self.verbose:
                 if ground_truth != sensor_reading:
@@ -269,6 +270,7 @@ class HMM:
             self.pretty_print_maze(matrix=current_state_list, maze_name='Initial Probability Matrix')
 
         for i, sensor_reading in enumerate(sensor_readings):
+            print(f'\n\n\n Output for Time t={i}')
             # initialize prediction vector
             prediction_vector = [[0 for x in range(4)] for x in range(4)]
             # if the color of the ground truth matches the current sensor reading, then set the probability to 0.88
@@ -285,50 +287,31 @@ class HMM:
             if self.verbose:
                 self.pretty_print_maze(matrix=prediction_vector, maze_name='Prediction Vector')
 
-            next = [[0 for x in range(4)] for x in range(4)]
+            transition = np.array([[0 for x in range(4)] for x in range(4)])
             for row in range(4):
                 for col in range(4):
+                    # multiply the transition vector by the current_state
+                    for transition_state in range(16):
+                        current_transition_model: np.array = np.array(transition_model[transition_state])
+                        transition = transition + (current_transition_model * current_state)
 
-                    # # define m
-                    # # I think this section is the problem area... How do we use the
-                    # counter = 0
-                    # current_transition_model: np.array = np.array(transition_model[counter])
-                    # print(current_transition_model)
-                    # current_location = current_state[row][col]
-                    # m = current_transition_model * current_state
-                    # counter += 1
-                    # m_total: float = float(np.sum(m))
-                    # next[row][col] = m_total
-
-
-                    # define update vector (my update vector - next - is always a matrix of only ones!!)
-                    counter = 0
-                    m = [[0 for x in range(4)] for x in range(4)]
-                    for sub_row in range(4):
-                        for sub_col in range(4):
-                            current_transition_model: np.array = np.array(transition_model[counter])
-                            m[sub_row][sub_col] = current_transition_model * current_state[sub_row][sub_col]
-                            counter += 1
-
-                    # we then add the sum to the next matrix
-                    m_total: float = float(np.sum(m))
-                    next[row][col] = m_total
-
-            next_array = np.array(next)
+            transition_array = np.array(transition)
+            self.pretty_print_maze(matrix=transition, maze_name=f'Transition Matrix')
             prediction_vector_array = np.array(prediction_vector)
-            prediction_vector = prediction_vector_array + next_array  # <-- (+) or (*)
+            prediction_vector = prediction_vector_array * transition_array  # <-- (+) or (*)
 
             current_state = self.normalize_matrix(prediction_vector)
 
             if self.verbose:
                 self.pretty_print_maze(matrix=self.ground_truth_states[i], maze_name=f'Ground Truth: X{i}')
                 self.pretty_print_maze(matrix=current_state, maze_name='Current State')
-            print('\n\n')
+
+
 
         return current_state
 
 
 if __name__ == "__main__":
-    h = HMM(starting_state=(0, 0), path_length=25, verbose=True)
+    h = HMM(starting_state=(0, 0), path_length=100, verbose=True)
     h.pretty_print_maze(matrix=h.maze, maze_name='Maze')
     h.filtering()
