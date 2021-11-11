@@ -287,18 +287,19 @@ class HMM:
             if self.verbose:
                 self.pretty_print_maze(matrix=prediction_vector, maze_name='Prediction Vector')
 
+            # create the transition array
             transition = np.array([[0 for x in range(4)] for x in range(4)])
             for row in range(4):
                 for col in range(4):
                     # multiply the transition vector by the current_state
                     for transition_state in range(16):
                         current_transition_model: np.array = np.array(transition_model[transition_state])
-                        transition = transition + (current_transition_model * current_state)
+                        transition = transition + np.multiply(current_transition_model, current_state)  #
 
             transition_array = np.array(transition)
             self.pretty_print_maze(matrix=transition, maze_name=f'Transition Matrix')
             prediction_vector_array = np.array(prediction_vector)
-            prediction_vector = prediction_vector_array * transition_array  # <-- (+) or (*)
+            prediction_vector = np.multiply(prediction_vector_array, transition_array)  # <-- (+) or (*)
 
             current_state = self.normalize_matrix(prediction_vector)
 
@@ -306,12 +307,10 @@ class HMM:
                 self.pretty_print_maze(matrix=self.ground_truth_states[i], maze_name=f'Ground Truth: X{i}')
                 self.pretty_print_maze(matrix=current_state, maze_name='Current State')
 
-
-
         return current_state
 
 
 if __name__ == "__main__":
-    h = HMM(starting_state=(0, 0), path_length=100, verbose=True)
+    h = HMM(starting_state=(0, 0), path_length=10, verbose=True)
     h.pretty_print_maze(matrix=h.maze, maze_name='Maze')
     h.filtering()
