@@ -162,19 +162,49 @@ class HMM:
 
         empty_matrix = [[0 for x in range(4)] for x in range(4)]
 
+        # here we iterate through each cell in the maze and find the probability of moving in each direction
         for row in range(4):
             for col in range(4):
 
-                cell = (row, col)
                 current_matrix = deepcopy(empty_matrix)
 
                 # get the cell north - if it's open, then make it 0.25, if not then add 0.25 to the existing cell
+                north_cell = (row-1, col)
+                if north_cell[0] >= 0:
+                    current_matrix[row-1][col] = 0.25
+                else:
+                    # the robot is against the north wall
+                    current_matrix[row][col] = current_matrix[row][col] + 0.25
 
                 # get the cell east - if it's open, then make it 0.25, if not then add 0.25 to the existing cell
+                east_cell = (row, col+1)
+                if east_cell[1] <= 3:
+                    current_matrix[row][col+1] = 0.25
+                else:
+                    # the robot is against the right wall
+                    current_matrix[row][col] = current_matrix[row][col] + 0.25
 
                 # get the cell south - if it's open, then make it 0.25, if not then add 0.25 to the existing cell
+                south_cell = (row+1, col)
+                if south_cell[0] <= 3:
+                    current_matrix[row+1][col] = 0.25
+                else:
+                    # the robot is against the north wall
+                    current_matrix[row][col] = current_matrix[row][col] + 0.25
 
                 # get the cell west - if it's open, then make it 0.25, if not then add 0.25 to the existing cell
+                west_cell = (row, col-1)
+                if west_cell[1] >= 0:
+                    current_matrix[row][col-1] = 0.25
+                else:
+                    # the robot is against the right wall
+                    current_matrix[row][col] = current_matrix[row][col] + 0.25
+
+                if self.verbose:
+                    self.pretty_print_maze(matrix=current_matrix,
+                                           maze_name=f'Transition_Model - Robot Position: {(row, col)}')
+
+                transition_model.append(current_matrix)
 
         return transition_model
 
