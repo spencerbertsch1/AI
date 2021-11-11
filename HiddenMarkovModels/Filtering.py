@@ -168,23 +168,13 @@ class HMM:
                 cell = (row, col)
                 current_matrix = deepcopy(empty_matrix)
 
-                # top left corner
-                if (cell[0] == 0) & (cell[1] == 0):
-                    current_matrix[row][col] = 0.50
-                    current_matrix[row][col+1] = 0.25
-                    current_matrix[row+1][col] = 0.25
-                    transition_model.append(current_matrix)
+                # get the cell north - if it's open, then make it 0.25, if not then add 0.25 to the existing cell
 
-                    self.pretty_print_maze(matrix=current_matrix, maze_name='One of many transition_models...')
+                # get the cell east - if it's open, then make it 0.25, if not then add 0.25 to the existing cell
 
-                # top right corner
-                if (cell[0] == maze_size-1) & (cell[1] == 0):
-                    current_matrix[row][col] = 0.50
-                    current_matrix[row][col+1] = 0.25
-                    current_matrix[row-1][col] = 0.25
-                    transition_model.append(current_matrix)
+                # get the cell south - if it's open, then make it 0.25, if not then add 0.25 to the existing cell
 
-                    self.pretty_print_maze(matrix=current_matrix, maze_name='One of many transition_models...')
+                # get the cell west - if it's open, then make it 0.25, if not then add 0.25 to the existing cell
 
         return transition_model
 
