@@ -24,7 +24,7 @@ class HMM:
         self.starting_state = starting_state
         self.robot_path = self.generate_path()
         self.sensor_readings = self.make_sensor_readings()
-        # self.update_vector = self.generate_update_vector()
+        self.transition_model = self.generate_transition_model()
 
     @staticmethod
     def pretty_print_maze(matrix: list, maze_name: str):
@@ -152,19 +152,61 @@ class HMM:
 
         return sensor_readings
 
-    def generate_tranition_model(self, maze_size: int):
+    def generate_transition_model(self, maze_size: int = 4) -> list:
         """
         Generate the update vector
         :param: length of one side of the square maze
         :return:
         """
-        total_vector = []
+        transition_model = []
+
+        empty_matrix = [[0 for x in range(4)] for x in range(4)]
+
+        for row in range(4):
+            for col in range(4):
+
+                cell = (row, col)
+                current_matrix = deepcopy(empty_matrix)
+
+                # top left corner
+                if (cell[0] == 0) & (cell[1] == 0):
+                    current_matrix[row][col] = 0.50
+                    current_matrix[row][col+1] = 0.25
+                    current_matrix[row+1][col] = 0.25
+                    transition_model.append(current_matrix)
+
+                    self.pretty_print_maze(matrix=current_matrix, maze_name='One of many transition_models...')
+
+                # top right corner
+                if (cell[0] == maze_size-1) & (cell[1] == 0):
+                    current_matrix[row][col] = 0.50
+                    current_matrix[row][col+1] = 0.25
+                    current_matrix[row-1][col] = 0.25
+                    transition_model.append(current_matrix)
+
+                    self.pretty_print_maze(matrix=current_matrix, maze_name='One of many transition_models...')
+
+        return transition_model
+
+    def normalize_matrix(self, matrix):
+        """
+        Sum everything in the array and divide by the sum
+        :param matrix:
+        :return:
+        """
+        sum = 0
+        for i in range(4):
+            for j in range(4):
+                sum = sum + matrix[i][j]
 
         for i in range(4):
             for j in range(4):
-                pass
+                matrix[i][j] = matrix[i][j] / sum
 
-    def filtering(self) -> list:
+        return matrix
+
+
+    def filtering(self):
         """
         Implement the filtering algorithm
         :return:
@@ -198,14 +240,28 @@ class HMM:
             if self.verbose:
                 self.pretty_print_maze(matrix=prediction_vector, maze_name='Prediction Vector')
 
+            next = [[0 for x in range(4)] for x in range(4)]
             for row in range(4):
                 for col in range(4):
                     # FIXME create the real transition matrix later
                     transition_model = [[1 for x in range(4)] for x in range(4)]
 
-                    m = transition_model[row][col] * current_state[row][col]
+                    # define m
+                    m = [[0 for x in range(4)] for x in range(4)]
+                    for sub_row in range(4):
+                        for sub_col in range(4):
+                            m = transition_model[sub_row][sub_col] * current_state[sub_row][sub_col]  # <-- might be (+)
+                    next[row][col] = sum(m)
 
-            """
+            prediction_vector = prediction_vector + np.array(next)
+            if self.verbose:
+                self.pretty_print_maze(matrix=prediction_vector, maze_name='Newly Updated Prediction Vector')
+
+            current_state = self.normalize_matrix(prediction_vector)
+
+            print(current_state)
+
+        """
             1. define the prediction vector (this part is done) 
             
             2. next = [[0 for x in range(4)] for x in range(4)]
@@ -227,19 +283,14 @@ class HMM:
             
             """
 
+        # u_v = generate update vector
+        # get the possible positions for next moves
+        # update probabilities for next moves
+        # 16 4x4 matrices
 
-            # u_v = generate update vector
-            # get the possible positions for next moves
-            # update probabilities for next moves
-            # 16 4x4 matrices
-
-            print('\n\n\n')
+        print('\n\n\n')
 
             # probability_matrix = prediction_vector * update_vector
-            pass
-
-
-
 
         # takes an initial probability matrix of
         # [0.0625, 0.0625, 0.0625, 0.0625]
