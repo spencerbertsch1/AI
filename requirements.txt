@@ -2,3 +2,4 @@ grip==4.5.2
 python-chess==1.999
 PyQt5==5.15.4
 numpy==1.21.4
+matplotlib==3.4.3
