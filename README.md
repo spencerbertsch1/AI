@@ -24,3 +24,6 @@ Artificial Intelligence - Dartmouth Fall 2021
 * [GSAT Sudoku](https://github.com/spencerbertsch1/AI/blob/main/Logic/SAT.py)
 * [WalkSAT Sudoku](https://github.com/spencerbertsch1/AI/blob/main/Logic/SAT.py)
 * [WalkSAT Map Coloring](https://github.com/spencerbertsch1/AI/blob/main/Logic/SAT.py)
+
+[Hidden Markov Models](https://github.com/spencerbertsch1/AI/tree/main/HiddenMarkovModels)
+* [Filtering - Robot Localization](https://github.com/spencerbertsch1/AI/blob/main/HiddenMarkovModels/Filtering.py)
