@@ -2,7 +2,7 @@
 import numpy as np
 from copy import deepcopy
 import random
-random.seed(5)
+random.seed(3)
 
 
 class HMM:
@@ -289,16 +289,18 @@ class HMM:
 
             # create the transition array
             transition = np.array([[0 for x in range(4)] for x in range(4)])
+            counter = 0
             for row in range(4):
                 for col in range(4):
                     # multiply the transition vector by the current_state
-                    for transition_state in range(16):
-                        current_transition_model: np.array = np.array(transition_model[transition_state])
-                        transition = transition + np.multiply(current_transition_model, current_state)  #
+                    current_transition_model: np.array = np.array(transition_model[counter])
+                    transition = transition + np.multiply(current_transition_model, current_state[row][col])
+                    counter += 1
 
             transition_array = np.array(transition)
             self.pretty_print_maze(matrix=transition, maze_name=f'Transition Matrix')
             prediction_vector_array = np.array(prediction_vector)
+
             prediction_vector = np.multiply(prediction_vector_array, transition_array)  # <-- (+) or (*)
 
             current_state = self.normalize_matrix(prediction_vector)
