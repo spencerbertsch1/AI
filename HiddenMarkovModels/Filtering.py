@@ -1,8 +1,41 @@
+# Spencer Bertsch
+# October 2021
+# Assignment 6
+# CS 276 @ Dartmouth College
 
+import matplotlib.pylab as plt
 import numpy as np
 from copy import deepcopy
 import random
-random.seed(4)  # <-- use seed of 3 to create base maze
+random.seed(4)
+
+
+def heatmap(ground_truth_array: np.array, curr_state_array: np.array):
+    """
+    Simple utility function to generate some nice heatmaps of the outputs
+
+    :return:
+    """
+
+    # Basic Configuration
+    fig, axes = plt.subplots(ncols=2, figsize=(12, 12))
+    ax1, ax2 = axes
+    cmap = 'viridis'
+
+    # Heat maps.
+    im1 = ax1.matshow(ground_truth_array, cmap=cmap)
+    im2 = ax2.matshow(curr_state_array, cmap=cmap)
+
+    ax1.set_title('Ground Truth: Robot Location', y=-0.1, fontsize=24)
+    plt.setp(ax1.get_xticklabels(), rotation=45, ha='left', rotation_mode='anchor')
+    plt.colorbar(im1, fraction=0.045, pad=0.05, ax=ax1)
+
+    ax2.set_title('Current State: X(t)', y=-0.1, fontsize=24)
+    plt.setp(ax2.get_xticklabels(), rotation=45, ha='left', rotation_mode='anchor')
+    plt.colorbar(im2, fraction=0.045, pad=0.05, ax=ax2)
+
+    fig.tight_layout()
+    fig.show()
 
 
 class HMM:
@@ -17,8 +50,9 @@ class HMM:
     # define the colors of the board
     colors = ['R', 'B', 'G', 'Y']
 
-    def __init__(self, path_length: int, starting_state: tuple, verbose: bool):
+    def __init__(self, path_length: int, starting_state: tuple, verbose: bool, show_heatmaps: bool):
         self.verbose = verbose
+        self.show_heatmaps = show_heatmaps
         self.maze = self.generate_maze()
         self.path_length = path_length
         self.starting_state = starting_state
@@ -238,7 +272,7 @@ class HMM:
             maze = [[0 for x in range(4)] for x in range(4)]
             row = position[0]
             col = position[1]
-            maze[row][col] = '*'
+            maze[row][col] = 1
             robot_path.append(maze)
 
         return robot_path
@@ -297,9 +331,6 @@ class HMM:
                     transition = transition + np.multiply(current_transition_model, current_state[row][col])
                     counter += 1
 
-            if i > 5:
-                print('something')
-
             transition_array = np.array(transition)
             self.pretty_print_maze(matrix=transition, maze_name=f'Transition Matrix')
             prediction_vector_array = np.array(prediction_vector)
@@ -311,12 +342,16 @@ class HMM:
             if self.verbose:
                 self.pretty_print_maze(matrix=self.ground_truth_states[i], maze_name=f'Ground Truth: X{i}')
                 self.pretty_print_maze(matrix=current_state, maze_name='Current State')
-                print('something')
+
+            if self.show_heatmaps:
+                # we need to suppress output even more here so we don't end up with 100 solution heatmaps
+                if i % 5 == 0:
+                    heatmap(ground_truth_array=np.array(self.ground_truth_states[i]), curr_state_array=current_state)
 
         return current_state
 
 
 if __name__ == "__main__":
-    h = HMM(starting_state=(0, 0), path_length=50, verbose=True)
+    h = HMM(starting_state=(0, 0), path_length=30, verbose=True, show_heatmaps=True)
     h.pretty_print_maze(matrix=h.maze, maze_name='Maze')
     h.filtering()
