@@ -2,7 +2,7 @@
 import numpy as np
 from copy import deepcopy
 import random
-random.seed(3)
+random.seed(4)  # <-- use seed of 3 to create base maze
 
 
 class HMM:
@@ -297,6 +297,9 @@ class HMM:
                     transition = transition + np.multiply(current_transition_model, current_state[row][col])
                     counter += 1
 
+            if i > 5:
+                print('something')
+
             transition_array = np.array(transition)
             self.pretty_print_maze(matrix=transition, maze_name=f'Transition Matrix')
             prediction_vector_array = np.array(prediction_vector)
@@ -308,11 +311,12 @@ class HMM:
             if self.verbose:
                 self.pretty_print_maze(matrix=self.ground_truth_states[i], maze_name=f'Ground Truth: X{i}')
                 self.pretty_print_maze(matrix=current_state, maze_name='Current State')
+                print('something')
 
         return current_state
 
 
 if __name__ == "__main__":
-    h = HMM(starting_state=(0, 0), path_length=10, verbose=True)
+    h = HMM(starting_state=(0, 0), path_length=50, verbose=True)
     h.pretty_print_maze(matrix=h.maze, maze_name='Maze')
     h.filtering()
