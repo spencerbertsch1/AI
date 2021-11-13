@@ -17,11 +17,7 @@ This problem uses a Hidden Markov Model to approximate the location of a robot a
 The board squares are each colored either red, yellow, green, or blue, and the robot's only sensor is a color sensor pointing down 
 that is not always quite accurate. However! The robot knows what the board looks like before it starts, but it doesn't know where it's starting from. 
 The job of the filtering algorithm is to generate a probability distribution that eventually finds the most probable position of the robot simply given its
-transitions between colors as the robot moves across the board. 
-
-<p align="center">
-    <img src="https://github.com/spencerbertsch1/AI/blob/main/HiddenMarkovModels/docs/maze_setup.png?raw=true" alt="sensorless_diagram" width="60%"/>
-</p>
+transitions between colors as the robot moves across the board.
 
 The implemented algorithm is a filtering algorithm which takes a series of sensor readings - *E(t)* - and produces a probability matrix
 representing the distribution representing the likely locations of the robot for a certain time (t). 
