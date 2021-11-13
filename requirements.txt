@@ -3,3 +3,4 @@ python-chess==1.999
 PyQt5==5.15.4
 numpy==1.21.4
 matplotlib==3.4.3
+seaborn==0.11.2
