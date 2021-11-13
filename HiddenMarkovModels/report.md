@@ -37,23 +37,11 @@ likely position of the robot: (0, 2).
 in any of the states that it sees are blue.*
 
 <p align="center">
-| <br>
-| <br>
-v <br>
-</p>
-
-<p align="center">
     <img src="https://github.com/spencerbertsch1/AI/blob/main/HiddenMarkovModels/docs/solution_iteration_3.svg?raw=true" alt="sensorless_diagram" width="60%"/>
 </p>
 
 *Figure 2: Ground truth function of state at time t=3 with the robot in cell (1, 0). After only three moves, we can already see
 that the Current state lists the true location as the most probable, but we can get better!*
-
-<p align="center">
-| <br>
-| <br>
-v <br>
-</p>
 
 <p align="center">
     <img src="https://github.com/spencerbertsch1/AI/blob/main/HiddenMarkovModels/docs/solution_iteration_9.svg?raw=true" alt="sensorless_diagram" width="60%"/>
