@@ -1,16 +1,18 @@
 # Spencer Bertsch
-# October 2021
+# November 2021
 # Assignment 6
 # CS 276 @ Dartmouth College
 
+from copy import deepcopy
+import random
+import seaborn as sns
 from pathlib import Path
 import matplotlib.pylab as plt
 from matplotlib.colors import LogNorm
 import numpy as np
-from copy import deepcopy
-import random
-import seaborn as sns
+np.random.seed(1)
 random.seed(4)
+
 
 # define paths to save heatmap files of solutions
 PATH_TO_THIS_FILE: Path = Path(__file__).resolve()
