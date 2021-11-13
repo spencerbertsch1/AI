@@ -3,39 +3,48 @@
 # Assignment 6
 # CS 276 @ Dartmouth College
 
+from pathlib import Path
 import matplotlib.pylab as plt
+from matplotlib.colors import LogNorm
 import numpy as np
 from copy import deepcopy
 import random
+import seaborn as sns
 random.seed(4)
 
+# define paths to save heatmap files of solutions
+PATH_TO_THIS_FILE: Path = Path(__file__).resolve()
+ABSPATH_TO_DOCS: Path = PATH_TO_THIS_FILE.parent / 'docs'
 
-def heatmap(ground_truth_array: np.array, curr_state_array: np.array):
+
+def heatmap(ground_truth_array: np.array, curr_state_array: np.array, i: int):
     """
-    Simple utility function to generate some nice heatmaps of the outputs
-
-    :return:
+    Simple utility function to generate some nice heatmaps of the outputs.
+    This let's us make sure that the probability distribution found in the state X(t)
+    really represents the location of the robot.
+    :return: NA
     """
 
-    # Basic Configuration
-    fig, axes = plt.subplots(ncols=2, figsize=(12, 12))
-    ax1, ax2 = axes
-    cmap = 'viridis'
+    # round the probability matrix for better annotation in plotting
+    curr_state_array = np.around(curr_state_array, decimals=4)
 
-    # Heat maps.
-    im1 = ax1.matshow(ground_truth_array, cmap=cmap)
-    im2 = ax2.matshow(curr_state_array, cmap=cmap)
+    fig, ax = plt.subplots(1, 2)
 
-    ax1.set_title('Ground Truth: Robot Location', y=-0.1, fontsize=24)
-    plt.setp(ax1.get_xticklabels(), rotation=45, ha='left', rotation_mode='anchor')
-    plt.colorbar(im1, fraction=0.045, pad=0.05, ax=ax1)
+    # plot the ground truth
+    sns.heatmap(ground_truth_array, ax=ax[0], linewidths=.5,
+                cmap="YlGnBu", square=True, annot=True, cbar=False).set(title='Ground Truth (Robot Position)')
 
-    ax2.set_title('Current State: X(t)', y=-0.1, fontsize=24)
-    plt.setp(ax2.get_xticklabels(), rotation=45, ha='left', rotation_mode='anchor')
-    plt.colorbar(im2, fraction=0.045, pad=0.05, ax=ax2)
+    # plot the current state
+    sns.heatmap(curr_state_array, ax=ax[1], linewidths=.5,
+                cmap="YlGnBu", square=True, annot=True, cbar=False,
+                norm=LogNorm()).set(title=f'Current State X(time={i})')
 
-    fig.tight_layout()
-    fig.show()
+    # save the figure to the /docs directory
+    plot_name: str = f'solution_iteration_{i}_random.svg'
+    save_path: Path = ABSPATH_TO_DOCS / plot_name
+    plt.savefig(str(save_path))
+
+    plt.show()
 
 
 class HMM:
@@ -180,8 +189,10 @@ class HMM:
                 choices.append(other_color)
 
             # here we simulate the sensor reading (88% chance of getting it right, and 12% chance of getting it wrong)
-            # sensor_reading_array: str = np.random.choice(a=choices, size=1, p=[0.88, 0.04, 0.04, 0.04])
-            sensor_reading_array: str = np.random.choice(a=choices, size=1, p=[1, 0, 0, 0])  # <-- TODO remove and use the above line, just for testing
+            sensor_reading_array: str = np.random.choice(a=choices, size=1, p=[0.88, 0.04, 0.04, 0.04])
+
+            # we can use the below line to test the optimal ability of the system (given a perfectly performing sensor)
+            # sensor_reading_array: str = np.random.choice(a=choices, size=1, p=[1, 0, 0, 0])
             sensor_reading = sensor_reading_array[0]
             if self.verbose:
                 if ground_truth != sensor_reading:
@@ -304,7 +315,9 @@ class HMM:
             self.pretty_print_maze(matrix=current_state_list, maze_name='Initial Probability Matrix')
 
         for i, sensor_reading in enumerate(sensor_readings):
-            print(f'\n\n\n Output for Time t={i}')
+            if self.verbose:
+                print(f'\n\n\n Output for Time t={i}')
+
             # initialize prediction vector
             prediction_vector = [[0 for x in range(4)] for x in range(4)]
             # if the color of the ground truth matches the current sensor reading, then set the probability to 0.88
@@ -332,7 +345,6 @@ class HMM:
                     counter += 1
 
             transition_array = np.array(transition)
-            self.pretty_print_maze(matrix=transition, maze_name=f'Transition Matrix')
             prediction_vector_array = np.array(prediction_vector)
 
             prediction_vector = np.multiply(prediction_vector_array, transition_array)  # <-- (+) or (*)
@@ -345,13 +357,18 @@ class HMM:
 
             if self.show_heatmaps:
                 # we need to suppress output even more here so we don't end up with 100 solution heatmaps
-                if i % 5 == 0:
-                    heatmap(ground_truth_array=np.array(self.ground_truth_states[i]), curr_state_array=current_state)
+                if i % 3 == 0:
+                    heatmap(ground_truth_array=np.array(self.ground_truth_states[i]), curr_state_array=current_state,
+                            i=i)
 
         return current_state
 
 
+# test code
 if __name__ == "__main__":
-    h = HMM(starting_state=(0, 0), path_length=30, verbose=True, show_heatmaps=True)
+    h = HMM(starting_state=(0, 0),
+            path_length=12,
+            verbose=True,
+            show_heatmaps=False)  # <-- heatmaps require matplotlib and seaborn to be installed! See requirements.txt
     h.pretty_print_maze(matrix=h.maze, maze_name='Maze')
     h.filtering()
