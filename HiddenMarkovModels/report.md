@@ -19,6 +19,10 @@ that is not always quite accurate. However! The robot knows what the board looks
 The job of the filtering algorithm is to generate a probability distribution that eventually finds the most probable position of the robot simply given its
 transitions between colors as the robot moves across the board. 
 
+<p align="center">
+    <img src="https://github.com/spencerbertsch1/AI/blob/main/HiddenMarkovModels/docs/maze_setup.png?raw=true" alt="sensorless_diagram" width="60%"/>
+</p>
+
 The implemented algorithm is a filtering algorithm which takes a series of sensor readings - *E(t)* - and produces a probability matrix
 representing the distribution representing the likely locations of the robot for a certain time (t). 
 
@@ -55,6 +59,42 @@ Then the sensor reading would likely be Blue. In that case, the Sensor Model wou
 The sensor model reflects an equal probability of the robot being in any of the blue cells. 
 
 ### The Transition Model
+
+The transition model is the heart of the filtering algorithm. In order to produce the transition vector at each iteration, 
+we loop through each cell in the maze and multiply a matrix representation of the likelyhood of the robot's new position given random movement *if* the robot 
+were in that cell by the scalar value of the *Current State* for that given cell value. See the Filtering_Diagram.pdf in the `docs` directory for a better description. 
+
+<p align="center">
+    <img src="https://github.com/spencerbertsch1/AI/blob/main/HiddenMarkovModels/docs/trans_vec_calc.png?raw=true" alt="sensorless_diagram" width="98%"/>
+</p>
+
+In short, we take the cumulative sum of each of the individual transition matrices multiplied by the current state at each of the respective cells in the maze. This cumulative sum is what gives us the transition
+vector! This transition vector (or transition model) is extremely important because we then use it to compute the new *Current State*. 
+
+### How each distribution of states is computed 
+
+In order to understand the algorithm fully myself, I laid out the pseudocode visually. At first I didn't understand what values needed to be represented as matrices and what values
+should be scalars, so I made a Draw.io diagram of the algorithm logic. Please see the PDF in the `docs` directory for a high  
+resolution visual representation of the filtering algorithm. In addition to the visual representation of the algorithm, I will also go through each step here. 
+
+The distribution of states is computed using the filtering algorithm that takes a list of sensor readings as input. As described above in the *Sensor Model* and *Transition Model* sections, 
+we first compute the sensor model matrix which represents a 0.88 probability for each of the positions that match the color that was just sensed, and 0.04 everywhere else. We then 
+create the transition model in which we take the cumulative sum of each of the transition matrices multiplied byt eh *Current State* at each cell. 
+
+After this, we multiply the prediction vector and the transition vector using element-wise multiplication using the Numpy python scientific computing library to generate a new prediction vector. At this point we're almost done, 
+we just need to normalize the new prediction vector. This is needed because we want a matrix of probabilities, but at this point the sum of the matrix elements will likely not equal one. 
+I do this by simply summing all the values in the matrix and then dividing each element by the sum. And that's it! Here we can print the ground truth to see 
+where the robot is, and we can also print the *Current State* to see how close our distribution matches the ground truth. 
+
+
+### What design decisions did you make?
+
+I created a HMM (hidden markov model) class, and I placed all the methods that I needed to initialize the maze inside that class. 
+I also implemented the Filtering algorithm as a method of that class and used several helpful instance variables such as the transition vector (which 
+I pre-computer once to save time) and the sensor readings, ground truth state, robot path, etc. 
+
+I also made the design decision to create heatmaps in order to view the performance of the *Current State* compared to the ground truth location of the robot in the maze. 
+See the end of this report to find some examples of how performant the *Current State* at time steps t=0, t=3, and t=9. 
 
 
 # Evaluation
